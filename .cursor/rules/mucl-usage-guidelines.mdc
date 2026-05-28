@@ -1,0 +1,324 @@
+---
+description: Design usage rules extracted from MUCL Storybook documentation (.mdx files). Enforces correct component selection, composition, and content formatting.
+globs:
+alwaysApply: true
+---
+
+# MUCL Usage Guidelines
+
+> Sourced from MUCL component Storybook documentation. This is a living document — coverage will expand as new `.mdx` files are approved. What is here is correct; gaps are expected.
+
+Rules are classified as **Hard** (AI must refuse/redirect) or **Soft** (AI should suggest the better alternative).
+
+---
+
+## Component Selection Decision Tree
+
+These rules resolve the most common "which component?" decisions. Apply them before building.
+
+### Interactive vs. non-interactive indicators
+
+| Need | Use | Not |
+|---|---|---|
+| Static status label, count, or category | `m-badge` | `m-chip` |
+| Removable tag, selectable filter, interactive choice | `m-chip` | `m-badge` |
+
+Classification: **Hard**
+
+### Checkbox vs. Radio vs. Switch
+
+| Need | Use | Not |
+|---|---|---|
+| Multiple selections from a group | `m-checkbox` | `m-radio` |
+| Single selection from a group of 2+ | `m-radio` | `m-checkbox` |
+| Binary on/off that takes immediate effect | `m-switch` | `m-checkbox` |
+| Binary choice that requires form submission | `m-checkbox` | `m-switch` |
+| Single option on its own (agreement, opt-in) | `m-checkbox` | `m-radio` |
+
+Classification: **Hard** — Checkboxes = selection, switches = activation. Do not interchange.
+
+### Button vs. ButtonLink
+
+| Need | Use |
+|---|---|
+| In-page action (submit, toggle, open modal) | `m-button` |
+| Navigation to a route or URL | `m-button-link` |
+
+Classification: **Hard**
+
+### Menu vs. Select vs. Popup
+
+| Need | Use |
+|---|---|
+| Choose one value for a form field | `m-select` |
+| Open a list of commands or actions | `m-button-menu` |
+| Show arbitrary content (card) anchored to a trigger | `m-button-popup` |
+
+Classification: **Hard**
+
+### Split Button vs. Menu Button
+
+| Need | Use |
+|---|---|
+| One default/primary action + related secondary options | `m-split-button` |
+| All options are equal, no default action | `m-button-menu` |
+
+Classification: **Hard**
+
+### Popup vs. Modal
+
+| Need | Use |
+|---|---|
+| User needs to see underlying page while interacting | `m-popup` |
+| Alert, confirmation, or focused task | `m-modal` |
+
+Classification: **Soft** — Prefer modals in most cases.
+
+### Skeleton vs. Spinner
+
+| Need | Use |
+|---|---|
+| Structure of upcoming content is known | `m-skeleton` |
+| Structure is unknown or area is small | `m-spinner` |
+| Content-heavy layout (tables, trees, blades) | `m-skeleton` |
+| Background or non-critical loading | `m-spinner` |
+
+Classification: **Hard** for structure-known rule; **Soft** for preferences.
+
+### Input vs. Inline Input
+
+| Need | Use |
+|---|---|
+| Standalone form field | `m-input` |
+| Fill-in-the-blank within a sentence or paragraph | `m-inline-input` |
+
+Classification: **Hard** — Do not use inline input as a general form field replacement.
+
+### Table vs. List
+
+| Need | Use |
+|---|---|
+| Structured data with at least 2 rows and consistent columns | `m-datatable` |
+| Content without a consistent columnar pattern | Other layout |
+
+Classification: **Hard**
+
+### Accordion: when NOT to use
+
+Do not use `m-accordion` when:
+- Content must be read in full (use paragraph text)
+- There is too little content to justify collapsing (adds cognitive load)
+- The layout already shows clear hierarchy without collapsing
+
+Classification: **Hard**
+
+---
+
+## Per-Component Usage Rules
+
+### m-accordion
+
+| Rule | Type |
+|---|---|
+| Keep header text to 50–75 characters per line | Soft |
+| Cap row width at 1080px to keep title and end icons visually connected | Soft |
+| Use color on headers sparingly and only for semantic meaning | Soft |
+
+### m-badge
+
+| Rule | Type |
+|---|---|
+| Every badge must have a `label` — no icon-only badges | Hard |
+| Use sentence case for badge labels | Soft |
+| Do not cluster multiple badges on one element; use one badge for the primary status and plain text for extras | Soft |
+| Do not place `m-accent` (important/navy) badges near filled action buttons — they look identical | Soft |
+| Add a border when badge-to-background contrast is below 3:1 | Soft |
+
+**Variant intent mapping:**
+
+| Variant | Use for |
+|---|---|
+| `m-accent` / `m-accent-subtle` | Critical callouts requiring attention |
+| `m-positive` / `m-positive-subtle` | Success, completion, met criteria |
+| `m-negative` / `m-negative-subtle` | Errors, denials, failures |
+| `m-warning` / `m-warning-subtle` | Caution, risks, pre-submission checks |
+| `m-info` / `m-info-subtle` | Tips, supplementary context |
+| `m-highlight` / `m-highlight-subtle` | New features, special items, unmet quantifiers |
+
+Use standard variants for primary-focus status; subtle variants when status is secondary or UI is visually dense.
+
+### m-button
+
+| Rule | Type |
+|---|---|
+| Maximum one primary (`m-filled` or `m-negative`) button per page | Hard |
+| Every button must have a label (use `hideLabel` for icon-only, not omission) | Hard |
+| Use verbs for button labels ("Save", "Cancel"), not nouns or adjectives | Soft |
+| Use sentence case for button labels | Soft |
+| Icons go in leading position only; no trailing icons (except dropdown carets) | Hard |
+| Do not use icons as decoration — only when they clarify the action | Soft |
+| Do not override button styles or use custom colors | Hard |
+| Place primary button to the right of secondary buttons | Soft |
+
+**Button hierarchy:**
+
+| Variant | Role |
+|---|---|
+| `m-filled` | Primary action (one per page) |
+| `m-negative` | Destructive/irreversible action (one per page, instead of m-filled) |
+| `m-outline` | Secondary actions |
+| `m-inverted` | Secondary on dark backgrounds |
+| `m-text` | Tertiary actions (use sparingly) |
+
+### m-card
+
+| Rule | Type |
+|---|---|
+| Do not nest cards inside other cards | Hard |
+| Keep card content focused — title, body, relevant actions | Soft |
+| Use `m-bordered` for display-only cards, `m-tonal` for subdued content, `m-interactive` when the entire card is clickable | Soft |
+
+### m-checkbox
+
+| Rule | Type |
+|---|---|
+| Every checkbox group must have a descriptive group label | Hard |
+| Use indeterminate state when a parent checkbox represents mixed child values | Hard |
+| Use disabled (not hidden) for controls that will activate later in the workflow | Soft |
+
+### m-chip
+
+| Rule | Type |
+|---|---|
+| Keep chip labels under 20 characters | Soft |
+| Use sentence case for chip labels | Soft |
+| Leading icon = primary action or category; trailing icon = secondary action (dismiss, expand) | Soft |
+
+### m-datatable
+
+| Rule | Type |
+|---|---|
+| No zebra stripes (alternating row colors) — row dividers are sufficient | Hard |
+| Left-align text; right-align numbers (except nominal numbers: ZIP, phone, ordinals) | Hard |
+| Column headers must match the alignment of their data | Hard |
+| Center-align only for badges, icons, or very small content — never for regular text or numbers | Hard |
+| Use en dash (–) for missing or N/A cell values | Soft |
+| Aim for 5–7 columns maximum to avoid horizontal scrolling | Soft |
+| Use pagination for large datasets (10–15 rows per page) | Soft |
+
+### m-date-picker
+
+| Rule | Type |
+|---|---|
+| A label is required (can be visually hidden) | Hard |
+
+### m-icon
+
+| Rule | Type |
+|---|---|
+| Use icons to support text, not replace it — if meaning is unclear, use a text label instead | Hard |
+| Solid style = active/selected state; regular (outline) style = inactive/unselected state | Soft |
+
+### m-inline-input
+
+| Rule | Type |
+|---|---|
+| Use only for fill-in-the-blank within running text — never as standalone form fields | Hard |
+| A label is required (usually visually hidden) | Hard |
+| No room for help text — use `m-tooltip` for guidance if needed | Soft |
+
+### m-input
+
+| Rule | Type |
+|---|---|
+| A label is required — unlabeled fields are not acceptable | Hard |
+| Use sentence case for labels and placeholder text | Hard |
+| Do not use placeholder text for instructions — use help text instead | Hard |
+| Do not duplicate the same text in both placeholder and help text | Hard |
+| Error text should be user-focused, offer a solution, and end with a period | Soft |
+
+### m-menu / m-menu-item
+
+| Rule | Type |
+|---|---|
+| Every menu item must have a `label` | Hard |
+
+### m-popup
+
+| Rule | Type |
+|---|---|
+| Must have a `title` attribute | Hard |
+| Avoid showing multiple popups at once | Soft |
+
+### m-radio / m-radio-group
+
+| Rule | Type |
+|---|---|
+| Radio buttons must be used in groups — never standalone | Hard |
+| Group must have a `groupLabel` (can be visually hidden) | Hard |
+| All options in a group must be mutually exclusive | Hard |
+| Prefer `m-radio-group` with an `options` array over individual `m-radio` elements | Soft |
+| Use sentence case for labels | Soft |
+
+### m-select
+
+| Rule | Type |
+|---|---|
+| A label is required — placeholder is not a substitute | Hard |
+| Use sentence case for labels and placeholder text | Soft |
+| Size the field width to show the full selected value without truncation | Soft |
+
+### m-skeleton
+
+| Rule | Type |
+|---|---|
+| Skeleton layout must approximate the final content (size, shape, alignment) | Soft |
+| Use neutral, muted placeholder colors | Hard |
+| Avoid overuse — skip skeletons for content that loads quickly (causes flicker) | Soft |
+
+### m-spinner
+
+| Rule | Type |
+|---|---|
+| Use indeterminate when duration is unknown; determinate when progress is quantifiable | Soft |
+| Show only one spinner at a time | Soft |
+| Size by context: xl = full-page, l = large area, m = panel/modal, s = inline/button | Soft |
+| Label should be specific ("Preparing results…") not generic ("Loading…") | Soft |
+
+### m-split-button
+
+| Rule | Type |
+|---|---|
+| Must have a `label` | Hard |
+
+### m-switch
+
+| Rule | Type |
+|---|---|
+| A label is required (can be hidden via `labelPosition`) | Hard |
+| Use a noun or short noun phrase for the label (describes the setting) | Soft |
+| Switches do not support error state — use checkbox if validation is needed | Soft |
+
+### m-tooltip
+
+| Rule | Type |
+|---|---|
+| Never use tooltips as the only way to convey critical information | Hard |
+| Never place interactive elements (buttons, links) inside tooltips | Hard |
+| Do not restate information already visible on the page | Hard |
+| Keep content to one or two short sentences | Soft |
+| Limit icon usage to `circle-info`, `triangle-exclamation`, or `circle-check` | Soft |
+
+---
+
+## Cross-Cutting Rules
+
+These apply to all components:
+
+| Rule | Type |
+|---|---|
+| Use sentence case for all user-facing labels and text | Soft |
+| Every input-like component (input, select, date picker, radio group, inline input) must have a label | Hard |
+| Icons support text — they do not replace it | Hard |
+| Variant selection should follow semantic intent, not color preference | Hard |
+| Standard variants for primary emphasis; subtle variants for secondary or dense layouts | Soft |

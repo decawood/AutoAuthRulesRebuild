@@ -1,0 +1,324 @@
+---
+description: MUCL component catalog — available components, props, variants, slots, and composables for building UIs.
+alwaysApply: true
+---
+
+# MUCL Component Catalog
+
+All components are exported from `@uxe/mucl`. Import with:
+```vue
+import { MButton, MInput, MModal } from '@uxe/mucl';
+```
+
+Components auto-register when using the MUCL resolver (`@uxe/mucl/resolver`), so they can be used directly in templates as `<m-button>`, `<m-input>`, etc.
+
+## Natural Language → Component Mapping
+
+**This design system was built to serve this family of applications.** When a user describes a UI pattern, the AI must map their language to MUCL components **before writing any markup**. This table bridges everyday descriptions to specific components.
+
+| User says… | MUCL component(s) | Notes |
+|---|---|---|
+| "accordion," "collapsible," "expandable section," "toggle section" | `m-accordion` | Supports nesting, custom header content via `#header` slot |
+| "tree," "nested list," "hierarchy," "guideline tree," "criteria tree," "the accordion thing" | `m-accordion` (nested) | m-accordion inside m-accordion. Also check snippet catalog for domain-specific trees |
+| "admission criteria," "review criteria," "care guidelines," "clinical criteria," "clinical guidelines," "guideline," "indications" | `m-accordion` (nested) + guideline tree snippet | **Always check snippet-catalog.mdc first.** These terms map to the sanctioned guideline tree/row assets. |
+| "tabs," "tab bar," "switch between sections" | `m-tab-list` | |
+| "dropdown," "select," "picker," "choose from a list" | `m-select` | For menu-style dropdowns, also consider `m-menu` |
+| "menu," "context menu," "right-click menu," "action menu" | `m-menu` + `m-menu-item` | |
+| "popup," "popover," "floating panel," "anchored overlay" | `m-popup` | |
+| "modal," "dialog," "confirmation," "alert," "are you sure" | `m-modal`, `m-modal-alert`, `m-modal-confirmation` | |
+| "badge," "tag," "label," "status indicator," "pill" | `m-badge` | For interactive tags, use `m-chip` |
+| "chip," "filter chip," "removable tag" | `m-chip` | |
+| "table," "grid," "data table," "list of records," "spreadsheet" | `m-datatable` | |
+| "code reference," "lookup table," "formulary list," "categorized list with pagination" | `m-datatable` + reference-table snippet | See snippet-catalog.mdc |
+| "card," "panel," "box," "container," "section" | `m-card` | |
+| "search," "search bar," "find," "filter input" | `m-search` | |
+| "toggle," "switch," "on/off" | `m-switch` | |
+| "checkbox," "check," "tick box" | `m-checkbox` | |
+| "radio," "radio buttons," "choose one" | `m-radio-group` + `m-radio` | |
+| "tooltip," "hover text," "hint," "help tip" | `m-tooltip` | |
+| "side panel," "drawer," "slide-in," "detail pane" | `m-side-panel` | |
+| "split view," "two-pane," "master-detail," "list-detail" | `m-split-view` | |
+| "loading," "spinner," "please wait" | `m-spinner` | |
+| "skeleton," "loading placeholder," "shimmer" | `m-skeleton` | |
+| "pagination," "page numbers," "next/previous" | `m-pagination` or `m-datatable-pagination` | |
+| "date picker," "calendar," "pick a date" | `m-date-picker` | |
+| "time picker," "pick a time" | `m-time-picker` | |
+| "icon," "symbol," "pictogram" | `m-icon` | Must be from the approved icon set |
+| "text input," "field," "text box," "type here" | `m-input` | |
+| "text area," "multiline input," "big text box" | `m-textarea` | |
+| "inline edit," "click to edit," "editable text" | `m-inline-input` | |
+| "admin dialog," "password prompt," "unlock" | `m-modal` with `#content` slot | |
+| "split button," "button with dropdown" | `m-split-button` | |
+| "button link," "link styled as button" | `m-button-link` | |
+| "stat cards," "metric cards," "KPI cards," "summary cards," "count cards," "dashboard header" | `m-card` + `m-badge` | Compose m-card grid with m-badge for status indicators |
+| "calculator," "calc button," "calculator button," "scoring tool," "clinical calculator" | `m-icon` (Indicia) or `m-button` (CWQI-S) | Product-specific feature in guideline trees. See snippet-catalog.mdc for placement rules. |
+| "Indicia," "Indicia Synapse" | Guideline tree product context | Calculator icons in `gl-header__actions`. See guideline-tree snippet. |
+| "CareWeb," "CareWebQI," "CareWebQI-Synapse," "CWQI-S," "CWQI" | Guideline tree product context | Calculator `m-button`(s) inline in `gl-header__text`. See guideline-tree snippet. |
+
+## Composition Patterns
+
+Common ways to compose MUCL components for complex UI:
+
+| Pattern | Composition |
+|---|---|
+| **Tree / hierarchy** | `m-accordion` nested inside `m-accordion`. Use `#header` slot for row content, default slot for children. `header-only` prop for leaf nodes. |
+| **Form** | `m-card` containing `m-input`, `m-select`, `m-checkbox`, `m-textarea` with `m-button` for actions. Wire up `v-model` bindings. |
+| **Dashboard** | Grid of `m-card` components. Use `m-badge` for status metrics, `.m-heading-*` for labels. |
+| **Data page** | `m-card` with summary badges/stats at top, `m-datatable` below. |
+| **Tabbed content** | `m-tab-list` controlling which `m-card` section is visible via `v-if`/`v-show`. |
+| **Confirmation flow** | `m-button` triggering `m-modal-confirmation`. Wire `@confirm` and `@cancel` events. |
+| **Side-by-side comparison** | `m-split-view` with `m-card` in each pane. |
+| **Searchable list** | `m-search` above `m-datatable` with filtered data. |
+
+## Button Components
+
+### MButton
+Primary interactive button. Wraps in a `<span class="m-button-container">`.
+
+| Prop | Type | Default | Notes |
+|---|---|---|---|
+| `label` | string | `''` | Button text |
+| `icon` | string | `''` | Font Awesome icon name (e.g. `'check'`, `'trash'`) |
+| `iconStyle` | `'solid' \| 'regular' \| 'brands' \| 'custom'` | `'solid'` | FA style |
+| `use` | `'m-filled' \| 'm-outline' \| 'm-text' \| 'm-negative' \| 'm-inverted'` | `'m-outline'` | Visual style |
+| `size` | string | `'standard'` | `'standard'` or `'small'` |
+| `disabled` | boolean | `false` | |
+| `processing` | boolean | `false` | Shows spinner, disables click |
+| `selected` | boolean | `false` | Selected state |
+| `hideLabel` | boolean | `false` | Visually hides label (screen-reader accessible) |
+| `type` | string | `'button'` | HTML button type |
+| `containerClass` | string | `''` | Class on outer span |
+
+Emits: `click`
+
+### MButtonDropdown / MButtonMenu / MButtonPopup
+Buttons that open a dropdown, menu, or popup respectively. Extend MButton with toggle behavior.
+
+### MButtonLink
+Button styled as a hyperlink.
+
+### MSplitButton
+Split button with a primary action and a dropdown for secondary actions.
+
+## Input Components
+
+### MInput
+Text input with validation, labels, and help text. Generic over value type.
+
+| Prop | Type | Default | Notes |
+|---|---|---|---|
+| `v-model` | `string \| number \| null` | — | Two-way binding. Supports `.trim` and `.number` modifiers |
+| `label` | string | `''` | Input label |
+| `labelPosition` | `'floating' \| 'top' \| 'side' \| 'fixed'` | `'floating'` | |
+| `type` | `'text' \| 'email' \| 'number' \| 'password' \| 'search' \| 'tel' \| 'url' \| 'file'` | `'text'` | |
+| `placeholder` | string | `''` | |
+| `helpText` | string | `''` | Hint text below input |
+| `required` | boolean | `false` | Shows asterisk |
+| `disabled` | boolean | `false` | |
+| `readonly` | boolean | `false` | |
+| `clearable` | boolean | `false` | Shows clear button |
+| `icon` | string | `''` | Appended icon |
+| `rules` | `ValidationRule[]` | `[]` | Quasar validation rules |
+| `min`, `max` | number/string | — | Min/max constraints |
+| `minlength`, `maxlength` | number | — | Character limits |
+
+Slots: `append`
+
+### MTextarea
+Multi-line text input. Similar props to MInput plus resize control (`'both' \| 'horizontal' \| 'vertical' \| 'none'`).
+
+### MInlineInput
+Inline editable text field.
+
+### MNumericUnitInput
+Number input with a unit label.
+
+### MSearch
+Search-specific input with search icon and clear behavior.
+
+### MSelect
+Dropdown select. Accepts `IOption` items (string, number, or `Record<string, unknown>`). Use `useIOptionKeyValue` composable to map custom objects.
+
+### MDatePicker
+Date picker. Values use ISO format: `YYYY-MM-DD`.
+
+### MTimePicker
+Time picker. Values use `HH:MM` format.
+
+### MCheckbox
+Checkbox input with label.
+
+### MRadio / MRadioGroup
+Radio button and radio button group.
+
+### MSwitch
+Toggle switch. Label position controlled by `position: 'before' \| 'after' \| 'hidden'`.
+
+## Data Display
+
+### MDatatable
+Full-featured data table with sorting, column selection, and row click handlers.
+
+### MDatatablePagination
+Standalone pagination for datatables. Uses `MPaginationProp`:
+```ts
+{ page: number; rowsPerPage: number; sortBy?: string; descending?: boolean; rowsNumber?: number }
+```
+
+### MPagination
+General-purpose pagination controls.
+
+### MBadge
+Non-interactive status label.
+
+| Prop | Notes |
+|---|---|
+| `variant` | See BadgeVariants: `'m-accent'`, `'m-positive'`, `'m-negative'`, `'m-warning'`, `'m-info'`, `'m-highlight'`, subtle variants (`'m-accent-subtle'`, `'m-positive-subtle'`, `'m-negative-subtle'`, `'m-warning-subtle'`, `'m-info-subtle'`, `'m-highlight-subtle'`), section types (`'m-problem'`, `'m-question'`, `'m-barrier'`), and all product codes |
+| `icon` | Optional leading icon |
+| `label` | Badge text |
+
+### MChip
+Interactive compact element for choices, filters, or attributes.
+
+Variants: `'m-accent'`, `'m-positive'`, `'m-negative'`, `'m-warning'`, `'m-info'`, `'m-highlight'`.
+
+### MSegmentText
+Renders text with highlighted segments.
+
+### MIcon
+Icon wrapper for Font Awesome. Key props: `icon` (name), `iconStyle` (`'solid' \| 'regular' \| 'brands' \| 'custom'`), `variant`, `size`, `rotation` (`'90' \| '180' \| '270'`).
+
+Icon variants: all PersistentVariants plus `'m-dark'` and `'m-inverse'`.
+
+**Icon style as state indicator:** Many icons have both `solid` (filled, default) and `regular` (outlined) variants. Use the style switch to communicate state — e.g., `note-sticky` with `icon-style="regular"` for "empty/no content" and `icon-style="solid"` for "has content." This is a common pattern across the product and should be preferred over swapping icon names to show state changes.
+
+## Layout & Containers
+
+### MCard
+Container card.
+
+| Prop | Notes |
+|---|---|
+| `use` | `'m-bordered'` (default border), `'m-tonal'` (shaded bg), `'m-interactive'` (hover effect) |
+
+### MAccordion
+Collapsible content sections with expand/collapse toggle. Supports nesting for tree structures.
+
+| Prop | Type | Default | Notes |
+|---|---|---|---|
+| `v-model:expanded` | boolean | `false` | Two-way binding for expand/collapse state |
+| `headerText` | string | `''` | Simple header text (alternative to `#header` slot) |
+| `headerClass` | string/object | `''` | CSS class on the header wrapper |
+| `contentClass` | string/object | `''` | CSS class on the content wrapper |
+| `headerOnly` | boolean | `false` | Header only, no toggle button, no expandable content. Use for leaf nodes in trees. |
+| `iconClosed` | string | `'caret-right'` | Icon when collapsed |
+| `iconExpanded` | string | `'caret-down'` | Icon when expanded |
+| `disabled` | boolean | `false` | Disables expand/collapse |
+| `hidden` | boolean | `false` | Hides the accordion entirely (not in DOM) |
+| `verticalRule` | boolean | `false` | Shows a vertical line on the left of content |
+| `horizontalRule` | boolean | `false` | Shows a horizontal divider after content |
+| `insetLevel` | number | `0` | Left margin multiplier. **Do not use for nested trees** — nesting provides natural indentation. Only for stacked (flat) accordions. |
+| `toggleAriaLabel` | string | `'Accordion toggle'` | Screen reader label for the toggle button |
+
+Slots: `header` (custom header content), `default` (expandable content — receives `{ disabled }`)
+
+**Nesting:** Place `m-accordion` inside `m-accordion`'s default slot. Content area auto-resets padding to 0 when it contains nested accordions. Content has `margin-left: var(--m-28)` providing natural indentation per level.
+
+**Circle-caret icons:** Use `icon-closed="circle-caret-right"` and `icon-expanded="circle-caret-down"` for a filled circle toggle (e.g., "documented" state in clinical trees).
+
+### MSplitView
+Two-pane split layout.
+
+### MSkeleton
+Loading placeholder with shimmer animation.
+
+### MSpinner
+Loading spinner. Sizes: `'s'` (24px), `'m'` (32px), `'l'` (48px), `'xl'` (64px).
+
+### MLogo
+MCG brand logo.
+
+## Overlays
+
+### MModal
+Modal dialog.
+
+| Prop | Type | Default |
+|---|---|---|
+| `v-model` | boolean | `false` |
+| `titleText` | string | — |
+| `titleIcon` | string | — |
+| `subtitleText` | string | — |
+| `position` | `'standard' \| 'top' \| 'left' \| 'right' \| 'bottom'` | `'standard'` |
+| `persistent` | boolean | `false` |
+| `maximized` | boolean | `false` |
+| `fullWidth` | boolean | `false` |
+| `fullHeight` | boolean | `false` |
+| `seamless` | boolean | `false` |
+
+Emits: `confirm`, `cancel`, `dismiss`, `activator:click`, `update:modelValue`
+
+**Critical slot usage:** The **default slot replaces the entire modal card** (header, body, actions). To place content inside the modal while keeping the title bar and action footer, use the `#content` slot. Available slots: `activator`, `header`, `content` (body), `actions`, `close`, `default` (replaces everything).
+
+### MModalAlert
+Alert modal with a single action button.
+Extra props: `actionText`, `confirmationText`.
+
+### MModalConfirmation
+Confirmation modal with primary and secondary actions.
+Extra props: `primaryActionText`, `secondaryActionText`, `confirmationText`.
+
+### MPopup
+Popup overlay anchored to a trigger element.
+
+### MTooltip
+Tooltip wrapper using Tippy.js. Wrap any element to add a tooltip on hover/focus.
+
+### MSidePanel
+Slide-in side panel. Responsive widths: desktop 550px, tablet 400px, mobile 100vw.
+
+## Navigation
+
+### MMenu
+Floating menu with submenu support.
+
+### MMenuItem
+Individual menu item. Props: `label`, `caption`, `link`, `value`.
+
+### MTabList
+Tab navigation. Sizes: `'small'`, `'medium'`, `'large'`.
+
+## Composables
+
+| Composable | Import | Purpose |
+|---|---|---|
+| `useForm` | `@uxe/mucl` | Form state: validation, dirty tracking, error collection |
+| `useValidation` | `@uxe/mucl` | Per-field validation rules and error handling |
+| `useModal` | `@uxe/mucl` | Programmatic modals: `alert()` and `confirm()` |
+| `useToast` | `@uxe/mucl` | Toast notifications: `success()`, `error()`, `info()` |
+| `useFocusWithin` | `@uxe/mucl` | Keyboard focus management (arrow keys, wrap) |
+| `usePopupPosition` | `@uxe/mucl` | Position popup relative to trigger element |
+| `useListeners` | `@uxe/mucl` | Collect `on*` event listeners from `$attrs` |
+| `useGlobalComponent` | `@uxe/mucl` | Mount components outside the app tree |
+| `useIOptionKeyValue` | `@uxe/mucl` | Map objects to `{ value, label }` for selects |
+
+## Variant Systems
+
+Components share a consistent variant vocabulary via CSS classes:
+
+**Persistent (semantic) variants:** `'m-accent'`, `'m-positive'`, `'m-negative'`, `'m-warning'`, `'m-info'`, `'m-disabled'`, `'m-problem'`, `'m-question'`, `'m-barrier'`
+
+**Button use styles:** `'m-filled'`, `'m-outline'`, `'m-text'`, `'m-negative'`, `'m-inverted'`
+
+**Card use styles:** `'m-bordered'`, `'m-tonal'`, `'m-interactive'`
+
+**Product variants:** `'m-ac'`, `'m-bhc'`, `'m-cc'`, `'m-grc'`, `'m-hc'`, `'m-isc'`, `'m-mcm'`, `'m-mcr'`, `'m-pi'`, `'m-rfc'`, `'m-tc'`
+
+## Helpers
+
+| Helper | Import from | Functions |
+|---|---|---|
+| `array` | `@uxe/mucl` | `groupBy`, `sum`, `wrapInArray` |
+| `date` | `@uxe/mucl` | `formatIsoStringToMMDDYY`, `isoToDate`, `isoToTime`, `getCurrentDate`, `dateAndTimeToIso` |
+| `form` | `@uxe/mucl` | `validateNotEmpty`, `validateIsChecked` |
+| `uniqueId` | `@uxe/mucl` | `uniqueId()` |

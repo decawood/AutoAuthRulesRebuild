@@ -1,0 +1,204 @@
+---
+description: Catalog of reusable HTML snippet assets for non-MUCL patterns and domain components.
+globs: 
+alwaysApply: true
+---
+
+# Snippet Asset Catalog
+
+Fragment files (`.fragment.vue`) live alongside their companion demo pages in `src/assets/`. They are organized by visibility tier:
+
+- `src/assets/sanctioned/` — design-team approved patterns (locked)
+- `src/assets/public/` — user-promoted patterns shared with all users
+- `src/assets/{username}/` — user-created patterns (personal workspace)
+
+These are **reference material** — the AI reads a fragment, adapts it to the page's context (clinical content, mock data, layout needs), and inlines the result into the page's `<template>` and `<style>`.
+
+Fragments are never imported or executed at runtime. They are pattern guides. The `.fragment.vue` extension distinguishes them from rendered demo pages (`.vue`) in the same directory.
+
+## When to Use Snippets
+
+Before improvising an extrapolated component, **check this catalog first**. If a snippet exists for the pattern the user is asking for, use it as the starting point. This ensures:
+
+- Consistency across pages that use the same pattern
+- Domain-correct structure (especially for clinical components)
+- Design-token compliance built in
+
+If no snippet exists and the AI builds a novel extrapolation, consider whether it should become a new snippet for future reuse. Note this in the page's design notes.
+
+## Snippet Status: Sanctioned vs. User
+
+Every snippet has a **status** indicated in its header comment:
+
+| Status | Meaning | Watermark? |
+|---|---|---|
+| `sanctioned` | Created or approved by the design team. Trusted pattern. | **No** |
+| `user` | Created by a user for personal reuse. Not yet reviewed by design. | **Yes** |
+
+**Sanctioned snippets** represent the design team's authority over how a pattern should look. They are the snippet equivalent of MUCL components — reliable and consistent.
+
+**User snippets** are patterns a user liked and asked the AI to save for reuse. They carry the "Non Design System Component" watermark until the design team reviews and promotes them to sanctioned status.
+
+**Promotion workflow:** When the design team reviews a user snippet and approves it, move the fragment file and its demo page to `src/assets/sanctioned/`, update `Status: user` to `Status: sanctioned` in the snippet's header comment, and update this catalog. The watermark requirement drops off automatically.
+
+## How to Use a Fragment
+
+1. **Read the `.fragment.vue` file** to understand its structure and customization points.
+2. **Replicate faithfully, then adapt.** Copy the exact component usage from the fragment — icon names, icon styles, variants, class names, slot structures. Do not improvise substitutions (e.g., swapping `note-sticky` for `copy` or `comment`). Only the content (clinical text, mock data, number of items) should change.
+3. **Adapt the template** to the page's context:
+   - Swap clinical text, labels, and mock data
+   - Adjust the number of items (rows, levels, etc.)
+   - Set interactive states (checked, expanded, collapsed) via `ref()` data
+4. **Copy the styles** from the `<!-- === STYLES === -->` comment block into the page's `<style>` section, if present. Some fragments (e.g., reference-table) use only a `<!-- === SCRIPT SETUP === -->` block and have no custom styles.
+5. **Wire up interactivity** with `ref()` bindings in `<script setup>`.
+6. **Check the fragment's status:**
+   - `sanctioned` — no watermark needed.
+   - `user` — add the "Non Design System Component" watermark overlay.
+7. **Document usage** in the page's design notes section.
+
+## Saving a User Fragment (Asset Extraction Workflow)
+
+When a user wants to save a reusable pattern from a prototype, follow this workflow:
+
+1. **Identify the section** the user wants to extract. Ask for clarification if ambiguous — a full page is rarely a good reusable unit.
+2. **Extract the template fragment** and its associated styles from the prototype's `.vue` file.
+3. **Generalize the fragment**: strip mock-data specifics, document customization points in the header comment, mark variable content with `{PLACEHOLDER}` notation.
+4. **Save as a `.fragment.vue` file** in the user's asset folder (`src/assets/{username}/`) with `Status: user` in the header.
+5. **Create an asset demo page** in the same folder (`src/assets/{username}/`). The router automatically discovers and categorizes it. This page demonstrates the fragment with representative mock data so users have a visual reference.
+6. **Register the fragment.** If operating as the recognized owner, add an entry directly to this catalog under the appropriate section with **Watermark: Yes**. Otherwise, record a `snippet` entry in `session/{username}/knowledge.md` with the fragment filename, description, and when-to-use guidance so it can be promoted into this catalog at release time.
+7. **Add a design note** to the source prototype documenting what was extracted and where the fragment lives.
+
+## Available Snippets
+
+### Domain Components
+
+These are business-specific patterns central to MCG product workflows. They carry domain semantics and should be rendered faithfully.
+
+#### Guideline Row (`guideline-row.fragment.vue`)
+
+**The atomic unit of the guideline tree, implemented as an m-accordion component.** Each expandable row IS an accordion — the row content lives in the `#header` slot and children live in the default slot.
+
+**MUCL components used:** m-accordion (the row itself), m-checkbox, m-badge, m-icon, m-button (CWQI-S calculator buttons). Inline links use `<a>` tags (governance-approved exception — avoids `m-button` layout side effects).
+
+**Notes icon (right-aligned action):**
+- `<m-icon icon="note-sticky" icon-style="regular" />` — outlined: no notes added (default)
+- `<m-icon icon="note-sticky" icon-style="solid" />` — filled: notes have been added
+- Every row gets exactly one notes icon. There is no separate copy icon.
+
+**Row types mapped to m-accordion usage:**
+- `indication` — m-accordion with checkbox in `#header`. Children in default slot.
+- `definition` — m-accordion with checkbox-spacer (no checkbox) in `#header`. Children in default slot. Text prefixed with "Definition:" in bold.
+- `criteria` — m-accordion with `header-only` prop (no toggle, no expandable content). Checkbox + text in `#header`.
+
+**Caret states (via m-accordion props):**
+- Undocumented: default icons (caret-right / caret-down) — no extra props needed.
+- Documented: `icon-closed="circle-caret-right"` + `icon-expanded="circle-caret-down"` + `gl-node--documented` class for blue color.
+
+**Quantifier badges (inline in header text):**
+- Unmet: `<m-badge label="1 or more" variant="m-highlight-subtle" />`
+- Met: `<m-badge label="1 or more" icon="circle-check" variant="m-positive-subtle" />`
+- All badges in guideline trees have a custom 1px border: `border: 1px solid currentColor` (applied via `.gl-tree .gl-header .m-badge` CSS)
+
+**Links (inline in header text):**
+- `<a href="#" class="gl-header__link">[References]</a>` — uses `<a>` tags, not `m-button`, to avoid `min-height` layout issues (governance-approved exception)
+
+**Vertical alignment:** Definition parent rows use `gl-header__checkbox-spacer` to reserve the same horizontal space where a checkbox would be.
+
+**Depth class:** When used inside a guideline tree, the row's `gl-node--depth-N` class must match its nesting level — see the depth assignment rule in the Guideline Tree section below.
+
+**When to use:** Any time a user asks for a guideline, criteria list, or clinical decision tree.
+
+**Status:** Sanctioned — **Watermark: No**
+
+#### Guideline Tree (`guideline-tree.fragment.vue`)
+
+**A hierarchical accordion-based representation of clinical care guidelines, built as nested m-accordion components.** This is a high-frequency domain component — design problems at MCG frequently surround or are embedded in a guideline tree.
+
+**Architecture:** Each expandable row is an m-accordion. Nesting is DOM-structural — m-accordion inside m-accordion. This means indentation, zebra striping, and hierarchy are inherent in the DOM structure rather than CSS applied to flat markup.
+
+**m-accordion features leveraged:**
+- **Toggle button:** Built-in m-button (handles icon, ARIA, click)
+- **Natural indentation:** Content area's `margin-left: var(--m-28)` auto-indents nested levels
+- **Content padding reset:** Automatically 0 when content contains nested m-accordion
+- **v-model:expanded:** Two-way binding for expand/collapse state
+- **header-only:** For leaf criteria rows (no toggle, no expandable content)
+- **Built-in ARIA:** aria-controls, aria-expanded, aria-disabled
+
+**Structure:**
+- Nesting depth is unlimited. Each child is one level deeper than its parent.
+- The `gl-node--depth-N` class on each m-accordion controls its zebra-stripe background.
+
+**Depth assignment rule (mandatory):**
+1. **Direct children of `.gl-tree`** are `depth-0`.
+2. **Every nested level increments by 1.** A child of a `depth-2` node is `depth-3`, not `depth-2`.
+3. **Count ancestor `gl-node` elements** to determine the correct depth — do not copy the depth from a sibling or neighbor.
+4. **When adding or moving nodes**, recalculate depth for the node and all its descendants.
+
+**Zebra striping (even/odd pattern):**
+- Even depths (0, 2, 4, …): `var(--m-bg-1)` (white)
+- Odd depths (1, 3, 5, …): `var(--m-bg-2)` (light grey)
+- CSS currently covers depths 0–5. If a tree needs deeper nesting, extend the pattern by adding `&--depth-6` to the even group and `&--depth-7` to the odd group, etc.
+
+**CSS specificity:** All `.gl-node` and `.gl-header` styles must be nested under `.mcg-mucl .gl-tree` to achieve specificity (0, 3, 0), which beats MUCL's base `.mcg-mucl .m-accordion` rules regardless of stylesheet load order.
+
+**Key behaviors:**
+- Expand/collapse via m-accordion's built-in toggle
+- Undocumented caret: default icons. Documented caret: circle-caret icons + CSS color
+- Checkboxes for met/not-met state (visual only in prototypes)
+- Definition parent rows use checkbox-spacer instead of checkbox
+- Quantifier badges: `m-badge` with `variant="m-highlight-subtle"` (unmet) / `variant="m-positive-subtle"` + `icon="circle-check"` (met). All have `border: 1px solid currentColor`.
+- Links: `<a href="#" class="gl-header__link">` — not `m-button` (avoids `min-height` layout issues)
+
+**Product variants:**
+The guideline tree is shared across products. Some features (like calculator buttons) differ by product. The AI should ask users for their product context when a guideline tree is relevant.
+
+- **Shared (baseline):** No calculator buttons. All rows show only `note-sticky` in actions.
+- **Indicia Synapse** (aliases: Indicia): Calculator icon(s) in `gl-header__actions`, alongside `note-sticky`. `icon="calculator"` with `regular`/`solid` for state. Most rows still have no calculator.
+- **CWQI-S** (aliases: CareWebQI, CareWebQI-Synapse, CareWeb): Calculator `m-button`(s) inline with text inside `gl-header__text`. Each button is labeled with the calculator code (e.g., "CURB65", "PSI"). Most rows still have no calculator.
+- **Unknown products:** Default to Indicia-style unless the user specifies otherwise.
+
+Calculator buttons are a per-row, data-driven feature — the exception, not the rule.
+
+**Visual states not yet implemented:**
+- Clinical match highlight — background tint indicating LLM-identified important information in a node
+
+**When to use:** Any time a user asks for a guideline tree, clinical criteria tree, care guidelines, admission criteria, or review criteria. Also use when the user describes "the accordion thing" or "the criteria tree."
+
+**Status:** Sanctioned — **Watermark: No**
+
+### Generic Patterns
+
+#### Reference Table (`reference-table.fragment.vue`)
+
+**A paginated data table for categorized reference data, composed of m-datatable, m-datatable-pagination, and m-badge inside an m-card.** Supports custom cell rendering via datatable slots — a bold primary column and a badge-typed category column.
+
+**MUCL components used:** m-card (container), m-datatable (table with column definitions and cell slots), m-datatable-pagination (standalone pagination), m-badge (category indicators).
+
+**Customization points:**
+- **Columns:** Array of `{ name, label, field, align }` objects defining table structure
+- **Badge column:** Any column can render as `m-badge` via `#body-cell-{name}` slot
+- **Variant mapping:** Function mapping category values to m-badge variants (`m-info`, `m-accent`, `m-warning`, etc.)
+- **Bold column:** Any column can render in `m-label-semibold` via cell slot
+- **Rows per page:** Configurable in the pagination ref
+- **Sorting:** Disabled by default; add `sortable: true` to column definitions to enable
+
+**When to use:** Any time a user asks for a data table, code reference, lookup table, formulary list, or categorized list with pagination.
+
+**Status:** User — **Watermark: Yes**
+
+## Adding New Fragments
+
+When creating a new fragment:
+
+1. Place the `.fragment.vue` file in the appropriate tier folder under `src/assets/` (user-created go in `src/assets/{username}/`, sanctioned go in `src/assets/sanctioned/`).
+2. Include a header comment block with: description, domain context, customization points, and `Status: sanctioned` or `Status: user`.
+3. Separate sections with `<!-- === TEMPLATE === -->`, `<!-- === STYLES === -->`, and/or `<!-- === SCRIPT SETUP === -->` comment markers. Not all sections are required — use only those relevant to the fragment.
+4. **Use MUCL components for all interactive elements** (Tier 2 governance applies to fragments). Use `m-button` for clickable elements, `m-checkbox` for checkboxes, `m-badge` for status labels, `m-icon` for icons. Use CSS overrides via `container-class` when MUCL component defaults don't fit. Never use raw `<button>` or `<input>` elements. `<a>` and `<span>` are permitted for inline text links and text runs where `m-button` would introduce layout side effects (see governance.mdc).
+5. Use design tokens exclusively for all styling — no hardcoded colors, sizes, or shadows.
+6. **Create a companion asset demo page** in the same `src/assets/{tier}/` folder that demonstrates the fragment with realistic mock data. The router auto-discovers it and categorizes it as an asset.
+7. **Register in the catalog.** If operating as the recognized owner, add an entry directly to this catalog with filename, description, structure notes, and when-to-use guidance. Otherwise, record a `snippet` entry in `session/{username}/knowledge.md` so it can be promoted at release time.
+8. Classify as "Domain Component" or "Generic Pattern."
+
+## Removing Fragments
+
+When an asset is deleted, all related metadata must be cleaned up. See the **Asset Deletion Cleanup** checklist in `governance.mdc` for the full procedure. In summary: delete the companion `.fragment.vue` file. If operating as the recognized owner, also remove the entry from this catalog and any references in `mucl-components.mdc`. Otherwise, record the deletion in `session/{username}/knowledge.md` so the owner can clean up catalog references at release time.

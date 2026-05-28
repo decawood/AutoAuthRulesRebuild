@@ -15,11 +15,31 @@ const actionLabels = {
   PendForReview: 'Pend for review'
 };
 
+const modeKeys = Object.keys(modeLabels);
+const actionKeys = Object.keys(actionLabels);
+const decisionKeys = ['AutoApproved', 'PendedForReview'];
+
 const viewLabels = {
   configure: 'Rule configuration',
   simulator: 'Simulator',
   audit: 'Audit trail'
 };
+
+function Badge({ children, variant = 'neutral', className = '' }) {
+  return (
+    <span className={`m-badge m-badge--${variant} ${className}`.trim()}>
+      {children}
+    </span>
+  );
+}
+
+function Button({ children, variant = 'outline', className = '', ...props }) {
+  return (
+    <button className={`m-button m-button--${variant} ${className}`.trim()} type="button" {...props}>
+      {children}
+    </button>
+  );
+}
 
 function App() {
   const [snapshot, setSnapshot] = useState(null);
@@ -106,7 +126,7 @@ function App() {
 
   if (appStopped) {
     return (
-      <main className="app-shell stopped-shell">
+      <main className="app-shell stopped-shell mcg-mucl">
         <section className="stopped-panel">
           <div className="power-mark" aria-hidden="true" />
           <h1>AutoAuth Rules Prototype has been shut down</h1>
@@ -118,7 +138,7 @@ function App() {
 
   if (!snapshot) {
     return (
-      <main className="app-shell loading-shell">
+      <main className="app-shell loading-shell mcg-mucl">
         <div className="loading-panel">
           <p>Starting local prototype...</p>
           {status.message && <p className="status-line error">{status.message}</p>}
@@ -128,18 +148,18 @@ function App() {
   }
 
   return (
-    <main className="app-shell">
+    <main className="app-shell mcg-mucl">
       <header className="app-header">
         <div>
           <p className="eyebrow">MCG Path</p>
           <h1>AutoAuth Rules Engine Prototype</h1>
         </div>
         <div className="header-badges" aria-label="Prototype status">
-          <span>{dashboard.deploymentModel}</span>
-          <span>{dashboard.dataRetention}</span>
-          <button className="shutdown-button" type="button" onClick={handleShutdown}>
+          <Badge variant="info">{dashboard.deploymentModel}</Badge>
+          <Badge>{dashboard.dataRetention}</Badge>
+          <Button variant="negative-text" className="shutdown-button" onClick={handleShutdown}>
             Shut down
-          </button>
+          </Button>
         </div>
       </header>
 
@@ -152,14 +172,14 @@ function App() {
 
       <nav className="view-tabs" aria-label="Prototype views">
         {Object.entries(viewLabels).map(([view, label]) => (
-          <button
+          <Button
             key={view}
-            className={activeView === view ? 'active' : ''}
-            type="button"
+            variant="tab"
+            className={activeView === view ? 'is-active' : ''}
             onClick={() => setActiveView(view)}
           >
             {label}
-          </button>
+          </Button>
         ))}
       </nav>
 
@@ -208,7 +228,7 @@ function Metric({ label, value, helper }) {
 
 function ConfigurationView({ rules, modeFilter, setModeFilter, onSaveRule, requests }) {
   const modes = ['All', ...Object.keys(modeLabels)];
-  const filteredRules = modeFilter === 'All' ? rules : rules.filter((rule) => rule.mode === modeFilter);
+  const filteredRules = modeFilter === 'All' ? rules : rules.filter((rule) => getRuleMode(rule.mode) === modeFilter);
   const indications = uniqueIndications(requests);
 
   return (
@@ -217,14 +237,14 @@ function ConfigurationView({ rules, modeFilter, setModeFilter, onSaveRule, reque
         <h2>Configuration modes</h2>
         <div className="segmented vertical">
           {modes.map((mode) => (
-            <button
+            <Button
               key={mode}
-              type="button"
-              className={modeFilter === mode ? 'active' : ''}
+              variant="segment"
+              className={modeFilter === mode ? 'is-active' : ''}
               onClick={() => setModeFilter(mode)}
             >
               {mode === 'All' ? 'All modes' : modeLabels[mode]}
-            </button>
+            </Button>
           ))}
         </div>
       </aside>
@@ -271,13 +291,13 @@ function RuleCard({ rule, indications, onSaveRule }) {
     ConfidenceThreshold: 'Builds a medically necessary bucket from Synapse confidence.',
     DataPointCombination: 'Requires provider attestation and Synapse support for the same indication.',
     PathwayThreshold: 'Requires more met pathways than the base guideline threshold.'
-  }[draft.mode];
+  }[getRuleMode(draft.mode)];
 
   return (
     <article className={`rule-card ${draft.enabled ? '' : 'muted'}`}>
       <div className="rule-card-header">
         <div>
-          <p className="mode-label">{modeLabels[draft.mode]}</p>
+          <p className="mode-label">{modeLabels[getRuleMode(draft.mode)]}</p>
           <input
             className="rule-title"
             value={draft.name}
@@ -285,13 +305,13 @@ function RuleCard({ rule, indications, onSaveRule }) {
             aria-label="Rule name"
           />
         </div>
-        <label className="switch">
+        <label className="switch" aria-label="Rule enabled state">
           <input
             type="checkbox"
             checked={draft.enabled}
             onChange={(event) => updateDraft('enabled', event.target.checked)}
           />
-          <span>{draft.enabled ? 'Enabled' : 'Disabled'}</span>
+          <Badge variant={draft.enabled ? 'positive' : 'neutral'}>{draft.enabled ? 'Enabled' : 'Disabled'}</Badge>
         </label>
       </div>
 
@@ -307,7 +327,7 @@ function RuleCard({ rule, indications, onSaveRule }) {
       <div className="field-grid">
         <label>
           <span>Action</span>
-          <select value={draft.action} onChange={(event) => updateDraft('action', event.target.value)}>
+          <select value={getRuleAction(draft.action)} onChange={(event) => updateDraft('action', event.target.value)}>
             {Object.entries(actionLabels).map(([value, label]) => (
               <option key={value} value={value}>{label}</option>
             ))}
@@ -336,7 +356,7 @@ function RuleCard({ rule, indications, onSaveRule }) {
           />
         </label>
 
-        {draft.mode === 'PathwayThreshold' && (
+        {getRuleMode(draft.mode) === 'PathwayThreshold' && (
           <label>
             <span>Minimum pathways</span>
             <input
@@ -375,7 +395,7 @@ function RuleCard({ rule, indications, onSaveRule }) {
 
       <div className="card-actions">
         <span>Last updated by {draft.updatedBy}</span>
-        <button type="button" onClick={() => onSaveRule(draft)}>Save rule</button>
+        <Button variant="filled" onClick={() => onSaveRule(draft)}>Save rule</Button>
       </div>
     </article>
   );
@@ -385,7 +405,7 @@ function OptionGroup({ title, options, selected, labels = {}, onToggle, allowEmp
   return (
     <fieldset className="option-group">
       <legend>{title}</legend>
-      {allowEmptyLabel && selected.length === 0 && <span className="empty-pill">{allowEmptyLabel}</span>}
+      {allowEmptyLabel && selected.length === 0 && <Badge variant="neutral" className="empty-pill">{allowEmptyLabel}</Badge>}
       <div className="chip-row">
         {options.map((option) => (
           <label key={option} className={selected.includes(option) ? 'chip selected' : 'chip'}>
@@ -409,15 +429,15 @@ function SimulatorView({ requests, selectedRequest, setSelectedRequestId, curren
         <h2>Demo requests</h2>
         <div className="request-list">
           {requests.map((request) => (
-            <button
+            <Button
               key={request.id}
-              className={selectedRequest?.id === request.id ? 'active request-button' : 'request-button'}
-              type="button"
+              variant="request"
+              className={selectedRequest?.id === request.id ? 'is-active request-button' : 'request-button'}
               onClick={() => setSelectedRequestId(request.id)}
             >
               <strong>{request.id}</strong>
               <span>{request.memberSegment} - {request.caseType}</span>
-            </button>
+            </Button>
           ))}
         </div>
       </aside>
@@ -429,7 +449,7 @@ function SimulatorView({ requests, selectedRequest, setSelectedRequestId, curren
               <p className="eyebrow">Authorization request</p>
               <h2>{selectedRequest.guidelineName}</h2>
             </div>
-            <button type="button" className="primary-action" onClick={onRunEvaluation}>Run evaluation</button>
+            <Button variant="filled" className="primary-action" onClick={onRunEvaluation}>Run evaluation</Button>
           </article>
 
           <div className="summary-grid">
@@ -476,16 +496,25 @@ function IndicationTable({ request }) {
             <strong>{result.indicationName}</strong>
             <small>{result.category} - {result.sourceDocument}</small>
           </div>
-          <span>{request.providerAttestations[result.indicationId] ? 'Yes' : 'No'}</span>
+          <Badge variant={request.providerAttestations[result.indicationId] ? 'positive-subtle' : 'neutral'}>
+            {request.providerAttestations[result.indicationId] ? 'Yes' : 'No'}
+          </Badge>
           <div className="confidence-cell">
-            <div className="confidence-track">
+            <div
+              className="confidence-track"
+              role="progressbar"
+              aria-label={`${result.indicationName} Synapse confidence`}
+              aria-valuenow={Number(result.confidence)}
+              aria-valuemin="0"
+              aria-valuemax="100"
+            >
               <span style={{ width: `${result.confidence}%` }} />
             </div>
             <strong>{result.confidence}%</strong>
           </div>
-          <span className={result.pathwayMet ? 'pill positive' : 'pill neutral'}>
+          <Badge variant={result.pathwayMet ? 'positive' : 'neutral'} className="pill">
             {result.pathwayMet ? 'Met' : 'Not met'}
-          </span>
+          </Badge>
         </div>
       ))}
     </section>
@@ -493,10 +522,14 @@ function IndicationTable({ request }) {
 }
 
 function EvaluationPanel({ evaluation }) {
+  const autoApproved = isAutoApproved(evaluation.decision);
+
   return (
     <section className="evaluation-panel">
-      <div className={`decision-banner ${evaluation.decision === 'AutoApproved' ? 'approved' : 'pended'}`}>
-        <span>{formatDecision(evaluation.decision)}</span>
+      <div className={`decision-banner ${autoApproved ? 'approved' : 'pended'}`}>
+        <Badge variant={autoApproved ? 'positive' : 'warning'}>
+          {formatDecision(evaluation.decision)}
+        </Badge>
         <strong>{evaluation.decisionSummary}</strong>
       </div>
 
@@ -507,7 +540,7 @@ function EvaluationPanel({ evaluation }) {
         ) : (
           <div className="chip-row">
             {evaluation.medicallyNecessaryBucket.map((item) => (
-              <span className="static-chip" key={item}>{item}</span>
+              <Badge variant="info-subtle" className="static-chip" key={item}>{item}</Badge>
             ))}
           </div>
         )}
@@ -521,12 +554,14 @@ function EvaluationPanel({ evaluation }) {
                 <span>Priority {execution.priority}</span>
                 <h3>{execution.ruleName}</h3>
               </div>
-              <strong>{execution.fired ? actionLabels[execution.actionTaken] : 'Did not fire'}</strong>
+              <Badge variant={execution.fired ? 'positive-subtle' : 'neutral'}>
+                {execution.fired ? formatAction(execution.actionTaken) : 'Did not fire'}
+              </Badge>
             </div>
             <div className="condition-list">
               {execution.conditions.map((condition) => (
                 <div className="condition-row" key={`${execution.ruleId}-${condition.label}`}>
-                  <span className={condition.passed ? 'dot passed' : 'dot failed'} />
+                  <span className={condition.passed ? 'dot passed' : 'dot failed'} aria-label={condition.passed ? 'Passed' : 'Failed'} />
                   <div>
                     <strong>{condition.label}</strong>
                     <p>{condition.detail}</p>
@@ -557,9 +592,9 @@ function AuditView({ evaluations }) {
             <p>{evaluation.decisionSummary}</p>
           </div>
           <div className="audit-meta">
-            <span>{evaluation.request.memberSegment}</span>
-            <span>{evaluation.request.serviceLine}</span>
-            <span>{evaluation.phiRetentionStatement}</span>
+            <Badge>{evaluation.request.memberSegment}</Badge>
+            <Badge>{evaluation.request.serviceLine}</Badge>
+            <Badge variant="info-subtle">{evaluation.phiRetentionStatement}</Badge>
           </div>
         </article>
       ))}
@@ -571,8 +606,8 @@ function normalizeRuleForSave(rule) {
   return {
     name: rule.name,
     description: rule.description,
-    mode: rule.mode,
-    action: rule.action,
+    mode: getRuleModeIndex(rule.mode),
+    action: getRuleActionIndex(rule.action),
     priority: Number(rule.priority),
     enabled: rule.enabled,
     memberSegments: rule.memberSegments,
@@ -602,7 +637,56 @@ function uniqueIndications(requests) {
 }
 
 function formatDecision(decision) {
-  return decision === 'AutoApproved' ? 'Auto-approved' : 'Pended for review';
+  return isAutoApproved(decision) ? 'Auto-approved' : 'Pended for review';
+}
+
+function formatAction(action) {
+  return actionLabels[getRuleAction(action)] ?? 'Unknown action';
+}
+
+function isAutoApproved(decision) {
+  return getEnumKey(decision, decisionKeys) === 'AutoApproved';
+}
+
+function getRuleMode(mode) {
+  return getEnumKey(mode, modeKeys);
+}
+
+function getRuleAction(action) {
+  return getEnumKey(action, actionKeys);
+}
+
+function getRuleModeIndex(mode) {
+  return getEnumIndex(mode, modeKeys);
+}
+
+function getRuleActionIndex(action) {
+  return getEnumIndex(action, actionKeys);
+}
+
+function getEnumKey(value, keys) {
+  if (typeof value === 'number') {
+    return keys[value] ?? '';
+  }
+
+  if (typeof value === 'string' && /^\d+$/.test(value)) {
+    return keys[Number(value)] ?? '';
+  }
+
+  return value;
+}
+
+function getEnumIndex(value, keys) {
+  if (typeof value === 'number') {
+    return value;
+  }
+
+  if (typeof value === 'string' && /^\d+$/.test(value)) {
+    return Number(value);
+  }
+
+  const index = keys.indexOf(value);
+  return index >= 0 ? index : 0;
 }
 
 export default App;

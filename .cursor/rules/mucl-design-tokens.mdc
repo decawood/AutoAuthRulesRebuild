@@ -1,0 +1,153 @@
+---
+description: MUCL (Vital) design system tokens — colors, typography, spacing, elevation. Reference when building or styling any UI.
+alwaysApply: true
+---
+
+# MUCL Design Tokens
+
+MUCL is the codification of the **Vital Design System**. All styling must use CSS custom properties (tokens) — never hard-code hex values, pixel sizes, or shadows.
+
+Token source files live in `src/css/design-system/`. Wrap all component markup in the `.mcg-mucl` class.
+
+## Color System (3 layers)
+
+### Layer 1 — Color Ramp (`MColorRamp.css`)
+
+Raw palette. **Never reference ramp variables directly in component code.** They exist only to feed semantic tokens.
+
+Families: `navy`, `purple`, `red`, `orange`, `yellow`, `cyan`, `green`, `grey` (steps 10–100), plus `--m-black` / `--m-white`.
+
+Extended colors (used for product badges): `ateneo-blue`, `citron`, `cyber-grape`, `dark-blue-grey`, `dark-Raspberry`, `dirty-brown`, `fern-green`, `gold`, `ivy-green`, `razzmic-berry`, `red-violet`, `ruddy-brown`, `teal`.
+
+### Layer 2 — Semantic Colors (`MColorSemantic.css`)
+
+Use these in component styles. They map intent, not specific hues.
+
+**Backgrounds:**
+
+| Token pattern | Purpose |
+|---|---|
+| `--m-bg-1` through `--m-bg-6` | Neutral backgrounds (white → grey-25) |
+| `--m-bg-inv` | Inverted background (dark) |
+| `--m-bg-dis-light`, `--m-bg-dis-dark` | Disabled backgrounds |
+| `--m-action-bg`, `-hover`, `-pressed`, `-selected`, `-dis`, `-inv` | Primary action (navy) |
+| `--m-neg-bg-*` | Negative/error (red) |
+| `--m-warn-bg-*` | Warning (yellow) |
+| `--m-posi-bg-*` | Positive/success (green) |
+| `--m-info-bg-*` | Informational (purple) |
+
+**Foregrounds** follow the same pattern with `-fg` instead of `-bg`.
+
+**Strokes:**
+
+| Token | Purpose |
+|---|---|
+| `--m-stroke-1` | Default border (grey-50) |
+| `--m-stroke-2`, `--m-stroke-3` | Lighter borders |
+| `--m-stroke-focus-1`, `--m-stroke-focus-2` | Focus ring colors |
+| `--m-stroke-dis` | Disabled border |
+| `--m-action-stroke`, `--m-neg-stroke`, `--m-posi-stroke`, `--m-warn-stroke`, `--m-info-stroke` | Semantic strokes |
+
+**Section types:** `--m-problem-*`, `--m-question-*`, `--m-barrier-*` (normal, text, hover variants).
+
+**Product colors:** `--m-ac-*`, `--m-bhc-*`, `--m-cc-*`, `--m-grc-*`, `--m-hc-*`, `--m-isc-*`, `--m-mcm-*`, `--m-mcr-*`, `--m-pi-*`, `--m-rfc-*`, `--m-tc-*`.
+
+### Layer 3 — Element Colors (`MColorElements.css`)
+
+Component-specific tokens. Use when styling specific UI elements:
+
+- **Header:** `--m-header-normal`, `--m-header-normal-text`
+- **Tooltip:** `--m-tooltip-normal`, `--m-tooltip-normal-text`
+- **Toast:** `--m-toast-light-*`, `--m-toast-medium-*`, `--m-toast-dark-*`
+- **Menu:** `--m-menu-normal`, `--m-menu-item-hover`, `--m-menu-item-selected`, `--m-menu-item-disabled`
+- **Table:** `--m-table-header`, `--m-table-row-light`, `--m-table-row-dark`, `--m-table-row-hover`, `--m-table-row-selected`
+- **Input:** `--m-input-normal`, `--m-input-border`, `--m-input-hover`, `--m-input-focused`, `--m-input-error`, `--m-input-disabled`
+- **Expansion items:** `--m-expansion-item-*` (light, medium, dark variants with question sub-variants)
+
+## Typography (`MTypeRamp.scss` + `MTypeMixins.scss`)
+
+Font: **Roboto** (`--m-font-family`). Base: 16px on an 8px grid.
+
+### Sizing scale
+
+All sizes use `var(--m-N)` where N is a pixel value (4–48 continuously, then 52, 56, 60, 64, 68, 72, 96). `var(--m-16)` = 16px = 1rem equivalent.
+
+### Font weights
+
+| Token | Value |
+|---|---|
+| `--m-font-normal` | 400 |
+| `--m-font-semibold` | 600 |
+| `--m-font-bold` | 700 |
+
+### Type styles (SCSS mixins and CSS classes)
+
+| Class / Mixin | Size | Line-height | Weight |
+|---|---|---|---|
+| `.m-heading-1` | 32px | 48px | bold |
+| `.m-heading-2` | 24px | 32px | bold |
+| `.m-heading-3` | 20px | 32px | bold |
+| `.m-heading-4` | 16px | 24px | bold |
+| `.m-heading-5` | 16px | 24px | semibold |
+| `.m-heading-6` | 12px | 16px | semibold |
+| `.m-body` | 16px | 24px | normal |
+| `.m-body-semibold` | 16px | 24px | semibold |
+| `.m-body-small` | 14px | 24px | normal |
+| `.m-body-small-semibold` | 14px | 24px | semibold |
+| `.m-label` | 14px | 16px | normal |
+| `.m-label-semibold` | 14px | 16px | semibold |
+| `.m-label-small` | 12px | 16px | normal |
+| `.m-label-small-semibold` | 12px | 16px | semibold |
+| `.m-label-large` | 16px | 16px | normal |
+| `.m-label-large-semibold` | 16px | 16px | semibold |
+| `.m-footnote` | 16px | 16px | normal |
+
+Import mixins with `@use '../css/mixins/MTypeMixins';` then `@include MTypeMixins.m-heading-2;`.
+
+## Spacing (`MStandardDefinitions.css`)
+
+Use `var(--m-N)` directly for spacing values. Named aliases exist but are **deprecated**:
+
+| Alias | Maps to |
+|---|---|
+| `--m-spacing-xxs` | `var(--m-4)` = 4px |
+| `--m-spacing-xs` | `var(--m-8)` = 8px |
+| `--m-spacing-s` | `var(--m-12)` = 12px |
+| `--m-spacing-m` | `var(--m-16)` = 16px |
+| `--m-spacing-l` | `var(--m-20)` = 20px |
+| `--m-spacing-xl` | `var(--m-24)` = 24px |
+| `--m-spacing-xxl` | `var(--m-28)` = 28px |
+| `--m-spacing-xxxl` | `var(--m-32)` = 32px |
+
+Prefer the numeric tokens (`var(--m-8)`, `var(--m-16)`, etc.) in new code.
+
+## Border Radius
+
+| Token | Value |
+|---|---|
+| `--m-border-radius` | 4px (all corners) |
+| `--m-border-radius-top` | 4px 4px 0 0 |
+| `--m-border-radius-right` | 0 4px 4px 0 |
+| `--m-border-radius-bottom` | 0 0 4px 4px |
+| `--m-border-radius-left` | 4px 0 0 4px |
+| `--m-border-radius-rounded` | 50% |
+
+## Elevation (Box Shadows)
+
+| Token | Usage |
+|---|---|
+| `--m-elevation-1` | Subtle lift (cards, default) |
+| `--m-elevation-2` | Moderate lift (dropdowns) |
+| `--m-elevation-3` | Prominent lift (popovers) |
+| `--m-elevation-4` | High lift (modals) |
+| `--m-elevation-5` | Maximum lift (dialogs over overlays) |
+
+Utility classes: `.m-elevation-1` through `.m-elevation-5`.
+
+## Transitions
+
+| Token | Value |
+|---|---|
+| `--m-animation-duration` | 0.1s |
+| `--m-transition-timing` | cubic-bezier(0.4, 0, 1, 1) |
+| `--m-common-transition` | all 0.1s cubic-bezier(0.4, 0, 1, 1) |
