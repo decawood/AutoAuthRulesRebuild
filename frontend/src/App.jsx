@@ -27,6 +27,17 @@ const viewLabels = {
   audit: 'Audit trail'
 };
 
+const metricDefinitions = {
+  recall: {
+    term: 'Recall',
+    definition: 'Of what the human selected, how much Synapse also selected'
+  },
+  precision: {
+    term: 'Precision',
+    definition: 'Of what Synapse selected, how much the human also selected'
+  }
+};
+
 function Badge({ children, variant = 'neutral', className = '' }) {
   return (
     <span className={`m-badge m-badge--${variant} ${className}`.trim()}>
@@ -507,13 +518,20 @@ function ObjectiveIndicationsView({ guideline }) {
         <ObjectiveMetric label="# Met (AI)" value={`${guideline.metrics.metAi}%`} tone="info" />
         <ObjectiveMetric label="MCG avg confidence" value={`${guideline.metrics.confidence}%`} tone={metricTone(guideline.metrics.confidence)} />
         <ObjectiveMetric
-          label="User agreement"
+          label="User agreement / precision"
           value={`${guideline.metrics.agreementAgree}%`}
           helper={`${guideline.metrics.agreementDisagree}% disagree`}
           tone={agreementTone(guideline.metrics.agreementAgree)}
+          definition={metricDefinitions.precision}
+          definitionsId="objective-precision-metric-definition"
         />
-        <ObjectiveMetric label="Precision" value={`${guideline.metrics.precision}%`} tone={metricTone(guideline.metrics.precision)} />
-        <ObjectiveMetric label="Recall" value={`${guideline.metrics.recall}%`} tone={metricTone(guideline.metrics.recall)} />
+        <ObjectiveMetric
+          label="Recall"
+          value={`${guideline.metrics.recall}%`}
+          tone={metricTone(guideline.metrics.recall)}
+          definition={metricDefinitions.recall}
+          definitionsId="objective-recall-metric-definition"
+        />
       </section>
 
       <section className="guideline-panel">
@@ -531,9 +549,22 @@ function ObjectiveIndicationsView({ guideline }) {
               <span>Indication</span>
               <span># Met (AI)</span>
               <span>MCG Avg Confidence</span>
-              <span>User Agreement</span>
-              <span>Precision</span>
-              <span>Recall</span>
+              <span className="guideline-table__head-cell guideline-table__head-cell--with-info">
+                User Agreement / Precision
+                <MetricDefinitionTooltip
+                  id="objective-precision-header-definition"
+                  definition={metricDefinitions.precision}
+                  align="left"
+                />
+              </span>
+              <span className="guideline-table__head-cell guideline-table__head-cell--with-info">
+                Recall
+                <MetricDefinitionTooltip
+                  id="objective-recall-header-definition"
+                  definition={metricDefinitions.recall}
+                  align="left"
+                />
+              </span>
             </div>
             <GuidelineNodeList nodes={guideline.nodes} depth={0} />
           </div>
@@ -543,13 +574,51 @@ function ObjectiveIndicationsView({ guideline }) {
   );
 }
 
-function ObjectiveMetric({ label, value, helper, tone = 'neutral' }) {
+function ObjectiveMetric({ label, value, helper, tone = 'neutral', definition, definitionsId }) {
   return (
     <article className={`objective-metric objective-metric--${tone}`}>
-      <span>{label}</span>
+      <div className="objective-metric__label-row">
+        <span className="objective-metric__label">{label}</span>
+        {definition && definitionsId && (
+          <MetricDefinitionTooltip id={definitionsId} definition={definition} />
+        )}
+      </div>
       <strong>{value}</strong>
       {helper && <small>{helper}</small>}
     </article>
+  );
+}
+
+function MetricDefinitionTooltip({ id, definition, align = 'right' }) {
+  const [open, setOpen] = useState(false);
+  const ariaLabel = `${definition.term}: ${definition.definition}`;
+
+  return (
+    <span
+      className={`metric-info metric-info--${align} ${open ? 'metric-info--open' : ''}`}
+      onMouseEnter={() => setOpen(true)}
+      onMouseLeave={() => setOpen(false)}
+      onFocus={() => setOpen(true)}
+      onBlur={() => setOpen(false)}
+      onKeyDown={(event) => {
+        if (event.key === 'Escape') {
+          setOpen(false);
+        }
+      }}
+    >
+      <button
+        className="metric-info__button"
+        type="button"
+        aria-label={ariaLabel}
+        aria-describedby={id}
+      >
+        i
+      </button>
+      <span className="metric-info__tooltip" id={id} role="tooltip">
+        <strong>{definition.term}</strong>
+        <span>{definition.definition}</span>
+      </span>
+    </span>
   );
 }
 
@@ -627,7 +696,6 @@ function GuidelineMetricCells({ metrics }) {
       <MetricBadge value={metrics.metAi} suffix="%" variant="info-subtle" label="# Met AI" />
       <MetricBadge value={metrics.confidence} suffix="%" variant={badgeVariant(metricTone(metrics.confidence))} label="MCG avg confidence" />
       <AgreementCell metrics={metrics} />
-      <MetricBadge value={metrics.precision} suffix="%" variant={badgeVariant(metricTone(metrics.precision))} label="Precision" />
       <MetricBadge value={metrics.recall} suffix="%" variant={badgeVariant(metricTone(metrics.recall))} label="Recall" />
     </>
   );
@@ -643,7 +711,7 @@ function MetricBadge({ value, suffix = '', variant = 'neutral', label }) {
 
 function AgreementCell({ metrics }) {
   return (
-    <div className="agreement-cell" role="gridcell" aria-label={`User agreement: ${metrics.agreementAgree}% agree, ${metrics.agreementDisagree}% disagree`}>
+    <div className="agreement-cell" role="gridcell" aria-label={`User agreement precision: ${metrics.agreementAgree}% agree, ${metrics.agreementDisagree}% disagree`}>
       <Badge variant={badgeVariant(agreementTone(metrics.agreementAgree))}>{metrics.agreementAgree}% agree</Badge>
       <span>{metrics.agreementDisagree}% disagree</span>
     </div>

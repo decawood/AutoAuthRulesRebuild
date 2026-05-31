@@ -11,7 +11,6 @@ export const objectiveGuidelineScaffold = {
     confidence: 97,
     agreementAgree: 80,
     agreementDisagree: 20,
-    precision: 66,
     recall: 89
   },
   nodes: [
@@ -25,7 +24,6 @@ export const objectiveGuidelineScaffold = {
         confidence: 97,
         agreementAgree: 80,
         agreementDisagree: 20,
-        precision: 66,
         recall: 89
       },
       items: [
@@ -39,7 +37,6 @@ export const objectiveGuidelineScaffold = {
             confidence: 97,
             agreementAgree: 99,
             agreementDisagree: 1,
-            precision: 98,
             recall: 93
           }
         },
@@ -52,7 +49,6 @@ export const objectiveGuidelineScaffold = {
             confidence: 98,
             agreementAgree: 90,
             agreementDisagree: 10,
-            precision: 92,
             recall: 81
           }
         },
@@ -65,7 +61,6 @@ export const objectiveGuidelineScaffold = {
             confidence: 99,
             agreementAgree: 70,
             agreementDisagree: 30,
-            precision: 68,
             recall: 76
           }
         },
@@ -78,7 +73,6 @@ export const objectiveGuidelineScaffold = {
             confidence: 99,
             agreementAgree: 80,
             agreementDisagree: 20,
-            precision: 83,
             recall: 88
           }
         },
@@ -91,7 +85,6 @@ export const objectiveGuidelineScaffold = {
             confidence: 97,
             agreementAgree: 50,
             agreementDisagree: 50,
-            precision: 56,
             recall: 62
           }
         },
@@ -105,7 +98,6 @@ export const objectiveGuidelineScaffold = {
             confidence: 99,
             agreementAgree: 99,
             agreementDisagree: 1,
-            precision: 97,
             recall: 94
           }
         },
@@ -118,7 +110,6 @@ export const objectiveGuidelineScaffold = {
             confidence: 95,
             agreementAgree: 91,
             agreementDisagree: 9,
-            precision: 90,
             recall: 72
           }
         },
@@ -132,7 +123,6 @@ export const objectiveGuidelineScaffold = {
             confidence: 96,
             agreementAgree: 98,
             agreementDisagree: 2,
-            precision: 95,
             recall: 84
           }
         },
@@ -146,7 +136,6 @@ export const objectiveGuidelineScaffold = {
             confidence: 99,
             agreementAgree: 99,
             agreementDisagree: 1,
-            precision: 98,
             recall: 90
           }
         },
@@ -160,7 +149,6 @@ export const objectiveGuidelineScaffold = {
             confidence: 97,
             agreementAgree: 89,
             agreementDisagree: 11,
-            precision: 87,
             recall: 79
           },
           items: [
@@ -173,7 +161,6 @@ export const objectiveGuidelineScaffold = {
                 confidence: 96,
                 agreementAgree: 88,
                 agreementDisagree: 12,
-                precision: 86,
                 recall: 78
               }
             },
@@ -186,7 +173,6 @@ export const objectiveGuidelineScaffold = {
                 confidence: 97,
                 agreementAgree: 91,
                 agreementDisagree: 9,
-                precision: 89,
                 recall: 81
               }
             },
@@ -200,7 +186,6 @@ export const objectiveGuidelineScaffold = {
                 confidence: 98,
                 agreementAgree: 94,
                 agreementDisagree: 6,
-                precision: 93,
                 recall: 85
               }
             }
