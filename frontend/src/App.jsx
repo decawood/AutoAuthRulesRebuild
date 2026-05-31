@@ -1,5 +1,6 @@
 import { useEffect, useMemo, useState } from 'react';
 import { evaluateRequest, getPrototype, shutdownPrototype, updateRule } from './api.js';
+import { objectiveGuidelineScaffold } from './guidelineScaffoldData.js';
 
 const memberSegments = ['Medicare', 'Commercial', 'Medicaid'];
 const serviceLines = ['Inpatient admission', 'Elective procedure'];
@@ -22,6 +23,7 @@ const decisionKeys = ['AutoApproved', 'PendedForReview'];
 const viewLabels = {
   configure: 'Rule configuration',
   simulator: 'Simulator',
+  objective: 'Objective indications',
   audit: 'Audit trail'
 };
 
@@ -207,6 +209,10 @@ function App() {
           currentEvaluation={currentEvaluation}
           onRunEvaluation={handleRunEvaluation}
         />
+      )}
+
+      {activeView === 'objective' && (
+        <ObjectiveIndicationsView guideline={objectiveGuidelineScaffold} />
       )}
 
       {activeView === 'audit' && (
@@ -481,6 +487,169 @@ function Fact({ label, value }) {
   );
 }
 
+function ObjectiveIndicationsView({ guideline }) {
+  return (
+    <section className="objective-view" aria-label="Objective indication scaffold">
+      <article className="objective-hero">
+        <div>
+          <p className="eyebrow">Trust spectrum scaffold</p>
+          <h2>{guideline.title} ({guideline.code})</h2>
+          <p>{guideline.summary}</p>
+        </div>
+        <div className="objective-hero__badges">
+          <Badge variant="info-subtle">{guideline.focus}</Badge>
+          <Badge variant="highlight-subtle">v{guideline.version}</Badge>
+          <Badge>Frontend fixture</Badge>
+        </div>
+      </article>
+
+      <section className="objective-metric-grid" aria-label="Guideline performance metrics">
+        <ObjectiveMetric label="# Met (AI)" value={`${guideline.metrics.metAi}%`} tone="info" />
+        <ObjectiveMetric label="MCG avg confidence" value={`${guideline.metrics.confidence}%`} tone={metricTone(guideline.metrics.confidence)} />
+        <ObjectiveMetric
+          label="User agreement"
+          value={`${guideline.metrics.agreementAgree}%`}
+          helper={`${guideline.metrics.agreementDisagree}% disagree`}
+          tone={agreementTone(guideline.metrics.agreementAgree)}
+        />
+        <ObjectiveMetric label="Precision" value={`${guideline.metrics.precision}%`} tone={metricTone(guideline.metrics.precision)} />
+        <ObjectiveMetric label="Recall" value={`${guideline.metrics.recall}%`} tone={metricTone(guideline.metrics.recall)} />
+      </section>
+
+      <section className="guideline-panel">
+        <div className="guideline-panel__header">
+          <div>
+            <p className="eyebrow">Guideline indication tree</p>
+            <h2>Specific indication elements</h2>
+          </div>
+          <Badge variant="info-subtle">Recursive renderer</Badge>
+        </div>
+
+        <div className="guideline-table-wrap">
+          <div className="guideline-table" role="treegrid" aria-label={`${guideline.title} ${guideline.code} indication metrics`}>
+            <div className="guideline-table__head" role="row">
+              <span>Indication</span>
+              <span># Met (AI)</span>
+              <span>MCG Avg Confidence</span>
+              <span>User Agreement</span>
+              <span>Precision</span>
+              <span>Recall</span>
+            </div>
+            <GuidelineNodeList nodes={guideline.nodes} depth={0} />
+          </div>
+        </div>
+      </section>
+    </section>
+  );
+}
+
+function ObjectiveMetric({ label, value, helper, tone = 'neutral' }) {
+  return (
+    <article className={`objective-metric objective-metric--${tone}`}>
+      <span>{label}</span>
+      <strong>{value}</strong>
+      {helper && <small>{helper}</small>}
+    </article>
+  );
+}
+
+function GuidelineNodeList({ nodes, depth }) {
+  return nodes.map((node) => (
+    <GuidelineNode key={node.id} node={node} depth={depth} />
+  ));
+}
+
+function GuidelineNode({ node, depth }) {
+  const hasChildren = node.items?.length > 0;
+  const [expanded, setExpanded] = useState(true);
+  const rowClass = [
+    'guideline-node__row',
+    hasChildren ? 'guideline-node__row--group' : 'guideline-node__row--leaf',
+    depth === 0 ? 'guideline-node__row--root' : '',
+    node.selected ? 'guideline-node__row--selected' : ''
+  ].filter(Boolean).join(' ');
+  const commonProps = {
+    className: rowClass,
+    style: { '--tree-depth': depth, '--tree-indent': `${depth * 20}px` },
+    role: 'row',
+    'aria-level': depth + 1
+  };
+
+  if (hasChildren) {
+    return (
+      <div className="guideline-node" role="rowgroup">
+        <button
+          {...commonProps}
+          type="button"
+          aria-expanded={expanded}
+          onClick={() => setExpanded((current) => !current)}
+        >
+          <GuidelineNodeLabel node={node} depth={depth} expanded={expanded} hasChildren />
+          <GuidelineMetricCells metrics={node.metrics} />
+        </button>
+        {expanded && (
+          <div className="guideline-node__children" role="rowgroup">
+            <GuidelineNodeList nodes={node.items} depth={depth + 1} />
+          </div>
+        )}
+      </div>
+    );
+  }
+
+  return (
+    <div {...commonProps}>
+      <GuidelineNodeLabel node={node} depth={depth} />
+      <GuidelineMetricCells metrics={node.metrics} />
+    </div>
+  );
+}
+
+function GuidelineNodeLabel({ node, expanded, hasChildren = false }) {
+  return (
+    <div className="guideline-node__label" role="gridcell">
+      <span className={hasChildren ? 'guideline-node__toggle' : 'guideline-node__status'} aria-hidden="true">
+        {hasChildren ? (expanded ? '-' : '+') : ''}
+      </span>
+      <div className="guideline-node__text">
+        <strong>{node.text}</strong>
+        <div className="guideline-node__meta">
+          {node.requirement && <span>Requirement: {node.requirement}</span>}
+          {node.selected && <Badge variant="positive-subtle">Selected</Badge>}
+        </div>
+      </div>
+    </div>
+  );
+}
+
+function GuidelineMetricCells({ metrics }) {
+  return (
+    <>
+      <MetricBadge value={metrics.metAi} suffix="%" variant="info-subtle" label="# Met AI" />
+      <MetricBadge value={metrics.confidence} suffix="%" variant={badgeVariant(metricTone(metrics.confidence))} label="MCG avg confidence" />
+      <AgreementCell metrics={metrics} />
+      <MetricBadge value={metrics.precision} suffix="%" variant={badgeVariant(metricTone(metrics.precision))} label="Precision" />
+      <MetricBadge value={metrics.recall} suffix="%" variant={badgeVariant(metricTone(metrics.recall))} label="Recall" />
+    </>
+  );
+}
+
+function MetricBadge({ value, suffix = '', variant = 'neutral', label }) {
+  return (
+    <div className="guideline-metric-cell" role="gridcell" aria-label={`${label}: ${value}${suffix}`}>
+      <Badge variant={variant}>{value}{suffix}</Badge>
+    </div>
+  );
+}
+
+function AgreementCell({ metrics }) {
+  return (
+    <div className="agreement-cell" role="gridcell" aria-label={`User agreement: ${metrics.agreementAgree}% agree, ${metrics.agreementDisagree}% disagree`}>
+      <Badge variant={badgeVariant(agreementTone(metrics.agreementAgree))}>{metrics.agreementAgree}% agree</Badge>
+      <span>{metrics.agreementDisagree}% disagree</span>
+    </div>
+  );
+}
+
 function IndicationTable({ request }) {
   return (
     <section className="table-wrap" aria-label="Indications">
@@ -642,6 +811,40 @@ function formatDecision(decision) {
 
 function formatAction(action) {
   return actionLabels[getRuleAction(action)] ?? 'Unknown action';
+}
+
+function metricTone(value) {
+  if (value >= 95) {
+    return 'positive';
+  }
+
+  if (value >= 80) {
+    return 'warning';
+  }
+
+  return 'negative';
+}
+
+function agreementTone(value) {
+  if (value >= 95) {
+    return 'positive';
+  }
+
+  if (value >= 80) {
+    return 'warning';
+  }
+
+  return 'negative';
+}
+
+function badgeVariant(tone) {
+  return {
+    positive: 'positive-subtle',
+    warning: 'warning',
+    negative: 'negative-subtle',
+    info: 'info-subtle',
+    neutral: 'neutral'
+  }[tone] ?? 'neutral';
 }
 
 function isAutoApproved(decision) {
