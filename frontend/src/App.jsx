@@ -1,6 +1,5 @@
 import { useEffect, useMemo, useState } from 'react';
-import { evaluateRequest, getPrototype, shutdownPrototype, updateRule } from './api.js';
-import { objectiveGuidelineScaffold } from './guidelineScaffoldData.js';
+import { evaluateRequest, getObjectiveGuideline, getObjectiveGuidelines, getPrototype, shutdownPrototype, updateRule } from './api.js';
 
 const memberSegments = ['Medicare', 'Commercial', 'Medicaid'];
 const serviceLines = ['Inpatient admission', 'Elective procedure'];
@@ -19,6 +18,7 @@ const actionLabels = {
 const modeKeys = Object.keys(modeLabels);
 const actionKeys = Object.keys(actionLabels);
 const decisionKeys = ['AutoApproved', 'PendedForReview'];
+const percentFormatter = new Intl.NumberFormat('en-US', { maximumFractionDigits: 1 });
 
 const viewLabels = {
   configure: 'Rule configuration',
@@ -223,7 +223,7 @@ function App() {
       )}
 
       {activeView === 'objective' && (
-        <ObjectiveIndicationsView guideline={objectiveGuidelineScaffold} />
+        <ObjectiveIndicationsView />
       )}
 
       {activeView === 'audit' && (
@@ -498,37 +498,227 @@ function Fact({ label, value }) {
   );
 }
 
-function ObjectiveIndicationsView({ guideline }) {
+function ObjectiveIndicationsView() {
+  const [guidelines, setGuidelines] = useState([]);
+  const [selectedGuidelineId, setSelectedGuidelineId] = useState('');
+  const [guideline, setGuideline] = useState(null);
+  const [query, setQuery] = useState('');
+  const [listStatus, setListStatus] = useState({ type: 'busy', message: 'Loading guideline XMLs...' });
+  const [detailStatus, setDetailStatus] = useState({ type: 'idle', message: '' });
+
+  useEffect(() => {
+    let cancelled = false;
+
+    const loadGuidelines = async () => {
+      setListStatus({ type: 'busy', message: 'Loading guideline XMLs...' });
+
+      try {
+        const data = await getObjectiveGuidelines();
+        if (cancelled) {
+          return;
+        }
+
+        setGuidelines(data);
+        setListStatus({ type: 'idle', message: '' });
+        setSelectedGuidelineId((current) => {
+          if (current) {
+            return current;
+          }
+
+          const defaultGuideline = data.find((candidate) => candidate.title.toLowerCase() === 'pneumonia') ?? data[0];
+          return defaultGuideline?.id ?? '';
+        });
+      } catch (error) {
+        if (!cancelled) {
+          setListStatus({ type: 'error', message: error.message });
+        }
+      }
+    };
+
+    loadGuidelines();
+
+    return () => {
+      cancelled = true;
+    };
+  }, []);
+
+  useEffect(() => {
+    if (!selectedGuidelineId) {
+      setGuideline(null);
+      return;
+    }
+
+    let cancelled = false;
+
+    const loadGuideline = async () => {
+      setDetailStatus({ type: 'busy', message: 'Loading guideline indications...' });
+
+      try {
+        const data = await getObjectiveGuideline(selectedGuidelineId);
+        if (!cancelled) {
+          setGuideline(data);
+          setDetailStatus({ type: 'idle', message: '' });
+        }
+      } catch (error) {
+        if (!cancelled) {
+          setGuideline(null);
+          setDetailStatus({ type: 'error', message: error.message });
+        }
+      }
+    };
+
+    loadGuideline();
+
+    return () => {
+      cancelled = true;
+    };
+  }, [selectedGuidelineId]);
+
+  const filteredGuidelines = useMemo(() => {
+    const normalizedQuery = query.trim().toLowerCase();
+    if (!normalizedQuery) {
+      return guidelines;
+    }
+
+    return guidelines.filter((candidate) => (
+      [candidate.title, candidate.code, candidate.productCode, candidate.guidelineType]
+        .filter(Boolean)
+        .some((value) => value.toLowerCase().includes(normalizedQuery))
+    ));
+  }, [guidelines, query]);
+  const selectedSummary = guidelines.find((candidate) => candidate.id === selectedGuidelineId);
+  const selectOptions = selectedSummary && !filteredGuidelines.some((candidate) => candidate.id === selectedSummary.id)
+    ? [selectedSummary, ...filteredGuidelines]
+    : filteredGuidelines;
+
   return (
-    <section className="objective-view" aria-label="Objective indication scaffold">
+    <section className="objective-view" aria-label="Objective indication viewer">
+      <GuidelineSelector
+        guidelines={selectOptions}
+        selectedGuidelineId={selectedGuidelineId}
+        setSelectedGuidelineId={setSelectedGuidelineId}
+        query={query}
+        setQuery={setQuery}
+        totalCount={guidelines.length}
+        filteredCount={filteredGuidelines.length}
+        loading={listStatus.type === 'busy'}
+      />
+
+      {listStatus.type === 'error' && (
+        <div className="empty-state">{listStatus.message}</div>
+      )}
+
+      {detailStatus.type === 'busy' && !guideline && (
+        <div className="empty-state">{detailStatus.message}</div>
+      )}
+
+      {detailStatus.type === 'error' && (
+        <div className="empty-state">{detailStatus.message}</div>
+      )}
+
+      {guideline && (
+        <GuidelineDetail guideline={guideline} />
+      )}
+    </section>
+  );
+}
+
+function GuidelineSelector({
+  guidelines,
+  selectedGuidelineId,
+  setSelectedGuidelineId,
+  query,
+  setQuery,
+  totalCount,
+  filteredCount,
+  loading
+}) {
+  return (
+    <section className="guideline-selector" aria-label="Guideline search">
+      <label>
+        <span>Search guidelines</span>
+        <input
+          type="search"
+          value={query}
+          onChange={(event) => setQuery(event.target.value)}
+          placeholder="Search by title, code, or product"
+        />
+      </label>
+      <label>
+        <span>Selected guideline</span>
+        <select
+          value={selectedGuidelineId}
+          onChange={(event) => setSelectedGuidelineId(event.target.value)}
+          disabled={loading || guidelines.length === 0}
+        >
+          {guidelines.length === 0 ? (
+            <option value="">No guidelines found</option>
+          ) : (
+            guidelines.map((candidate) => (
+              <option key={candidate.id} value={candidate.id}>
+                {candidate.title} ({candidate.code})
+              </option>
+            ))
+          )}
+        </select>
+      </label>
+      <div className="guideline-selector__meta" aria-live="polite">
+        <strong>{filteredCount}</strong>
+        <span>of {totalCount} guidelines</span>
+      </div>
+    </section>
+  );
+}
+
+function GuidelineDetail({ guideline }) {
+  const { summary, metrics } = guideline;
+  const matchText = summary.usesSampleMetrics
+    ? 'No matched performance rows'
+    : `${summary.matchedIndicationCount} of ${summary.indicationCount} indication IDs matched`;
+
+  return (
+    <>
       <article className="objective-hero">
         <div>
-          <p className="eyebrow">Trust spectrum scaffold</p>
-          <h2>{guideline.title} ({guideline.code})</h2>
-          <p>{guideline.summary}</p>
+          <p className="eyebrow">Guideline indications</p>
+          <h2>{summary.title} ({summary.code})</h2>
+          <p>Showing auto-authorization indication criteria parsed from the guideline XML. Metrics are populated from matched performance workbook rows when available.</p>
         </div>
         <div className="objective-hero__badges">
-          <Badge variant="info-subtle">{guideline.focus}</Badge>
-          <Badge variant="highlight-subtle">v{guideline.version}</Badge>
-          <Badge>Frontend fixture</Badge>
+          <Badge variant="info-subtle">{summary.productCode}</Badge>
+          <Badge variant="highlight-subtle">v{summary.version}</Badge>
+          {summary.glos && <Badge>{summary.glos}</Badge>}
+          <Badge variant={summary.usesSampleMetrics ? 'warning' : 'positive-subtle'}>
+            {summary.usesSampleMetrics ? 'Sample metrics' : matchText}
+          </Badge>
         </div>
       </article>
 
       <section className="objective-metric-grid" aria-label="Guideline performance metrics">
-        <ObjectiveMetric label="# Met (AI)" value={`${guideline.metrics.metAi}%`} tone="info" />
-        <ObjectiveMetric label="MCG avg confidence" value={`${guideline.metrics.confidence}%`} tone={metricTone(guideline.metrics.confidence)} />
         <ObjectiveMetric
-          label="User agreement / precision"
-          value={`${guideline.metrics.agreementAgree}%`}
-          helper={`${guideline.metrics.agreementDisagree}% disagree`}
-          tone={agreementTone(guideline.metrics.agreementAgree)}
+          label="# Met (AI)"
+          value={formatPercent(metrics?.metAi)}
+          helper={metrics?.totalCases ? `${metrics.totalCases} cases` : undefined}
+          tone={metrics?.metAi == null ? 'neutral' : 'info'}
+        />
+        <ObjectiveMetric
+          label="MCG avg confidence"
+          value={formatPercent(metrics?.confidence)}
+          helper="Temporary placeholder"
+          tone={metricTone(metrics?.confidence)}
+        />
+        <ObjectiveMetric
+          label="Precision / user agreement"
+          value={formatPercent(metrics?.agreementAgree)}
+          helper={metrics?.agreementDisagree == null ? undefined : `${formatPercent(metrics.agreementDisagree)} disagree`}
+          tone={agreementTone(metrics?.agreementAgree)}
           definition={metricDefinitions.precision}
           definitionsId="objective-precision-metric-definition"
         />
         <ObjectiveMetric
           label="Recall"
-          value={`${guideline.metrics.recall}%`}
-          tone={metricTone(guideline.metrics.recall)}
+          value={formatPercent(metrics?.recall)}
+          tone={metricTone(metrics?.recall)}
           definition={metricDefinitions.recall}
           definitionsId="objective-recall-metric-definition"
         />
@@ -540,17 +730,20 @@ function ObjectiveIndicationsView({ guideline }) {
             <p className="eyebrow">Guideline indication tree</p>
             <h2>Specific indication elements</h2>
           </div>
-          <Badge variant="info-subtle">Recursive renderer</Badge>
+          <div className="objective-hero__badges">
+            <Badge variant="info-subtle">{summary.autoAuthorizationSectionCount} AutoAuth section{summary.autoAuthorizationSectionCount === 1 ? '' : 's'}</Badge>
+            {summary.usesSampleMetrics && <Badge variant="warning">Sample metrics</Badge>}
+          </div>
         </div>
 
         <div className="guideline-table-wrap">
-          <div className="guideline-table" role="treegrid" aria-label={`${guideline.title} ${guideline.code} indication metrics`}>
+          <div className="guideline-table" role="treegrid" aria-label={`${summary.title} ${summary.code} indication metrics`}>
             <div className="guideline-table__head" role="row">
               <span>Indication</span>
               <span># Met (AI)</span>
               <span>MCG Avg Confidence</span>
               <span className="guideline-table__head-cell guideline-table__head-cell--with-info">
-                User Agreement / Precision
+                Precision / User Agreement
                 <MetricDefinitionTooltip
                   id="objective-precision-header-definition"
                   definition={metricDefinitions.precision}
@@ -566,11 +759,15 @@ function ObjectiveIndicationsView({ guideline }) {
                 />
               </span>
             </div>
-            <GuidelineNodeList nodes={guideline.nodes} depth={0} />
+            {guideline.nodes.length === 0 ? (
+              <div className="guideline-table__empty">No auto-authorization indication rows were found in this XML.</div>
+            ) : (
+              <GuidelineNodeList nodes={guideline.nodes} depth={0} />
+            )}
           </div>
         </div>
       </section>
-    </section>
+    </>
   );
 }
 
@@ -635,7 +832,7 @@ function GuidelineNode({ node, depth }) {
     'guideline-node__row',
     hasChildren ? 'guideline-node__row--group' : 'guideline-node__row--leaf',
     depth === 0 ? 'guideline-node__row--root' : '',
-    node.selected ? 'guideline-node__row--selected' : ''
+    node.metrics?.isSample ? 'guideline-node__row--sample' : ''
   ].filter(Boolean).join(' ');
   const commonProps = {
     className: rowClass,
@@ -681,10 +878,11 @@ function GuidelineNodeLabel({ node, expanded, hasChildren = false }) {
       </span>
       <div className="guideline-node__text">
         <strong>{node.text}</strong>
-        <div className="guideline-node__meta">
-          {node.requirement && <span>Requirement: {node.requirement}</span>}
-          {node.selected && <Badge variant="positive-subtle">Selected</Badge>}
-        </div>
+        {node.metrics?.isSample && (
+          <div className="guideline-node__meta">
+            <Badge variant="warning">Sample metrics</Badge>
+          </div>
+        )}
       </div>
     </div>
   );
@@ -693,27 +891,39 @@ function GuidelineNodeLabel({ node, expanded, hasChildren = false }) {
 function GuidelineMetricCells({ metrics }) {
   return (
     <>
-      <MetricBadge value={metrics.metAi} suffix="%" variant="info-subtle" label="# Met AI" />
-      <MetricBadge value={metrics.confidence} suffix="%" variant={badgeVariant(metricTone(metrics.confidence))} label="MCG avg confidence" />
+      <MetricBadge value={metrics?.metAi} suffix="%" variant="info-subtle" label="# Met AI" />
+      <MetricBadge value={metrics?.confidence} suffix="%" variant={badgeVariant(metricTone(metrics?.confidence))} label="MCG avg confidence" />
       <AgreementCell metrics={metrics} />
-      <MetricBadge value={metrics.recall} suffix="%" variant={badgeVariant(metricTone(metrics.recall))} label="Recall" />
+      <MetricBadge value={metrics?.recall} suffix="%" variant={badgeVariant(metricTone(metrics?.recall))} label="Recall" />
     </>
   );
 }
 
 function MetricBadge({ value, suffix = '', variant = 'neutral', label }) {
+  const hasValue = value != null;
+  const displayValue = hasValue ? `${formatNumber(value)}${suffix}` : '-';
+
   return (
-    <div className="guideline-metric-cell" role="gridcell" aria-label={`${label}: ${value}${suffix}`}>
-      <Badge variant={variant}>{value}{suffix}</Badge>
+    <div className="guideline-metric-cell" role="gridcell" aria-label={hasValue ? `${label}: ${displayValue}` : `${label}: no data`}>
+      <Badge variant={hasValue ? variant : 'neutral'}>{displayValue}</Badge>
     </div>
   );
 }
 
 function AgreementCell({ metrics }) {
+  if (metrics?.agreementAgree == null) {
+    return (
+      <div className="agreement-cell" role="gridcell" aria-label="Precision user agreement: no data">
+        <Badge>-</Badge>
+        <span>No data</span>
+      </div>
+    );
+  }
+
   return (
-    <div className="agreement-cell" role="gridcell" aria-label={`User agreement precision: ${metrics.agreementAgree}% agree, ${metrics.agreementDisagree}% disagree`}>
-      <Badge variant={badgeVariant(agreementTone(metrics.agreementAgree))}>{metrics.agreementAgree}% agree</Badge>
-      <span>{metrics.agreementDisagree}% disagree</span>
+    <div className="agreement-cell" role="gridcell" aria-label={`Precision user agreement: ${formatPercent(metrics.agreementAgree)} agree, ${formatPercent(metrics.agreementDisagree)} disagree`}>
+      <Badge variant={badgeVariant(agreementTone(metrics.agreementAgree))}>{formatPercent(metrics.agreementAgree)} agree</Badge>
+      <span>{formatPercent(metrics.agreementDisagree)} disagree</span>
     </div>
   );
 }
@@ -881,7 +1091,19 @@ function formatAction(action) {
   return actionLabels[getRuleAction(action)] ?? 'Unknown action';
 }
 
+function formatNumber(value) {
+  return percentFormatter.format(Number(value));
+}
+
+function formatPercent(value) {
+  return value == null ? '-' : `${formatNumber(value)}%`;
+}
+
 function metricTone(value) {
+  if (value == null) {
+    return 'neutral';
+  }
+
   if (value >= 95) {
     return 'positive';
   }
@@ -894,6 +1116,10 @@ function metricTone(value) {
 }
 
 function agreementTone(value) {
+  if (value == null) {
+    return 'neutral';
+  }
+
   if (value >= 95) {
     return 'positive';
   }

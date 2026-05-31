@@ -1,0 +1,1182 @@
+<ExportedGuideline>
+  <Guidelines>
+    <Guideline xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" HSIM="9ED8A6497925AD6" GCode="M-282C" Title="Pneumonia Copy" ProductCode="ISC" GuidelineType="org_otg" GLOS="2 (DS)" GLOSMin="2" GLOSMax="2" GLOSType="DS" ContentOwner="GA" Interactive="false" VersionNumber="30.0" ChronicCondition="false" GuidelineKey="" IsActive="true" ClientID="6676" ClientName="cwqi18dcawoodcc" Blos_A="" Blos_P="" Blos_G="" BlosComments="" IsCustom="false" GLOSDisplay="" HasCodesOrKeywords="true" DisclaimerNote="" GuidelineMode="1" Blurb="" EntityType="1" CanRevise="true" Status="0" GLOSNote="" RelatedHSIM="0555010b" RelatedHSIMActive="true" RelatedProduct="ISC">
+      <sections>
+        <section Heading="Care Planning - Inpatient Admission and Alternatives" Path="/Care_Planning_-_Inpatient_Admission_and_Alternatives" LogicType="1">
+          <section Heading="Clinical Indications for Admission to Inpatient Care" Path="/Care_Planning_-_Inpatient_Admission_and_Alternatives/Clinical_Indications_for_Admission_to_Inpatient_Care" LogicType="2" isautoauthorization="true" SupplementalMedicareCriteriaDef_id="def_MAFR2024" />
+          <section Heading="Alternatives to Admission" Path="/Care_Planning_-_Inpatient_Admission_and_Alternatives/Alternatives_to_Admission" LogicType="3" />
+        </section>
+        <section Heading="Hospitalization" Path="/Hospitalization" LogicType="1">
+          <section Heading="Optimal Recovery Course" Path="/Hospitalization/Optimal_Recovery_Course" LogicType="4" />
+          <section Heading="Extended Stay" Path="/Hospitalization/Extended_Stay" LogicType="3" />
+        </section>
+        <section Heading="Discharge" Path="/Discharge" LogicType="1">
+          <section Heading="Discharge Planning" Path="/Discharge/Discharge_Planning" LogicType="3" />
+          <section Heading="Discharge Destination" Path="/Discharge/Discharge_Destination" LogicType="3" />
+        </section>
+        <section Heading="Evidence Summary" Path="/Evidence_Summary" LogicType="1">
+          <section Heading="Background" Path="/Evidence_Summary/Background" LogicType="1" />
+          <section Heading="Criteria" Path="/Evidence_Summary/Criteria" LogicType="1" />
+          <section Heading="Length of Stay" Path="/Evidence_Summary/Length_of_Stay" LogicType="1" />
+          <section Heading="Rationale" Path="/Evidence_Summary/Rationale" LogicType="1" />
+          <section Heading="Related CMS Coverage Guidance" Path="/Evidence_Summary/Related_CMS_Coverage_Guidance" LogicType="1" />
+        </section>
+        <guidelinemaps>
+          <guidelinemap type="observation">
+            <links>
+              <link hsim="0555019v" title="Pneumonia: Observation Care" product="ISC" />
+            </links>
+          </guidelinemap>
+        </guidelinemaps>
+      </sections>
+      <LinesOfBusiness />
+    </Guideline>
+  </Guidelines>
+  <Sections>
+    <Section xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" ContentOwner="GA" ClientName="" VersionNumber="30.0" ProductCode="ISC" HSIM="9ED8A6497925AD6" SectionPath="/Care_Planning_-_Inpatient_Admission_and_Alternatives" ProgressionBehavior="" ProgressionPeriod="" ClientID="6676">
+      <guideline-sect2 id="CarePlanning_0555010b" logic_type="1" role="Care Planning - Inpatient Admission and Alternatives" contentsource="1" contenttype="Section" displayorder="2" idguideline="2204" idsection="5609539" path="/Care_Planning_-_Inpatient_Admission_and_Alternatives" SectionFlavor="ParentSection" SectionStructure="Container">
+        <heading>Care Planning - Inpatient Admission and Alternatives</heading>
+      </guideline-sect2>
+    </Section>
+    <Section xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" ContentOwner="GA" ClientName="" VersionNumber="30.0" ProductCode="ISC" HSIM="9ED8A6497925AD6" SectionPath="/Care_Planning_-_Inpatient_Admission_and_Alternatives/Clinical_Indications_for_Admission_to_Inpatient_Care" ProgressionBehavior="" ProgressionPeriod="" ClientID="6676">
+      <guideline-sect3 id="IndicationsAdmission_0555010b" logic_type="2" role="Clinical Indications for Admission to Inpatient Care" contentsource="1" contenttype="Section" displayorder="1" idguideline="2204" idsection="5609540" path="/Care_Planning_-_Inpatient_Admission_and_Alternatives/Clinical_Indications_for_Admission_to_Inpatient_Care" isautoauthorization="true" SectionFlavor="Indications" SectionStructure="ParentChild" SupplementalMedicareCriteriaDef_id="def_MAFR2024">
+        <heading>Clinical Indications for Admission to Inpatient Care</heading>
+        <para class="ocgorg">
+          <restrict>
+            <emphasis role="bold-italic">Note: Some patients may be appropriate for <definition-link db_id="def_07561">Observation care</definition-link>. For consideration of observation care, see </emphasis>Pneumonia: Observation Care.</restrict>
+        </para>
+        <para type="mcmnote">
+          <restrict>Note: For patients with clinically active secondary conditions, see <definition-link db_id="DEF_0555010b_MCM">Pneumonia Multiple Condition Management Guidelines</definition-link>.</restrict>
+        </para>
+        <itemizedlist>
+          <listitem indication_id="8DE994F59626DF23">
+            <autoauthsectiontext>Hospital admission is/was needed for appropriate care of the patient because of</autoauthsectiontext>
+            <para>Admission is indicated for <listlogic type="1"><emphasis>1 or more</emphasis> of the following</listlogic><footnote id="ca010336-3a98-4ec0-8c93-32e79cd575d7" display_value="A" cl="cl_f_1"><para>For patients with pneumonia suspected or known to be of viral etiology other than COVID-19 (eg, positive test for influenza), the <ulink url="isc_06399.htm" product="isc" hsim="isc_06399">Viral Illness, Acute</ulink> guideline is appropriate. For viral infection due to COVID-19, the <ulink url="isc_07387.htm" product="isc" hsim="isc_07387">COVID-19</ulink> guideline should be used. If the etiology is bacterial or unknown (eg, treating with antibiotics empirically), the <ulink url="0555010b.htm" product="isc" hsim="0555010b">Pneumonia</ulink> guideline is appropriate.</para></footnote><footnote id="49a6b716-325c-4e66-a2ef-2ce8df4fa13e" display_value="B" cl="cl_f_2"><para>This guideline pertains to the vast majority of patients with pneumonia, including patients deemed to have healthcare-associated pneumonia (HCAP). Pneumonia is diagnosed by the presence of radiographic findings (eg, patchy or lobar consolidation, air space opacities) with 2 or more signs (temperature greater than <unit>100.4 degrees F (38 degrees C)</unit> or <unit>96.8 degrees F (36 degrees C)</unit> or less, <definition-link db_id="DEF0057">Hypoxemia</definition-link>, leukocyte count greater than <unit>10,000/mm<superscript>3</superscript> (10 x10<superscript>9</superscript>/L)</unit> or less than <unit>4000/mm<superscript>3</superscript> (4 x10<superscript>9</superscript>/L)</unit>, respiratory rate greater than 20 breaths per minute) or symptoms (new or increased cough, dyspnea, or sputum production).<citation db_id="19225418" linkend="cit_3002843" cl="cl_c_1" display_value="1" /> HCAP is defined as pneumonia developing in a patient with one or more of the following healthcare contacts: residence in a nursing home or long-term care facility, wound care, IV chemotherapy or hemodialysis within the previous 30 days, or acute care hospitalization for 2 or more days within the previous 90 days.<citation db_id="19225419" linkend="cit_2713238" cl="cl_c_2" display_value="2" /> Concerns have been raised as to whether a patient identified as having HCAP is truly more likely to be infected with a multidrug-resistant organism.<citation db_id="19225420" linkend="cit_259797" cl="cl_c_3" display_value="3" /><citation db_id="19225421" linkend="cit_208282" cl="cl_c_4" display_value="4" /><citation db_id="19225422" linkend="cit_2507105" cl="cl_c_5" display_value="5" /></para></footnote><citation db_id="19225419" linkend="cit_2713238" cl="cl_c_6" display_value="2" /><citation db_id="19225420" linkend="cit_259797" cl="cl_c_7" display_value="3" /><citation db_id="19225423" linkend="cit_2537866" cl="cl_c_8" display_value="6" />:</para>
+            <itemizedlist>
+              <listitem indication_id="E48F41A3233D403B">
+                <para>
+                  <definition-link db_id="DEF0057">Hypoxemia</definition-link>
+                  <citation db_id="19225420" linkend="cit_259797" cl="cl_c_22" display_value="3" />
+                </para>
+              </listitem>
+              <listitem indication_id="F8BB900A2D5B9A21">
+                <para>
+                  <definition-link db_id="DEF0006">Hemodynamic instability</definition-link>
+                  <citation db_id="19225419" linkend="cit_2713238" cl="cl_c_23" display_value="2" />
+                  <citation db_id="19225420" linkend="cit_259797" cl="cl_c_24" display_value="3" />
+                </para>
+              </listitem>
+              <listitem indication_id="BBBF995EE6CD88EE">
+                <para>
+                  <definition-link db_id="def_03639">Altered mental status that is severe or persistent</definition-link>
+                  <citation db_id="19225420" linkend="cit_259797" cl="cl_c_25" display_value="3" />
+                </para>
+              </listitem>
+              <listitem indication_id="27F26BBCA10F67BF">
+                <para>
+                  <definition-link db_id="def_03636">Dehydration that is severe or persistent</definition-link>
+                  <citation db_id="19225424" linkend="cit_188728" cl="cl_c_26" display_value="9" />
+                </para>
+              </listitem>
+              <listitem indication_id="32EF3317EF7AAFD4">
+                <para>Ventilatory assistance<footnote id="257a73eb-7793-475d-acb1-c563111b5d35" display_value="C" cl="cl_f_3"><para>Ventilatory assistance includes noninvasive methods (eg, high-flow nasal cannula (HFNC), CPAP, BPAP) and invasive methods (intubation with mechanical ventilation).</para></footnote> needed (eg, mechanical ventilation, noninvasive ventilation)<citation db_id="19225419" linkend="cit_2713238" cl="cl_c_27" display_value="2" /><citation db_id="19225420" linkend="cit_259797" cl="cl_c_28" display_value="3" /></para>
+              </listitem>
+              <listitem indication_id="7EE8E31585D85427">
+                <para>
+                  <definition-link db_id="def_06662">Bacteremia</definition-link>
+                </para>
+              </listitem>
+              <listitem indication_id="68610767FBA05544">
+                <para>Moderate-risk-category or high-risk-category patient (Pneumonia Severity Index class IV or V, CURB-65 score of 3 or greater, or Quick Sequential Organ Failure Assessment (qSOFA) score of 2 or 3) <restrict><calculator type="PSI">PSI Calculator</calculator></restrict><restrict><calculator type="CURB">CURB-65 Calculator</calculator></restrict><citation db_id="19225419" linkend="cit_2713238" cl="cl_c_29" display_value="2" /><citation db_id="19225420" linkend="cit_259797" cl="cl_c_30" display_value="3" /><citation db_id="19225423" linkend="cit_2537866" cl="cl_c_31" display_value="6" /><citation db_id="19225425" linkend="cit_3005733" cl="cl_c_32" display_value="10" /></para>
+              </listitem>
+              <listitem indication_id="720076BDC7586D06">
+                <para>Respiratory finding (eg, <definition-link db_id="DEF0082">Tachypnea</definition-link>) that persists despite observation care<citation db_id="19225426" linkend="cit_2545019" cl="cl_c_33" display_value="11" /></para>
+              </listitem>
+              <listitem indication_id="4EA959EBAB5ECBD4">
+                <para>Complicated pleural effusions (eg, empyema, loculated)<citation db_id="19225427" linkend="cit_2713219" cl="cl_c_34" display_value="12" /></para>
+              </listitem>
+              <listitem indication_id="B6808771D586005D">
+                <para>Inability to maintain oral hydration (IV fluid support necessary) despite observation care</para>
+              </listitem>
+              <listitem indication_id="51453D0B32D5DC3C">
+                <para>Isolation indicated that cannot be performed outside hospital setting</para>
+              </listitem>
+            </itemizedlist>
+          </listitem>
+        </itemizedlist>
+      </guideline-sect3>
+    </Section>
+    <Section xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" ContentOwner="GA" ClientName="" VersionNumber="30.0" ProductCode="ISC" HSIM="9ED8A6497925AD6" SectionPath="/Care_Planning_-_Inpatient_Admission_and_Alternatives/Alternatives_to_Admission" ProgressionBehavior="" ProgressionPeriod="" ClientID="6676">
+      <guideline-sect3 id="AlternativesAdmission_0555010b" logic_type="3" role="Alternatives to Admission" contentsource="1" contenttype="Section" displayorder="3" idguideline="2204" idsection="5609541" path="/Care_Planning_-_Inpatient_Admission_and_Alternatives/Alternatives_to_Admission" SectionFlavor="Alternatives" SectionStructure="ParentChild">
+        <heading>Alternatives to Admission</heading>
+        <itemizedlist>
+          <listitem indication_id="226147694CA654FB">
+            <para>Alternatives include<citation db_id="19225419" linkend="cit_2713238" cl="cl_c_36" display_value="2" /><citation db_id="19225420" linkend="cit_259797" cl="cl_c_37" display_value="3" /><citation db_id="19225428" linkend="cit_2908907" cl="cl_c_38" display_value="14" /><citation db_id="19225429" linkend="cit_207516" cl="cl_c_39" display_value="15" />:</para>
+            <itemizedlist>
+              <listitem indication_id="A93311A3A348872E">
+                <para>Outpatient care in emergency department, rapid treatment site, urgent care center, or medical office</para>
+                <itemizedlist>
+                  <listitem indication_id="11A4FD54DF83CAE0">
+                    <para>History, physical examination, and assessment of risk factors</para>
+                  </listitem>
+                  <listitem indication_id="98DC412072F997FC">
+                    <para>Chest x-ray and laboratory testing</para>
+                  </listitem>
+                  <listitem indication_id="9BF754DE4EECB94A">
+                    <para>Antibiotics and re-evaluation of hemodynamics, oxygenation status, and other parameters</para>
+                  </listitem>
+                  <listitem indication_id="A8FCE62425612209">
+                    <para>Discharge on oral or parenteral antibiotics.</para>
+                  </listitem>
+                </itemizedlist>
+              </listitem>
+              <listitem indication_id="EE1556DB826A87AB">
+                <para>Observation. See Pneumonia: Observation Care guideline as appropriate.</para>
+              </listitem>
+              <listitem indication_id="B6E6B9BFD12C292D">
+                <para>Home care<citation db_id="19225430" linkend="cit_2500094" cl="cl_c_40" display_value="16" /></para>
+                <itemizedlist>
+                  <listitem indication_id="5E31D0DCE291B6AC">
+                    <para>Nursing visits for assessment and laboratory work</para>
+                  </listitem>
+                  <listitem indication_id="90758EE0E73F4CF8">
+                    <para>Parenteral antibiotics, respiratory therapy, and oxygen, as indicated</para>
+                  </listitem>
+                </itemizedlist>
+              </listitem>
+              <listitem indication_id="51AC86797C7710B4">
+                <para>Recovery facility</para>
+                <itemizedlist>
+                  <listitem indication_id="AFA96D270431FCBF">
+                    <para>Parenteral fluid and medication</para>
+                  </listitem>
+                  <listitem indication_id="8D932A9E74F39D40">
+                    <para>Respiratory treatment and oxygen</para>
+                  </listitem>
+                  <listitem indication_id="2496825AF2F1CCE1">
+                    <para>Frequent assessment and treatment</para>
+                  </listitem>
+                  <listitem indication_id="20F25E8900DFD5E5">
+                    <para>Management of comorbidities</para>
+                  </listitem>
+                </itemizedlist>
+              </listitem>
+            </itemizedlist>
+          </listitem>
+        </itemizedlist>
+      </guideline-sect3>
+    </Section>
+    <Section xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" ContentOwner="GA" ClientName="" VersionNumber="30.0" ProductCode="ISC" HSIM="9ED8A6497925AD6" SectionPath="/Hospitalization" ProgressionBehavior="" ProgressionPeriod="" ClientID="6676">
+      <guideline-sect2 id="Hospitalization_0555010b" logic_type="1" role="Hospitalization" contentsource="1" contenttype="Section" displayorder="3" idguideline="2204" idsection="5609542" path="/Hospitalization" SectionFlavor="ParentSection" SectionStructure="Container">
+        <heading>Hospitalization</heading>
+      </guideline-sect2>
+    </Section>
+    <Section xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" ContentOwner="GA" ClientName="" VersionNumber="30.0" ProductCode="ISC" HSIM="9ED8A6497925AD6" SectionPath="/Hospitalization/Optimal_Recovery_Course" ProgressionBehavior="Level Of Care" ProgressionPeriod="Day" ClientID="6676">
+      <guideline-sect3 id="OptimalRecoveryCourse_0555010b" logic_type="4" role="Optimal Recovery Course" contentsource="1" contenttype="Section" displayorder="1" idguideline="2204" idsection="5609543" path="/Hospitalization/Optimal_Recovery_Course" SectionFlavor="Progression" SectionStructure="Progression">
+        <heading>Optimal Recovery Course</heading>
+        <table frame="all" role="orc">
+          <tgroup cols="7">
+            <colspec colname="col1" colwidth="0.97*" />
+            <colspec colname="col2" colwidth="1.44*" />
+            <colspec colname="col3" colwidth="1.64*" />
+            <colspec colname="col4" colwidth="1.72*" />
+            <colspec colname="col5" colwidth="1.04*" />
+            <colspec colname="col6" colwidth="1.59*" />
+            <colspec colname="col7" colwidth="1.05*" />
+            <thead>
+              <row progressionInterval="Day">
+                <entry align="center">
+                  <para>
+                    <emphasis role="bold">Day</emphasis>
+                  </para>
+                </entry>
+                <entry align="center">
+                  <para>
+                    <emphasis role="bold">Level of Care</emphasis>
+                  </para>
+                </entry>
+                <entry align="center">
+                  <para>
+                    <emphasis role="bold">Clinical Status</emphasis>
+                  </para>
+                </entry>
+                <entry align="center">
+                  <para>
+                    <emphasis role="bold">Activity</emphasis>
+                  </para>
+                </entry>
+                <entry align="center">
+                  <para>
+                    <emphasis role="bold">Routes</emphasis>
+                  </para>
+                </entry>
+                <entry align="center">
+                  <para>
+                    <emphasis role="bold">Interventions</emphasis>
+                  </para>
+                </entry>
+                <entry align="center">
+                  <para>
+                    <emphasis role="bold">Medications</emphasis>
+                  </para>
+                </entry>
+              </row>
+            </thead>
+            <tbody>
+              <row progressionInterval="1">
+                <entry align="left">
+                  <para>
+                    <emphasis role="bold">1</emphasis>
+                  </para>
+                </entry>
+                <entry align="left">
+                  <itemizedlist>
+                    <listitem indication_id="832E702D83C375F6">
+                      <para>ICU<footnote id="e892f986-520a-4a6d-8b84-10322774478d" display_value="D" cl="cl_f_4"><para>Specialty society guidelines recommend ICU admission for a patient with need for invasive or noninvasive assisted ventilation, <definition-link db_id="DEF0006">Hemodynamic instability</definition-link>, or any 3 of the following severity factors: sodium less than <unit>130 mEq/L (mmol/L)</unit>, PaO<subscript>2</subscript> to FiO<subscript>2</subscript> ratio of <unit>250 mm Hg</unit> or less, multilobed infiltrates, <definition-link db_id="def_03638">Altered mental status</definition-link>, BUN <unit>20 mg/dL (7.1 mmol/L)</unit> or greater, WBC count less than <unit>4000/mm<superscript>3</superscript> (4 x10<superscript>9</superscript>/L)</unit>, platelet count less than <unit>100,000/mm<superscript>3</superscript> (100 x10<superscript>9</superscript>/L)</unit>, or temperature less than <unit>96.8 degrees F (36 degrees C)</unit>. See <ulink url="isc_ittc.htm" class="nav-link-toc" product="isc" hsim="isc_ittc">Intensive, Intermediate, and Telemetry Care Guidelines</ulink> for further information.<citation db_id="19225420" linkend="cit_259797" cl="cl_c_41" display_value="3" /><citation db_id="19225423" linkend="cit_2537866" cl="cl_c_42" display_value="6" /><citation db_id="19225431" linkend="cit_2537854" cl="cl_c_43" display_value="17" /><citation db_id="19225432" linkend="cit_91473" cl="cl_c_44" display_value="18" /></para></footnote> or floor</para>
+                    </listitem>
+                    <listitem indication_id="F1221BF369C5231F">
+                      <para>
+                        <definition-link db_id="def_06520" type="SocialDeterminantsofHealth">Social Determinants of Health Assessment</definition-link>
+                      </para>
+                    </listitem>
+                    <listitem indication_id="355CED64CCE89FAE">
+                      <para>
+                        <definition-link db_id="def_07657" type="ReadmissionRisk">Adult Readmission Risk Assessment</definition-link>
+                      </para>
+                    </listitem>
+                    <listitem indication_id="8B3153944F5A0D38">
+                      <para>
+                        <definition-link db_id="DEF_1879" type="ExtendedStayRisk">Extended Stay Risk Assessment</definition-link>
+                      </para>
+                    </listitem>
+                    <listitem indication_id="1D09B8123EC5A81B">
+                      <para>Discharge planning</para>
+                    </listitem>
+                  </itemizedlist>
+                </entry>
+                <entry align="left">
+                  <itemizedlist>
+                    <listitem type="rm" indication_id="3C75AF4673BDA96D">
+                      <para>Clinical Indications met<footnote id="3f04a026-6ef4-4f0b-9a9d-bdd97c3f5f83" display_value="E" cl="cl_f_5"><para>See <ulink url="#IndicationsAdmission_0555010b" product="isc" hsim="0555010b" sectionID="IndicationsAdmission_0555010b">Clinical Indications for Admission to Inpatient Care</ulink> in this guideline.</para></footnote></para>
+                    </listitem>
+                    <listitem indication_id="1F75D9CCDDD53D79">
+                      <para>Possible <definition-link db_id="def_03634">Fever</definition-link>, dyspnea, purulent sputum, pleuritic pain, <definition-link db_id="def_03638">Altered mental status</definition-link></para>
+                    </listitem>
+                  </itemizedlist>
+                </entry>
+                <entry align="left">
+                  <itemizedlist>
+                    <listitem indication_id="B2C5B97A3B8FBBCF">
+                      <para>Activity as tolerated</para>
+                    </listitem>
+                  </itemizedlist>
+                </entry>
+                <entry align="left">
+                  <itemizedlist>
+                    <listitem indication_id="50B7E4EBC2E9A3EF">
+                      <para>Possible IV fluids</para>
+                    </listitem>
+                    <listitem indication_id="80E1CF42D979E98B">
+                      <para>Parenteral or oral medications</para>
+                    </listitem>
+                    <listitem indication_id="5D1AC135D2FF5B4C">
+                      <para>Liquid or usual diet</para>
+                    </listitem>
+                  </itemizedlist>
+                </entry>
+                <entry align="left">
+                  <itemizedlist>
+                    <listitem indication_id="0058D05960451000">
+                      <para>WBC</para>
+                    </listitem>
+                    <listitem indication_id="45AC85DF48B15E73">
+                      <para>Possible ABG or oximetry </para>
+                    </listitem>
+                    <listitem indication_id="5CA955EFE8AA36FB">
+                      <para>Blood culture</para>
+                    </listitem>
+                    <listitem indication_id="373F1B8E2B5FDEB2">
+                      <para>Possible sputum Gram stain and culture</para>
+                    </listitem>
+                    <listitem indication_id="2D9C10CE937CF482">
+                      <para>Possible respiratory therapy</para>
+                    </listitem>
+                    <listitem indication_id="DFEA4ACC40FFDE7E">
+                      <para>Probable oxygen</para>
+                    </listitem>
+                    <listitem indication_id="B87E23F4AF1F37D2">
+                      <para>Possible thoracentesis</para>
+                    </listitem>
+                    <listitem indication_id="567C14CBA58B041B">
+                      <para>Incentive spirometry</para>
+                    </listitem>
+                    <listitem indication_id="5496B8A919C86F51">
+                      <para>Head of bed at 30 degrees</para>
+                    </listitem>
+                  </itemizedlist>
+                </entry>
+                <entry align="left">
+                  <itemizedlist>
+                    <listitem indication_id="34C0CCD47938337E">
+                      <para>IV antibiotics</para>
+                    </listitem>
+                    <listitem indication_id="9387904A68046908">
+                      <para>Possible corticosteroids</para>
+                    </listitem>
+                  </itemizedlist>
+                </entry>
+              </row>
+              <row progressionInterval="2">
+                <entry align="left">
+                  <para>
+                    <emphasis role="bold">2</emphasis>
+                  </para>
+                </entry>
+                <entry align="left">
+                  <itemizedlist>
+                    <listitem indication_id="6C3C1E5390539051">
+                      <para>Floor</para>
+                    </listitem>
+                    <listitem indication_id="F1221BF369C5231F">
+                      <para>
+                        <definition-link db_id="def_06520" type="SocialDeterminantsofHealth">Social Determinants of Health Assessment</definition-link>
+                      </para>
+                    </listitem>
+                    <listitem indication_id="355CED64CCE89FAE">
+                      <para>
+                        <definition-link db_id="def_07657" type="ReadmissionRisk">Adult Readmission Risk Assessment</definition-link>
+                      </para>
+                    </listitem>
+                    <listitem indication_id="8B3153944F5A0D38">
+                      <para>
+                        <definition-link db_id="DEF_1879" type="ExtendedStayRisk">Extended Stay Risk Assessment</definition-link>
+                      </para>
+                    </listitem>
+                  </itemizedlist>
+                </entry>
+                <entry align="left">
+                  <itemizedlist>
+                    <listitem type="rm" indication_id="142FDA4D33E7FBCE">
+                      <para>No CO<subscript>2</subscript> retention or acidosis</para>
+                    </listitem>
+                    <listitem type="rm" indication_id="6AB42B5DE5FB55D8">
+                      <para>No requirement for mechanical ventilation</para>
+                    </listitem>
+                    <listitem type="rm" indication_id="2F2F7232BDA5CE08">
+                      <para>
+                        <definition-link db_id="def_03462">Hypotension absent</definition-link>
+                      </para>
+                    </listitem>
+                    <listitem type="rm" indication_id="59BC041F24BF2229">
+                      <para>Afebrile or fever improved</para>
+                    </listitem>
+                    <listitem type="rm" indication_id="30D25EB504DE9555">
+                      <para>No hypoxia on room air or oxygenation improved</para>
+                    </listitem>
+                    <listitem type="rm" indication_id="1732B2C3691B85DF">
+                      <para>Mental status improved or at baseline</para>
+                    </listitem>
+                  </itemizedlist>
+                </entry>
+                <entry align="left">
+                  <itemizedlist>
+                    <listitem type="rm" indication_id="78D212549BD20CE9">
+                      <para>Increased activity</para>
+                    </listitem>
+                  </itemizedlist>
+                </entry>
+                <entry align="left">
+                  <itemizedlist>
+                    <listitem indication_id="479DCBBC32F1C02D">
+                      <para>Oral hydration</para>
+                    </listitem>
+                    <listitem indication_id="31B1FD6A97D84714">
+                      <para>Oral medications</para>
+                    </listitem>
+                    <listitem indication_id="378D08ED1F9E9535">
+                      <para>Usual diet</para>
+                    </listitem>
+                  </itemizedlist>
+                </entry>
+                <entry align="left">
+                  <itemizedlist>
+                    <listitem indication_id="567C14CBA58B041B">
+                      <para>Incentive spirometry</para>
+                    </listitem>
+                    <listitem indication_id="5E0F9029EEB230FC">
+                      <para>Pulse oximetry</para>
+                    </listitem>
+                    <listitem indication_id="5496B8A919C86F51">
+                      <para>Head of bed at 30 degrees </para>
+                    </listitem>
+                    <listitem indication_id="8EF68B0C913C05E2">
+                      <para>Possible oxygen</para>
+                    </listitem>
+                  </itemizedlist>
+                </entry>
+                <entry align="left">
+                  <itemizedlist>
+                    <listitem indication_id="334AB42BD77D851A">
+                      <para>IV or oral antibiotics</para>
+                    </listitem>
+                    <listitem indication_id="9387904A68046908">
+                      <para>Possible corticosteroids</para>
+                    </listitem>
+                  </itemizedlist>
+                </entry>
+              </row>
+              <row progressionInterval="3">
+                <entry align="left">
+                  <para>
+                    <emphasis role="bold">3</emphasis>
+                  </para>
+                </entry>
+                <entry align="left">
+                  <itemizedlist>
+                    <listitem indication_id="F1221BF369C5231F">
+                      <para>
+                        <definition-link db_id="def_06520" type="SocialDeterminantsofHealth">Social Determinants of Health Assessment</definition-link>
+                      </para>
+                    </listitem>
+                    <listitem indication_id="355CED64CCE89FAE">
+                      <para>
+                        <definition-link db_id="def_07657" type="ReadmissionRisk">Adult Readmission Risk Assessment</definition-link>
+                      </para>
+                    </listitem>
+                    <listitem indication_id="8B3153944F5A0D38">
+                      <para>
+                        <definition-link db_id="DEF_1879" type="ExtendedStayRisk">Extended Stay Risk Assessment</definition-link>
+                      </para>
+                    </listitem>
+                    <listitem indication_id="ECBCA49569F42058">
+                      <para>Floor to discharge<footnote id="3f0477dd-feb8-43cf-8231-6cc99619610e" display_value="F" cl="cl_f_6"><para>The patient may be discharged on oral antibiotics.<citation db_id="19225420" linkend="cit_259797" cl="cl_c_45" display_value="3" /></para></footnote></para>
+                    </listitem>
+                    <listitem indication_id="83B3E25390210EAE">
+                      <para>Complete discharge planning</para>
+                    </listitem>
+                  </itemizedlist>
+                </entry>
+                <entry align="left">
+                  <itemizedlist>
+                    <listitem discharge_readiness_order="1" type="rm" indication_id="C13A6844F647C61C">
+                      <para>
+                        <definition-link db_id="DEF0016">Hemodynamic stability</definition-link>
+                      </para>
+                    </listitem>
+                    <listitem discharge_readiness_order="4" type="rm" indication_id="CB48BB584D73874B">
+                      <para>Afebrile or temperature acceptable for next level of care</para>
+                    </listitem>
+                    <listitem discharge_readiness_order="2" type="rm" indication_id="29BBE85001B1C366">
+                      <para>
+                        <definition-link db_id="def_03465">Tachypnea absent</definition-link>
+                      </para>
+                    </listitem>
+                    <listitem discharge_readiness_order="3" type="rm" indication_id="3CB06E775D004352">
+                      <para>
+                        <definition-link db_id="def_03458">Hypoxemia absent</definition-link>
+                      </para>
+                    </listitem>
+                    <listitem discharge_readiness_order="6" type="rm" indication_id="7A496D81B85EF81B">
+                      <para>Mental status at baseline</para>
+                    </listitem>
+                    <listitem discharge_readiness_order="7" type="rm" indication_id="B4F5F0231B92E9BC">
+                      <para>Antibiotic regimen acceptable for next level of care</para>
+                    </listitem>
+                    <listitem discharge_readiness_order="12" type="rm" indication_id="9B8CEACFB958AA97">
+                      <para>Discharge plans and education understood</para>
+                    </listitem>
+                  </itemizedlist>
+                </entry>
+                <entry align="left">
+                  <itemizedlist>
+                    <listitem discharge_readiness_order="8" type="rm" indication_id="60BADBB108DE08DF">
+                      <para>Ambulatory or acceptable for next level of care</para>
+                    </listitem>
+                  </itemizedlist>
+                </entry>
+                <entry align="left">
+                  <itemizedlist>
+                    <listitem discharge_readiness_order="9" type="rm" indication_id="479DCBBC32F1C02D">
+                      <para>Oral hydration<footnote id="cc6f07dc-588d-40f9-af3c-4c690bd00497" display_value="G" cl="cl_f_7"><para>Some patients may have their hydration needs met via alternative means (eg, percutaneous endoscopic gastrostomy tube).</para></footnote></para>
+                    </listitem>
+                    <listitem discharge_readiness_order="10" type="rm" indication_id="4D8903D12914EE2D">
+                      <para>Oral medications or regimen acceptable for next level of care</para>
+                    </listitem>
+                    <listitem discharge_readiness_order="11" type="rm" indication_id="16236DE76F696F1B">
+                      <para>Oral diet or acceptable for next level of care</para>
+                    </listitem>
+                  </itemizedlist>
+                </entry>
+                <entry align="left">
+                  <itemizedlist>
+                    <listitem discharge_readiness_order="5" type="rm" indication_id="7CB0AC0745EB356F">
+                      <para>Oxygen absent or at baseline need</para>
+                    </listitem>
+                    <listitem type="rm" indication_id="40302F28F035DD67">
+                      <para>Isolation not indicated or is performable at next level of care</para>
+                    </listitem>
+                    <listitem indication_id="0058D05960451000">
+                      <para>WBC</para>
+                    </listitem>
+                    <listitem indication_id="567C14CBA58B041B">
+                      <para>Incentive spirometry</para>
+                    </listitem>
+                  </itemizedlist>
+                </entry>
+                <entry align="left">
+                  <itemizedlist>
+                    <listitem indication_id="A8B1FD66F9C51445">
+                      <para>Oral antibiotics</para>
+                    </listitem>
+                    <listitem indication_id="5C8236287DCD5FC1">
+                      <para>Possible oral corticosteroids</para>
+                    </listitem>
+                  </itemizedlist>
+                </entry>
+              </row>
+              <row>
+                <entry nameend="col7" namest="col1">
+                  <para>
+                    <citation db_id="19225418" linkend="cit_3002843" cl="cl_c_46" display_value="1" />
+                    <citation db_id="19225420" linkend="cit_259797" cl="cl_c_47" display_value="3" />
+                    <citation db_id="19225433" linkend="cit_7128" cl="cl_c_51" display_value="8" />
+                    <citation db_id="19225428" linkend="cit_2908907" cl="cl_c_50" display_value="14" />
+                    <citation db_id="19225434" linkend="cit_2904823" cl="cl_c_48" display_value="19" />
+                    <citation db_id="19225435" linkend="cit_2807318" cl="cl_c_49" display_value="20" />
+                  </para>
+                </entry>
+              </row>
+            </tbody>
+          </tgroup>
+        </table>
+        <goal-length-of-stay min="2" max="2" type="DS" display="GLOS">
+          <para>2 days </para>
+        </goal-length-of-stay>
+      </guideline-sect3>
+    </Section>
+    <Section xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" ContentOwner="GA" ClientName="" VersionNumber="30.0" ProductCode="ISC" HSIM="9ED8A6497925AD6" SectionPath="/Hospitalization/Extended_Stay" ProgressionBehavior="" ProgressionPeriod="" ClientID="6676">
+      <guideline-sect3 id="ExtendedStay_0555010b" logic_type="3" role="Extended Stay" contentsource="1" contenttype="Section" displayorder="2" idguideline="2204" idsection="5609544" path="/Hospitalization/Extended_Stay" SectionFlavor="ExtendedStay" SectionStructure="ParentChild">
+        <heading>Extended Stay</heading>
+        <para>
+          <emphasis role="italic">Note: See Pneumonia Multiple Condition Management Benchmarking Table for more detailed information.</emphasis>
+        </para>
+        <para type="notice" id="isc_extendedstay">Minimal (a few hours to 1 day), Brief (1 to 3 days), Moderate (4 to 7 days), and Prolonged (more than 7 days).</para>
+        <itemizedlist>
+          <listitem indication_id="0679F07A34CDCF48">
+            <para>Extended stay beyond goal length of stay may be needed for<citation db_id="19225420" linkend="cit_259797" cl="cl_c_53" display_value="3" /><citation db_id="19225433" linkend="cit_7128" cl="cl_c_54" display_value="8" />:</para>
+            <itemizedlist>
+              <listitem indication_id="547B0B5B622F687B">
+                <para>Failure to meet discharge criteria (recovery milestones within final day in Optimal Recovery Course)</para>
+                <itemizedlist>
+                  <listitem indication_id="3AF59A1BB5380932">
+                    <para>Expect brief stay extension.</para>
+                  </listitem>
+                </itemizedlist>
+              </listitem>
+              <listitem indication_id="C0AD3CACD3A1F0B6">
+                <para>Unclear diagnosis</para>
+                <itemizedlist>
+                  <listitem indication_id="790815BF7002D832">
+                    <para>Patient with negative cultures who is not recovering (eg, persistent signs and symptoms) on empiric antibiotics may require bronchoscopy, open lung biopsy, pleural biopsy, or changed antibiotic regimen.</para>
+                  </listitem>
+                  <listitem indication_id="3AF59A1BB5380932">
+                    <para>Expect brief stay extension.</para>
+                  </listitem>
+                </itemizedlist>
+              </listitem>
+              <listitem indication_id="58315D62F2DFF0B3">
+                <para>Pleural disease</para>
+                <itemizedlist>
+                  <listitem indication_id="5CCE527CAB9A50BE">
+                    <para>Large pleural effusions or empyema may require repetitive drainage after diagnostic thoracentesis, chest tube drainage, or video-assisted thoracoscopy.</para>
+                  </listitem>
+                  <listitem indication_id="3AF59A1BB5380932">
+                    <para>Expect brief stay extension.</para>
+                  </listitem>
+                </itemizedlist>
+              </listitem>
+              <listitem indication_id="952FA407E6174E0B">
+                <para>Severe pneumonia or treatment failure<citation db_id="19225431" linkend="cit_2537854" cl="cl_c_55" display_value="17" /><citation db_id="19225436" linkend="cit_2537853" cl="cl_c_56" display_value="21" /></para>
+                <itemizedlist>
+                  <listitem indication_id="3945038B6F60934A">
+                    <para>Nonresponsiveness to initial therapy has been associated with higher initial severity of infection (eg, high Pneumonia Severity Index or CURB-65 scores), hypoxemia, respiratory rate greater than 30 breaths per minute, and thrombocytopenia.<citation db_id="19225436" linkend="cit_2537853" cl="cl_c_57" display_value="21" /></para>
+                  </listitem>
+                  <listitem indication_id="068112CC0A06E73E">
+                    <para>Patient with necrotizing pneumonia or lung abscess may require longer hospital stay for recovery.<citation db_id="19225437" linkend="cit_230277" cl="cl_c_58" display_value="22" /></para>
+                  </listitem>
+                  <listitem indication_id="C7C853797890EE5F">
+                    <para>Patient with extension of x-ray infiltrates, multilobar disease, or ongoing hypoxemia may require longer hospital stay for recovery.</para>
+                  </listitem>
+                  <listitem indication_id="9518BE42A0FCA163">
+                    <para>Patient with bacterial and viral co-infection may have higher morbidity and require longer hospital stay.<citation db_id="19225438" linkend="cit_2707157" cl="cl_c_59" display_value="23" /></para>
+                  </listitem>
+                  <listitem indication_id="3AF59A1BB5380932">
+                    <para>Expect brief stay extension.</para>
+                  </listitem>
+                </itemizedlist>
+              </listitem>
+              <listitem indication_id="4D1D72F7BEF580AB">
+                <para>Infection with antibiotic-resistant organism (eg, <micro-organism>Pseudomonas</micro-organism> species, <micro-organism>Acinetobacter</micro-organism> species, methicillin-resistant <micro-organism>Staphylococcus aureus</micro-organism>)<footnote id="49a6b716-325c-4e66-a2ef-2ce8df4fa13e" display_value="B" cl="cl_f_11"><para>This guideline pertains to the vast majority of patients with pneumonia, including patients deemed to have healthcare-associated pneumonia (HCAP). Pneumonia is diagnosed by the presence of radiographic findings (eg, patchy or lobar consolidation, air space opacities) with 2 or more signs (temperature greater than <unit>100.4 degrees F (38 degrees C)</unit> or <unit>96.8 degrees F (36 degrees C)</unit> or less, <definition-link db_id="DEF0057">Hypoxemia</definition-link>, leukocyte count greater than <unit>10,000/mm<superscript>3</superscript> (10 x10<superscript>9</superscript>/L)</unit> or less than <unit>4000/mm<superscript>3</superscript> (4 x10<superscript>9</superscript>/L)</unit>, respiratory rate greater than 20 breaths per minute) or symptoms (new or increased cough, dyspnea, or sputum production).<citation db_id="19225418" linkend="cit_3002843" cl="cl_c_1" display_value="1" /> HCAP is defined as pneumonia developing in a patient with one or more of the following healthcare contacts: residence in a nursing home or long-term care facility, wound care, IV chemotherapy or hemodialysis within the previous 30 days, or acute care hospitalization for 2 or more days within the previous 90 days.<citation db_id="19225419" linkend="cit_2713238" cl="cl_c_2" display_value="2" /> Concerns have been raised as to whether a patient identified as having HCAP is truly more likely to be infected with a multidrug-resistant organism.<citation db_id="19225420" linkend="cit_259797" cl="cl_c_3" display_value="3" /><citation db_id="19225421" linkend="cit_208282" cl="cl_c_4" display_value="4" /><citation db_id="19225422" linkend="cit_2507105" cl="cl_c_5" display_value="5" /></para></footnote><footnote id="8a523c8a-cc2b-4ad8-b967-681d261d75f6" display_value="H" cl="cl_f_8"><para>The most useful and powerful risk factors for infection with antibiotic-resistant organisms are those that are locally developed and validated, as prevalence can vary significantly.<citation db_id="19225420" linkend="cit_259797" cl="cl_c_60" display_value="3" /> Concerning methicillin-resistant <micro-organism>Staphylococcus aureus</micro-organism> (MRSA) and <micro-organism>Pseudomonas</micro-organism> species, an evidence-based specialty society guideline concludes that the most consistently strong individual risk factors, other than those developed locally, are a patient having had either organism previously isolated, especially from the respiratory tract, or recent (within past 90 days) hospitalization with exposure to parenteral antibiotics.<citation db_id="19225420" linkend="cit_259797" cl="cl_c_61" display_value="3" /> This same guideline recommends that, when empiric coverage for <micro-organism>Pseudomonas</micro-organism> species or MRSA is used, therapy should be de-escalated (reversion to routine antibiotic coverage) if microbiological results (eg, blood culture, sputum culture) do not confirm infection with a resistant organism within 48 hours.<citation db_id="19225420" linkend="cit_259797" cl="cl_c_62" display_value="3" /></para></footnote><footnote id="3c031c25-079d-4ec1-9f44-0f63623020bb" display_value="I" cl="cl_f_9"><para>In pneumonia patients, the absence of nasal methicillin-resistant <micro-organism>Staphylococcus aureus</micro-organism> (MRSA) colonization upon admission indicates a very low likelihood of MRSA infection. A systematic review and meta-analysis (22 studies, 5163 patients) examining nasal colonization screening found a pooled sensitivity for MRSA pneumonia of 71% and a pooled specificity of 90%.<citation db_id="19225420" linkend="cit_259797" cl="cl_c_63" display_value="3" /><citation db_id="19225439" linkend="cit_227262" cl="cl_c_64" display_value="24" /> Assuming a 10% prevalence of MRSA pneumonia, this would translate to a positive predictive value (PPV) of 45% and a negative predictive value (NPV) of 97%, indicating that a negative screen can essentially rule out MRSA pneumonia.<citation db_id="19225420" linkend="cit_259797" cl="cl_c_65" display_value="3" /><citation db_id="19225439" linkend="cit_227262" cl="cl_c_66" display_value="24" /> In settings with a lower prevalence of MRSA pneumonia, the NPV would be even higher. The PPV, on the other hand, does not allow this screening to rule in MRSA pneumonia, although it may yield a likelihood that rises above the treatment (eg, IV vancomycin) threshold. Two studies, encompassing 901 patients admitted for community-acquired pneumonia, reported that a Drug Resistance in Pneumonia (DRIP) score of less than 4 had a 99% NPV for having a drug-resistant pathogen.<citation db_id="19225440" linkend="cit_2507109" cl="cl_c_67" display_value="25" /><citation db_id="19225441" linkend="cit_2507459" cl="cl_c_68" display_value="26" /> Low PPV for a DRIP score of 4 or greater (4.7% to 8.4%) in these studies indicates the need to continue using antibiotic stewardship and de-escalation practices in conjunction with this score after broad-spectrum antibiotics are started.<citation db_id="19225440" linkend="cit_2507109" cl="cl_c_69" display_value="25" /><citation db_id="19225441" linkend="cit_2507459" cl="cl_c_70" display_value="26" /> A calculator is available at <website>www.mdcalc.com/drug-resistance-pneumonia-drip-score</website>.</para></footnote><citation db_id="19225421" linkend="cit_208282" cl="cl_c_71" display_value="4" /><citation db_id="19225422" linkend="cit_2507105" cl="cl_c_72" display_value="5" /><citation db_id="19225442" linkend="cit_2507103" cl="cl_c_73" display_value="27" /></para>
+                <itemizedlist>
+                  <listitem indication_id="2A3C356BEFE70405">
+                    <para>Patient infected with antibiotic-resistant organism may require multiple antibiotics, broader coverage, and more prolonged IV antibiotic course.</para>
+                  </listitem>
+                  <listitem indication_id="3AF59A1BB5380932">
+                    <para>Expect brief stay extension.</para>
+                  </listitem>
+                </itemizedlist>
+              </listitem>
+              <listitem indication_id="3803031710C7680A">
+                <para>Respiratory insufficiency or failure</para>
+                <itemizedlist>
+                  <listitem indication_id="74A3BB8B4B4C9883">
+                    <para>Anticipate ventilatory support.<footnote id="257a73eb-7793-475d-acb1-c563111b5d35" display_value="C" cl="cl_f_12"><para>Ventilatory assistance includes noninvasive methods (eg, high-flow nasal cannula (HFNC), CPAP, BPAP) and invasive methods (intubation with mechanical ventilation).</para></footnote><citation db_id="19225434" linkend="cit_2904823" cl="cl_c_74" display_value="19" /><citation db_id="19225435" linkend="cit_2807318" cl="cl_c_75" display_value="20" /><citation db_id="19225443" linkend="cit_2543539" cl="cl_c_76" display_value="28" /></para>
+                  </listitem>
+                  <listitem indication_id="A0F9FD3298EE56F3">
+                    <para>Expect moderate stay extension.</para>
+                  </listitem>
+                </itemizedlist>
+              </listitem>
+              <listitem indication_id="4B378EFADECF08C3">
+                <para>New-onset hyponatremia (serum sodium concentration of <unit>135 mEq/L (mmol/L)</unit> or less)</para>
+                <itemizedlist>
+                  <listitem indication_id="FD0AD74E6CE13DAF">
+                    <para>Anticipate close monitoring for signs and symptoms and of serum electrolytes.</para>
+                  </listitem>
+                  <listitem indication_id="3AF59A1BB5380932">
+                    <para>Expect brief stay extension.</para>
+                  </listitem>
+                </itemizedlist>
+              </listitem>
+              <listitem indication_id="ABD1DCBBBDD14944">
+                <para>Clinically significant comorbid illness (eg, heart failure, atrial fibrillation with rapid heart rate, alcohol withdrawal, renal insufficiency, diabetes)</para>
+                <itemizedlist>
+                  <listitem indication_id="8A5192389EAD4D22">
+                    <para>Anticipate evaluation and treatment of specific comorbidity.</para>
+                  </listitem>
+                  <listitem indication_id="3AF59A1BB5380932">
+                    <para>Expect brief stay extension.</para>
+                  </listitem>
+                </itemizedlist>
+              </listitem>
+              <listitem indication_id="7E9231C3AD9C464F">
+                <para>Comorbid acute exacerbation of obstructive lung disease (eg, COPD, asthma)<citation db_id="19225444" linkend="cit_2708247" cl="cl_c_77" display_value="29" /></para>
+                <itemizedlist>
+                  <listitem indication_id="4762379C1C9C5254">
+                    <para>COPD is associated with higher mortality, higher rates of ventilator-dependent respiratory failure, and <micro-organism>Pseudomonas</micro-organism> infection.</para>
+                  </listitem>
+                  <listitem indication_id="3AF59A1BB5380932">
+                    <para>Expect brief stay extension.</para>
+                  </listitem>
+                </itemizedlist>
+              </listitem>
+              <listitem indication_id="F3D458368322138B">
+                <para>Concomitant diagnosis of malignancy (eg, postobstruction pneumonia)</para>
+                <itemizedlist>
+                  <listitem indication_id="F35F8E797498FF33">
+                    <para>Malignancy may be associated with malnutrition, immunologic impairment, or bronchial obstruction.</para>
+                  </listitem>
+                  <listitem indication_id="EF83D2E456C655FC">
+                    <para>Expect brief to moderate stay extension.</para>
+                  </listitem>
+                </itemizedlist>
+              </listitem>
+              <listitem indication_id="E711CD0E52635CEE">
+                <para>Altered mental status</para>
+                <itemizedlist>
+                  <listitem indication_id="43D6C130D23B73F6">
+                    <para>Altered mental status disease may delay mobilization and recovery.</para>
+                  </listitem>
+                  <listitem indication_id="3AF59A1BB5380932">
+                    <para>Expect brief stay extension.</para>
+                  </listitem>
+                </itemizedlist>
+              </listitem>
+              <listitem indication_id="916A1FD8AE32FD1B">
+                <para>Malnutrition<citation db_id="19225445" linkend="cit_2707156" cl="cl_c_78" display_value="30" /></para>
+                <itemizedlist>
+                  <listitem indication_id="2365E36C83294373">
+                    <para>Malnutrition is associated with higher mortality, higher rates of ventilator-dependent respiratory failure, and higher risk of sepsis and septic shock.</para>
+                  </listitem>
+                  <listitem indication_id="3AF59A1BB5380932">
+                    <para>Expect brief stay extension.</para>
+                  </listitem>
+                </itemizedlist>
+              </listitem>
+            </itemizedlist>
+          </listitem>
+        </itemizedlist>
+        <para>See Common Complications and Conditions for further information.</para>
+      </guideline-sect3>
+    </Section>
+    <Section xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" ContentOwner="GA" ClientName="" VersionNumber="30.0" ProductCode="ISC" HSIM="9ED8A6497925AD6" SectionPath="/Discharge" ProgressionBehavior="" ProgressionPeriod="" ClientID="6676">
+      <guideline-sect2 contentsource="38" contenttype="Section" displayorder="4" id="Discharge_0555010b" idguideline="2204" idsection="5609545" logic_type="1" path="/Discharge" role="Discharge" SectionFlavor="ParentSection" SectionStructure="Container">
+        <heading>Discharge</heading>
+      </guideline-sect2>
+    </Section>
+    <Section xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" ContentOwner="GA" ClientName="" VersionNumber="30.0" ProductCode="ISC" HSIM="9ED8A6497925AD6" SectionPath="/Discharge/Discharge_Planning" ProgressionBehavior="" ProgressionPeriod="" ClientID="6676">
+      <guideline-sect3 role="DischargePlanning" id="DischargePlanning_0555010b" logic_type="3" contentsource="63" contenttype="Section" displayorder="1" idguideline="7124" idsection="5609546" path="/Discharge/Discharge_Planning" SectionFlavor="Discharge" SectionStructure="ParentChild">
+        <heading>Discharge Planning</heading>
+        <itemizedlist>
+          <listitem indication_id="8952F915A6667D85">
+            <para>Discharge planning includes<footnote id="91e2da03-854d-46d7-b717-9c09ef1bd810" display_value="J" cl="cl_f_10"><para>Discharge instructions should be given in the patient's and caregiver's native language using trained language interpreters whenever possible.<citation db_id="19225446" linkend="cit_2604176" cl="cl_c_79" display_value="31" /></para></footnote>:</para>
+            <itemizedlist>
+              <listitem indication_id="B058F8B71CE48D46">
+                <para>Assessment of needs and planning for care, including<citation db_id="19225447" linkend="cit_0555010b_DP_2507131" cl="cl_c_80" display_value="32" /><citation db_id="19225448" linkend="cit_0555010b_DP_2903678" cl="cl_c_81" display_value="33" /><citation db_id="19225449" linkend="cit_0555010b_DP_3003059" cl="cl_c_82" display_value="34" />:</para>
+                <itemizedlist>
+                  <listitem indication_id="758D0CDC67916BD8">
+                    <para>Develop and modify treatment plan (involving multiple providers) as needed.</para>
+                  </listitem>
+                  <listitem indication_id="0727F88DD96D2751">
+                    <para>Evaluate and address preadmission functioning as needed.</para>
+                  </listitem>
+                  <listitem indication_id="4C7A6F55BDE0AD04">
+                    <para>Evaluate and address psychosocial status issues as indicated. See Psychosocial Assessment for further information.</para>
+                  </listitem>
+                  <listitem indication_id="06E4D564EF834218">
+                    <para>Evaluate and address social determinants of health (eg, housing, food). See Social Determinants of Health Screening Tool for further information.</para>
+                  </listitem>
+                  <listitem indication_id="D85CDBFE14CBDEA6">
+                    <para>Evaluate and address patient or caregiver preferences as indicated.</para>
+                  </listitem>
+                  <listitem indication_id="B9644ABC603C2B45">
+                    <para>Identify skilled services needed at next level of care, with specific attention to:</para>
+                    <itemizedlist>
+                      <listitem indication_id="E3618817B9495C5E">
+                        <para>Medication management, adherence instruction, and side effects assessment<citation db_id="19225450" linkend="cit_0555010b_DP_2904707" cl="cl_c_83" display_value="35" /></para>
+                      </listitem>
+                      <listitem indication_id="9D76B46D4447713B">
+                        <para>Ongoing education required<citation db_id="19225451" linkend="cit_0555010b_DP_2719039" cl="cl_c_84" display_value="36" /></para>
+                      </listitem>
+                      <listitem indication_id="F96971E1262F8C5F">
+                        <para>Respiratory status assessment</para>
+                      </listitem>
+                    </itemizedlist>
+                  </listitem>
+                </itemizedlist>
+              </listitem>
+              <listitem indication_id="4DA81687DE90CFC0">
+                <para>Early identification of anticipated discharge destination; options include<citation db_id="19225449" linkend="cit_0555010b_DP_3003059" cl="cl_c_87" display_value="34" /><citation db_id="19225452" linkend="cit_0555010b_DP_2900942" cl="cl_c_85" display_value="37" /><citation db_id="19225453" linkend="cit_0555010b_DP_2903677" cl="cl_c_86" display_value="38" />:</para>
+                <itemizedlist>
+                  <listitem indication_id="CF423C3FC48FBA7D">
+                    <para>Home; considerations include:</para>
+                    <itemizedlist>
+                      <listitem indication_id="F72E842AA1F8BB60">
+                        <para>Home safety assessment. See Home Safety Assessment for further information.</para>
+                      </listitem>
+                      <listitem collapsible="true" selectable="false" definition_id="DEF0162" indication_id="213E967C72950141">
+                        <cpara>Patient safe to go home</cpara>
+                        <para>Patient safe to go home; <listlogic type="E">examples include</listlogic><citation db_id="19225454" linkend="cit_84921" cl="cl_c_88" display_value="39" /><citation db_id="19225455" linkend="cit_2700835" cl="cl_c_89" display_value="40" /><citation db_id="19225456" linkend="cit_2801081" cl="cl_c_90" display_value="41" />:</para>
+                        <itemizedlist>
+                          <listitem indication_id="A446318C25F1902C">
+                            <para>Medical status stable for patient's condition</para>
+                          </listitem>
+                          <listitem indication_id="7A4E07F01FC99E1F">
+                            <para>Functional care can safely be provided with available resources.</para>
+                          </listitem>
+                          <listitem indication_id="3B5BA29CB63A9361">
+                            <para>Mental status stable for patient's condition</para>
+                          </listitem>
+                          <listitem indication_id="2086A0738CE16C95">
+                            <para>Medication availability confirmed and reconciliation complete</para>
+                          </listitem>
+                          <listitem indication_id="A2080D80E030C08D">
+                            <para>Patient/caregiver education completed with written discharge instructions provided</para>
+                          </listitem>
+                          <listitem indication_id="59D5B54FDF735360">
+                            <para>Community resources identified and referrals made, as needed</para>
+                          </listitem>
+                          <listitem indication_id="B088CE955A9632E2">
+                            <para>Home care arranged, if indicated</para>
+                          </listitem>
+                          <listitem indication_id="EFA652208CA57396">
+                            <para>Necessary medical equipment delivery arranged or available in home, if indicated</para>
+                          </listitem>
+                          <listitem indication_id="881B3F17BE0387A3">
+                            <para>Necessary medical supplies ordered, or patient/caregiver can obtain, if indicated</para>
+                          </listitem>
+                        </itemizedlist>
+                      </listitem>
+                      <listitem indication_id="2A02177357C6EB5D">
+                        <para>Access to follow-up care</para>
+                      </listitem>
+                      <listitem indication_id="C9AE5B54C1DDE847">
+                        <para>Self-management ability if appropriate. See Activities of Daily Living (ADL) and Instrumental Activities of Daily Living (IADL) Assessment for further information.</para>
+                      </listitem>
+                      <listitem indication_id="A21DABDD4B03429C">
+                        <para>Caregiver need, ability, and availability</para>
+                      </listitem>
+                    </itemizedlist>
+                  </listitem>
+                  <listitem indication_id="A6919270775E4F24">
+                    <para>Post-acute skilled care or custodial care as indicated. See Discharge Planning Tool for further information.</para>
+                  </listitem>
+                </itemizedlist>
+              </listitem>
+              <listitem indication_id="55EA980D2A70EBE7">
+                <para>Transitions of care plan complete, including<citation db_id="19225449" linkend="cit_0555010b_DP_3003059" cl="cl_c_94" display_value="34" /><citation db_id="19225452" linkend="cit_0555010b_DP_2900942" cl="cl_c_92" display_value="37" /><citation db_id="19225453" linkend="cit_0555010b_DP_2903677" cl="cl_c_93" display_value="38" /><citation db_id="19225457" linkend="cit_0555010b_DP_2605743" cl="cl_c_91" display_value="42" />:</para>
+                <itemizedlist>
+                  <listitem indication_id="2F92D39739BF6247">
+                    <para>Patient and caregiver education complete.</para>
+                    <itemizedlist>
+                      <listitem indication_id="5443C9542589B117">
+                        <para>See Teach-Back Tool for further information.</para>
+                      </listitem>
+                      <listitem indication_id="1E40868F731A515C">
+                        <para>See  Pneumonia: Patient Education for Clinicians for further information.</para>
+                      </listitem>
+                    </itemizedlist>
+                  </listitem>
+                  <listitem collapsible="true" selectable="false" definition_id="DEF_0993" indication_id="B2D2F49A0AD50618">
+                    <cpara>Medication reconciliation complete</cpara>
+                    <para>Medication reconciliation completion includes<citation db_id="19225450" linkend="cit_0555010b_DP_2904707" cl="cl_c_96" display_value="35" /><citation db_id="19225458" linkend="cit_2801295" cl="cl_c_95" display_value="43" />:</para>
+                    <itemizedlist>
+                      <listitem indication_id="1129F2C36E0908FE">
+                        <para>Compare patient's discharge list of medications (prescribed and over-the-counter) against provider's admission or transfer orders.</para>
+                      </listitem>
+                      <listitem indication_id="ED1C6C5035DF51C1">
+                        <para>Assess each medication for correlation to disease state or medical condition.</para>
+                      </listitem>
+                      <listitem indication_id="A3A39A8BDC7CE4A5">
+                        <para>Report medication discrepancies to prescribing provider, attending physician, and primary care provider, and ensure accurate medication order is identified.</para>
+                      </listitem>
+                      <listitem indication_id="3F05EC22E8C76415">
+                        <para>Provide reconciled medication list to all treating providers.</para>
+                      </listitem>
+                      <listitem indication_id="498835CD9ED9E7B2">
+                        <para>Confirm that patient or caregiver can acquire medication.</para>
+                      </listitem>
+                      <listitem indication_id="4C8FC61FAE01BC20">
+                        <para>Educate patient and caregiver.</para>
+                        <itemizedlist>
+                          <listitem indication_id="010894FAFD909D4D">
+                            <para>Provide complete medication list to patient and caregiver.</para>
+                          </listitem>
+                          <listitem indication_id="4C88C84C1E688769">
+                            <para>Importance of presenting personal medication list to all providers at each care transition, including all provider appointments</para>
+                          </listitem>
+                          <listitem indication_id="76B539CA12D01301">
+                            <para>Reason, dosage, and timing of medication (eg, use "teach-back" techniques)<citation db_id="19225459" linkend="cit_2903979" cl="cl_c_97" display_value="44" /></para>
+                          </listitem>
+                        </itemizedlist>
+                      </listitem>
+                      <listitem indication_id="27580FE91198ECCB">
+                        <para>Encourage communication between patient, caregiver, and pharmacy for obtaining prescriptions, setting up home medication delivery, and reviewing for drug-drug interactions.</para>
+                      </listitem>
+                      <listitem indication_id="EE50865F1372945B">
+                        <para>See Medication Reconciliation Tool for further information.</para>
+                      </listitem>
+                    </itemizedlist>
+                  </listitem>
+                  <listitem indication_id="AE7DB1642B9FE9CF">
+                    <para>Plan communicated to patient, caregiver, and all members of care team, including<citation db_id="19225460" linkend="cit_0555010b_DP_2801074" cl="cl_c_98" display_value="45" />:</para>
+                    <itemizedlist>
+                      <listitem indication_id="5F0CCD06ADFAF66C">
+                        <para>Inpatient care and service providers</para>
+                      </listitem>
+                      <listitem indication_id="FE6A8F119F827878">
+                        <para>Primary care provider</para>
+                      </listitem>
+                      <listitem indication_id="40DBEA12710B2650">
+                        <para>All post-discharge care and service providers</para>
+                      </listitem>
+                    </itemizedlist>
+                  </listitem>
+                  <listitem indication_id="233A1A3888941332">
+                    <para>Appointments planned or scheduled, which may include:</para>
+                    <itemizedlist>
+                      <listitem indication_id="FE6A8F119F827878">
+                        <para>Primary care provider<citation db_id="19225461" linkend="cit_0555010b_DP_3011149" cl="cl_c_99" display_value="46" /></para>
+                      </listitem>
+                      <listitem indication_id="9860101622FAE3BB">
+                        <para>Follow-up evaluation call. See Post-Acute Care Follow-Up Call Tool for further information.<citation db_id="19225448" linkend="cit_0555010b_DP_2903678" cl="cl_c_100" display_value="33" /></para>
+                      </listitem>
+                      <listitem indication_id="577CE28451E5B14D">
+                        <para>Infectious disease specialist<citation db_id="19225448" linkend="cit_0555010b_DP_2903678" cl="cl_c_101" display_value="33" /></para>
+                      </listitem>
+                      <listitem indication_id="9E86BDD0D357273C">
+                        <para>Pulmonologist</para>
+                      </listitem>
+                      <listitem indication_id="BD2A7BB32E64D907">
+                        <para>Respiratory therapy<citation db_id="19225448" linkend="cit_0555010b_DP_2903678" cl="cl_c_102" display_value="33" /></para>
+                      </listitem>
+                      <listitem indication_id="B437735D70578047">
+                        <para>Other</para>
+                      </listitem>
+                    </itemizedlist>
+                  </listitem>
+                  <listitem indication_id="BD58C17729E236B8">
+                    <para>Outpatient testing and procedure plans made, which may include<citation db_id="19225462" linkend="cit_0555010b_DP_3003738" cl="cl_c_103" display_value="47" />:</para>
+                    <itemizedlist>
+                      <listitem indication_id="3EAD123CE4E64B13">
+                        <para>Laboratory testing</para>
+                      </listitem>
+                      <listitem indication_id="851B90CC9D2F6429">
+                        <para>Radiology<citation db_id="19225448" linkend="cit_0555010b_DP_2903678" cl="cl_c_104" display_value="33" /></para>
+                      </listitem>
+                      <listitem indication_id="B437735D70578047">
+                        <para>Other</para>
+                      </listitem>
+                    </itemizedlist>
+                  </listitem>
+                  <listitem indication_id="415D986FAE6D0BC1">
+                    <para>Referrals made for assistance or support, which may include:</para>
+                    <itemizedlist>
+                      <listitem indication_id="7C9890E7028F05C9">
+                        <para>Alcohol and other drug abuse or dependence treatment<citation db_id="19225463" linkend="cit_0555010b_DP_2719042" cl="cl_c_105" display_value="48" /><citation db_id="19225464" linkend="cit_0555010b_DP_2807483" cl="cl_c_106" display_value="49" /></para>
+                      </listitem>
+                      <listitem indication_id="391A2AA6D0190F6C">
+                        <para>Community services</para>
+                      </listitem>
+                      <listitem indication_id="97F5961DC93177DD">
+                        <para>Financial, for follow-up care, medication, and transportation</para>
+                      </listitem>
+                      <listitem indication_id="7A5BD8FFD39E70BE">
+                        <para>Tobacco use treatment<citation db_id="19225463" linkend="cit_0555010b_DP_2719042" cl="cl_c_108" display_value="48" /><citation db_id="19225465" linkend="cit_0555010b_DP_2719029" cl="cl_c_107" display_value="50" /></para>
+                      </listitem>
+                      <listitem indication_id="B437735D70578047">
+                        <para>Other</para>
+                      </listitem>
+                    </itemizedlist>
+                  </listitem>
+                  <listitem indication_id="136840DAC7F5FAC9">
+                    <para>Medical equipment and supplies coordinated (ie, delivered or delivery confirmed), which may include:</para>
+                    <itemizedlist>
+                      <listitem indication_id="567344D4B58B041B">
+                        <para>Incentive spirometer<citation db_id="19225451" linkend="cit_0555010b_DP_2719039" cl="cl_c_109" display_value="36" /></para>
+                      </listitem>
+                      <listitem indication_id="D9C30E9491348A2B">
+                        <para>Nebulizer</para>
+                      </listitem>
+                      <listitem indication_id="F520FBE4858719ED">
+                        <para>Oxygen and supplies</para>
+                      </listitem>
+                      <listitem indication_id="B437735D70578047">
+                        <para>Other</para>
+                      </listitem>
+                    </itemizedlist>
+                  </listitem>
+                </itemizedlist>
+              </listitem>
+            </itemizedlist>
+          </listitem>
+        </itemizedlist>
+      </guideline-sect3>
+    </Section>
+    <Section xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" ContentOwner="GA" ClientName="" VersionNumber="30.0" ProductCode="ISC" HSIM="9ED8A6497925AD6" SectionPath="/Discharge/Discharge_Destination" ProgressionBehavior="" ProgressionPeriod="" ClientID="6676">
+      <guideline-sect3 logic_type="3" role="Discharge Destination" id="DischargeDestination_0555010b" contentsource="63" contenttype="Section" displayorder="2" idguideline="2204" idsection="5609547" path="/Discharge/Discharge_Destination" SectionFlavor="DischargeDestination" SectionStructure="ParentChild">
+        <heading>Discharge Destination</heading>
+        <itemizedlist>
+          <listitem indication_id="6F8AF10574E925A5">
+            <para>Post-hospital levels of admission may include:</para>
+            <itemizedlist>
+              <listitem indication_id="D85D7050F0539057">
+                <para>Home.</para>
+              </listitem>
+              <listitem indication_id="15F8BEFD91372846">
+                <para>Home healthcare. See Home Care Indications for Admission Section in Pneumonia guideline in Home Care.</para>
+              </listitem>
+              <listitem indication_id="E837F0074187356F">
+                <para>Recovery facility care. See Recovery Facility Care Indications for Admission Section in Pneumonia guideline in Recovery Facility Care.</para>
+              </listitem>
+            </itemizedlist>
+          </listitem>
+        </itemizedlist>
+      </guideline-sect3>
+    </Section>
+    <Section xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" ContentOwner="GA" ClientName="" VersionNumber="30.0" ProductCode="ISC" HSIM="9ED8A6497925AD6" SectionPath="/Evidence_Summary" ProgressionBehavior="" ProgressionPeriod="" ClientID="6676">
+      <guideline-sect2 contentsource="38" contenttype="Section" displayorder="5" id="EvidenceSummary_0555010b" idguideline="2204" idsection="5609548" logic_type="1" path="/Evidence_Summary" role="Evidence Summary" SectionFlavor="ParentSection" SectionStructure="Container">
+        <heading>Evidence Summary</heading>
+      </guideline-sect2>
+    </Section>
+    <Section xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" ContentOwner="GA" ClientName="" VersionNumber="30.0" ProductCode="ISC" HSIM="9ED8A6497925AD6" SectionPath="/Evidence_Summary/Background" ProgressionBehavior="" ProgressionPeriod="" ClientID="6676">
+      <guideline-sect3 contentsource="51" contenttype="Section" displayorder="1" id="BackgroundAnnotation_0555010b" idguideline="2204" idsection="5609549" logic_type="1" path="/Evidence_Summary/Background" role="Background Annotation" type="BGR" SectionFlavor="EvidenceSummary" SectionStructure="TextOnly">
+        <heading>Background</heading>
+        <para uid="1" type="BGR">For patients with pneumonia suspected or known to be of viral etiology other than COVID-19 (eg, positive test for influenza), the Viral Illness, Acute guideline is appropriate. For viral infection due to COVID-19, the COVID-19 guideline should be used. If the etiology is bacterial or unknown (eg, treating with antibiotics empirically), the Pneumonia guideline is appropriate.</para>
+        <para uid="2" type="BGR">This guideline pertains to the vast majority of patients with pneumonia, including patients deemed to have healthcare-associated pneumonia (HCAP). HCAP is defined as pneumonia developing in a patient with one or more of the following healthcare contacts: residence in a nursing home or long-term care facility, wound care, IV chemotherapy or hemodialysis within the previous 30 days, or acute care hospitalization for 2 or more days within the previous 90 days.<citation db_id="19225419" linkend="cit_2713238" cl="cl_c_9" display_value="2" /><evidence-grade level="2" /> Concerns have been raised as to whether a patient identified as having HCAP is truly more likely to be infected with a multidrug-resistant organism.<citation db_id="19225420" linkend="cit_259797" cl="cl_c_10" display_value="3" /><citation db_id="19225421" linkend="cit_208282" cl="cl_c_11" display_value="4" /><citation db_id="19225422" linkend="cit_2507105" cl="cl_c_12" display_value="5" /><evidence-grade level="2" /></para>
+      </guideline-sect3>
+    </Section>
+    <Section xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" ContentOwner="GA" ClientName="" VersionNumber="30.0" ProductCode="ISC" HSIM="9ED8A6497925AD6" SectionPath="/Evidence_Summary/Criteria" ProgressionBehavior="" ProgressionPeriod="" ClientID="6676">
+      <guideline-sect3 contentsource="51" contenttype="Section" displayorder="2" id="CriteriaAnnotation_0555010b" idguideline="2204" idsection="5609550" logic_type="1" role="Criteria Annotation" type="CRI" SectionFlavor="EvidenceSummary" SectionStructure="TextOnly" path="/Evidence_Summary/Criteria">
+        <heading>Criteria</heading>
+        <para uid="6" type="CRI">The evidence for the clinical indications found in this guideline includes 4 published peer reviewed articles, 2 specialty society or other evidence-based guidelines, and 4 book sections.</para>
+        <para uid="3" type="CRI">Analysis of national hospital discharge data for a commercially insured population shows 19.5% of patients seen in an emergency department with a principal diagnosis of pneumonia were admitted to inpatient care.<citation db_id="19225466" linkend="cit_2817177" cl="cl_c_13" display_value="7" /><evidence-grade level="3" /> Analysis of national hospital discharge data for a Medicare-insured population shows 60.7% of patients seen in an emergency department with a principal diagnosis of pneumonia were admitted to inpatient care.<citation db_id="19225466" linkend="cit_2817177" cl="cl_c_14" display_value="7" /><evidence-grade level="3" /> Analysis of an all-payer database shows a mean length of stay of 4.8 days for patients admitted to inpatient care.<citation db_id="19225433" linkend="cit_7128" cl="cl_c_15" display_value="8" /><evidence-grade level="3" /></para>
+        <para uid="4" type="CRI">An emergency medicine textbook recommends that patients evaluated by the Pneumonia Severity Index (PSI) as high risk (class IV or V) should be admitted to inpatient care, that moderate-risk patients (class III) can be initially treated in observation care, and that, absent other indications for admission, low-risk patients (class I or II) can be treated as outpatients.<citation db_id="19225419" linkend="cit_2713238" cl="cl_c_16" display_value="2" /><evidence-grade level="2" /> Clinical variables that are included in the PSI, and thus contribute to a higher risk score, are tachycardia, hypotension, altered mental status, tachypnea, and hypoxemia.<citation db_id="19225419" linkend="cit_2713238" cl="cl_c_17" display_value="2" /><evidence-grade level="2" /> A specialty society guideline recommends use of the PSI in addition to clinical judgment in the evaluation of pneumonia patients and specifies that low-risk patients can be treated as outpatients.<citation db_id="19225420" linkend="cit_259797" cl="cl_c_18" display_value="3" /><evidence-grade level="2" /> This same guideline identifies major and minor criteria that would denote a patient as having severe pneumonia (inpatient treatment appropriate, likely ICU). Examples include respiratory failure (ventilatory assistance needed), hypotension, hypoxemia, and altered mental status.<citation db_id="19225420" linkend="cit_259797" cl="cl_c_19" display_value="3" /><evidence-grade level="2" /> Another specialty society guideline also recommends the use of the PSI to help identify patients who require inpatient care, specifically outpatient care for low-risk patients (class I or II), observation care for moderate-risk patients (class III), and inpatient care for high-risk patients (class IV or V).<citation db_id="19225423" linkend="cit_2537866" cl="cl_c_20" display_value="6" /><evidence-grade level="2" /> An emergency medicine textbook identifies a CURB-65 score of 2 (1 point each for confusion, BUN greater than <unit>19 mg/dL (6.8 mmol/L)</unit>, respiratory rate 30 breaths per minute or higher, SBP less than <unit>90 mm Hg</unit> or DBP <unit>60 mm Hg</unit> or less, and age 65 years or older) as indicative of intermediate severity (eg, observation care appropriate) and a CURB-65 score of 3 or greater as warranting inpatient care.<citation db_id="19225419" linkend="cit_2713238" cl="cl_c_21" display_value="2" /><evidence-grade level="2" /></para>
+      </guideline-sect3>
+    </Section>
+    <Section xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" ContentOwner="GA" ClientName="" VersionNumber="30.0" ProductCode="ISC" HSIM="9ED8A6497925AD6" SectionPath="/Evidence_Summary/Length_of_Stay" ProgressionBehavior="" ProgressionPeriod="" ClientID="6676">
+      <guideline-sect3 contentsource="51" contenttype="Section" displayorder="3" id="LengthofStayAnnotation_0555010b" idguideline="2204" idsection="5609551" logic_type="1" path="/Evidence_Summary/Length_of_Stay" role="Length of Stay Annotation" type="LOS" SectionFlavor="EvidenceSummary" SectionStructure="TextOnly">
+        <heading>Length of Stay</heading>
+        <para uid="5" type="LOS"> Analysis of national hospital discharge data shows 28% of hospitalized adult patients with a principal diagnosis of pneumonia were discharged in 2 days or less.<citation db_id="19225433" linkend="cit_7128" cl="cl_c_52" display_value="8" /><evidence-grade level="3" /></para>
+      </guideline-sect3>
+    </Section>
+    <Section xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" ContentOwner="GA" ClientName="" VersionNumber="30.0" ProductCode="ISC" HSIM="9ED8A6497925AD6" SectionPath="/Evidence_Summary/Rationale" ProgressionBehavior="" ProgressionPeriod="" ClientID="6676">
+      <guideline-sect3 logic_type="1" role="Rationale" displayorder="4" SectionFlavor="EvidenceSummary" SectionStructure="TextOnly" id="RationaleAnnotation_0555010b" contentsource="51" contenttype="Section" idguideline="2204" path="/Evidence_Summary/Rationale" type="RAT">
+        <heading>Rationale</heading>
+        <para uid="7" type="RAT">Use of this MCG care guideline helps the clinician identify patient-specific complex clinical factors that make it reasonable to expect a necessity for hospital care across 2 or more midnights. The evidence-based clinical criteria assist the clinician in the decision to appropriately admit a patient to inpatient care. For Medicare enrollees, MCG care guidelines also support the clinician in the decision to appropriately admit a patient to inpatient care when there is not an expectation of 2 or more midnights of hospital care (eg, CMS' Two-Midnight Rule exceptions).</para>
+        <para uid="8" type="RAT">Use of these evidence-based clinical criteria to support decision making around the need for inpatient treatment is of clinical benefit to the patient and is crucial for quality patient care. Use of evidence-based clinical criteria ensures patients receive the most appropriate care for their specific condition, reduces unnecessary risks, promotes recovery, and provides a standard that can reduce disparities in care. Evidence-based clinical criteria not only help align treatment decisions with best practice, but they can also help reduce unwarranted variation in care by fostering consistency and equality in healthcare provision across regions and facilities. Appropriate use of the evidence-based clinical criteria in conjunction with the Supplemental Medicare Criteria ensures Medicare patients receive full access to Medicare benefits (eg, inpatient care), without risk of delay or decreased access, based on variables such as clinical severity of illness, length of provision of medically necessary hospital-level care, or satisfaction of specified Medicare criteria as directed by CMS. Use of these criteria will help ensure that the patient receives necessary care in the appropriate setting.</para>
+      </guideline-sect3>
+    </Section>
+    <Section xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" ContentOwner="GA" ClientName="" VersionNumber="30.0" ProductCode="ISC" HSIM="9ED8A6497925AD6" SectionPath="/Evidence_Summary/Related_CMS_Coverage_Guidance" ProgressionBehavior="" ProgressionPeriod="" ClientID="6676">
+      <guideline-sect3 role="Related CMS Coverage Guidance" displayorder="5" SectionFlavor="EvidenceSummary" SectionStructure="TextOnly" id="MRCAnnotation_0555010b" contentsource="51" contenttype="Section" idguideline="2204" logic_type="1" path="/Evidence_Summary/Related_CMS_Coverage_Guidance" type="RCG">
+        <heading>Related CMS Coverage Guidance</heading>
+        <para uid="9" type="RCG">This guideline supplements but does not replace, modify, or supersede existing Medicare regulations or applicable National Coverage Determinations (NCDs) or Local Coverage Determinations (LCDs).</para>
+        <para uid="10" type="RCG">
+          <emphasis>Code of Federal Regulations (CFR):</emphasis> 42 CFR 412.3<citation db_id="19225467" linkend="cit_2814737" cl="cl_c_110" display_value="13" />; 42 CFR 419.22<citation db_id="19225468" linkend="cit_2814740" cl="cl_c_111" display_value="51" />; 42 CFR 422.101<citation db_id="19225469" linkend="cit_2814741" cl="cl_c_112" display_value="52" /></para>
+        <para uid="11" type="RCG">
+          <emphasis>Internet-Only Manual (IOM) Citations:</emphasis> CMS IOM Publication 100-02, Medicare Benefit Policy Manual, Chapter 1 - Inpatient Hospital Services Covered Under Part A<citation db_id="19225470" linkend="cit_2700894" cl="cl_c_113" display_value="53" />; CMS IOM Publication 100-02, Medicare Benefit Policy Manual, Chapter 6 - Hospital Services Covered Under Part B<citation db_id="19225471" linkend="cit_2911864" cl="cl_c_114" display_value="54" />; CMS IOM Publication 100-02, Medicare Benefit Policy Manual, Chapter 15 - Covered Medical and Other Health Services<citation db_id="19225472" linkend="cit_3015887" cl="cl_c_115" display_value="55" />; CMS IOM Publication 100-08, Medicare Program Integrity Manual, Chapter 6, Section 6.5 - Medical Review of Inpatient Hospital Claims for Part A Payment<citation db_id="19225473" linkend="cit_2814743" cl="cl_c_116" display_value="56" /></para>
+        <para uid="12" type="RCG">
+          <emphasis>Medicare Coverage Determinations:</emphasis> Medicare Coverage Database<citation db_id="19225474" linkend="cit_2814744" cl="cl_c_117" display_value="57" /></para>
+      </guideline-sect3>
+    </Section>
+  </Sections>
+  <Definitions />
+  <Footnotes>
+    <Footnote xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" FootnotesID="1119864" ContentOwner="GA" FootnoteID="ca010336-3a98-4ec0-8c93-32e79cd575d7" VersionNumber="30.0" ProductCode="ISC" HSIM="9ED8A6497925AD6" DisplayValue="A" ClientID="6676">
+      <footnote id="f0555021b_14_1_192" display_value="A" cl="cl_f_1">
+        <para>For patients with pneumonia suspected or known to be of viral etiology other than COVID-19 (eg, positive test for influenza), the <ulink url="isc_06399.htm" product="isc" hsim="isc_06399">Viral Illness, Acute</ulink> guideline is appropriate. For viral infection due to COVID-19, the <ulink url="isc_07387.htm" product="isc" hsim="isc_07387">COVID-19</ulink> guideline should be used. If the etiology is bacterial or unknown (eg, treating with antibiotics empirically), the <ulink url="0555010b.htm" product="isc" hsim="0555010b">Pneumonia</ulink> guideline is appropriate.</para>
+      </footnote>
+    </Footnote>
+    <Footnote xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" FootnotesID="1119865" ContentOwner="GA" FootnoteID="49a6b716-325c-4e66-a2ef-2ce8df4fa13e" VersionNumber="30.0" ProductCode="ISC" HSIM="9ED8A6497925AD6" DisplayValue="B" ClientID="6676">
+      <footnote id="f0555010b_14_1_26" display_value="B" cl="cl_f_2">
+        <para>This guideline pertains to the vast majority of patients with pneumonia, including patients deemed to have healthcare-associated pneumonia (HCAP). Pneumonia is diagnosed by the presence of radiographic findings (eg, patchy or lobar consolidation, air space opacities) with 2 or more signs (temperature greater than <unit>100.4 degrees F (38 degrees C)</unit> or <unit>96.8 degrees F (36 degrees C)</unit> or less, <definition-link db_id="DEF0057">Hypoxemia</definition-link>, leukocyte count greater than <unit>10,000/mm<superscript>3</superscript> (10 x10<superscript>9</superscript>/L)</unit> or less than <unit>4000/mm<superscript>3</superscript> (4 x10<superscript>9</superscript>/L)</unit>, respiratory rate greater than 20 breaths per minute) or symptoms (new or increased cough, dyspnea, or sputum production).<citation db_id="19225418" linkend="cit_3002843" cl="cl_c_1" display_value="1" /> HCAP is defined as pneumonia developing in a patient with one or more of the following healthcare contacts: residence in a nursing home or long-term care facility, wound care, IV chemotherapy or hemodialysis within the previous 30 days, or acute care hospitalization for 2 or more days within the previous 90 days.<citation db_id="19225419" linkend="cit_2713238" cl="cl_c_2" display_value="2" /> Concerns have been raised as to whether a patient identified as having HCAP is truly more likely to be infected with a multidrug-resistant organism.<citation db_id="19225420" linkend="cit_259797" cl="cl_c_3" display_value="3" /><citation db_id="19225421" linkend="cit_208282" cl="cl_c_4" display_value="4" /><citation db_id="19225422" linkend="cit_2507105" cl="cl_c_5" display_value="5" /></para>
+      </footnote>
+    </Footnote>
+    <Footnote xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" FootnotesID="1119866" ContentOwner="GA" FootnoteID="257a73eb-7793-475d-acb1-c563111b5d35" VersionNumber="30.0" ProductCode="ISC" HSIM="9ED8A6497925AD6" DisplayValue="C" ClientID="6676">
+      <footnote id="f0555010b_790_1_537" display_value="C" cl="cl_f_3">
+        <para>Ventilatory assistance includes noninvasive methods (eg, high-flow nasal cannula (HFNC), CPAP, BPAP) and invasive methods (intubation with mechanical ventilation).</para>
+      </footnote>
+    </Footnote>
+    <Footnote xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" FootnotesID="1119867" ContentOwner="GA" FootnoteID="e892f986-520a-4a6d-8b84-10322774478d" VersionNumber="30.0" ProductCode="ISC" HSIM="9ED8A6497925AD6" DisplayValue="D" ClientID="6676">
+      <footnote id="f0555010b_2332_1_78" display_value="D" cl="cl_f_4">
+        <para>Specialty society guidelines recommend ICU admission for a patient with need for invasive or noninvasive assisted ventilation, <definition-link db_id="DEF0006">Hemodynamic instability</definition-link>, or any 3 of the following severity factors: sodium less than <unit>130 mEq/L (mmol/L)</unit>, PaO<subscript>2</subscript> to FiO<subscript>2</subscript> ratio of <unit>250 mm Hg</unit> or less, multilobed infiltrates, <definition-link db_id="def_03638">Altered mental status</definition-link>, BUN <unit>20 mg/dL (7.1 mmol/L)</unit> or greater, WBC count less than <unit>4000/mm<superscript>3</superscript> (4 x10<superscript>9</superscript>/L)</unit>, platelet count less than <unit>100,000/mm<superscript>3</superscript> (100 x10<superscript>9</superscript>/L)</unit>, or temperature less than <unit>96.8 degrees F (36 degrees C)</unit>. See <ulink url="isc_ittc.htm" class="nav-link-toc" product="isc" hsim="isc_ittc">Intensive, Intermediate, and Telemetry Care Guidelines</ulink> for further information.<citation db_id="19225420" linkend="cit_259797" cl="cl_c_41" display_value="3" /><citation db_id="19225423" linkend="cit_2537866" cl="cl_c_42" display_value="6" /><citation db_id="19225431" linkend="cit_2537854" cl="cl_c_43" display_value="17" /><citation db_id="19225432" linkend="cit_91473" cl="cl_c_44" display_value="18" /></para>
+      </footnote>
+    </Footnote>
+    <Footnote xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" FootnotesID="1119868" ContentOwner="GA" FootnoteID="3f04a026-6ef4-4f0b-9a9d-bdd97c3f5f83" VersionNumber="30.0" ProductCode="ISC" HSIM="9ED8A6497925AD6" DisplayValue="E" ClientID="6676">
+      <footnote id="f0555010b_mcg20051212_2" display_value="E" cl="cl_f_5">
+        <para>See <ulink url="#IndicationsAdmission_0555010b" product="isc" hsim="0555010b" sectionID="IndicationsAdmission_0555010b">Clinical Indications for Admission to Inpatient Care</ulink> in this guideline.</para>
+      </footnote>
+    </Footnote>
+    <Footnote xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" FootnotesID="1119869" ContentOwner="GA" FootnoteID="3f0477dd-feb8-43cf-8231-6cc99619610e" VersionNumber="30.0" ProductCode="ISC" HSIM="9ED8A6497925AD6" DisplayValue="F" ClientID="6676">
+      <footnote id="f0555010b_mcg20051212_9" display_value="F" cl="cl_f_6">
+        <para>The patient may be discharged on oral antibiotics.<citation db_id="19225420" linkend="cit_259797" cl="cl_c_45" display_value="3" /></para>
+      </footnote>
+    </Footnote>
+    <Footnote xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" FootnotesID="1119870" ContentOwner="GA" FootnoteID="cc6f07dc-588d-40f9-af3c-4c690bd00497" VersionNumber="30.0" ProductCode="ISC" HSIM="9ED8A6497925AD6" DisplayValue="G" ClientID="6676">
+      <footnote id="f0555010b_5417_1_423" display_value="G" cl="cl_f_7">
+        <para>Some patients may have their hydration needs met via alternative means (eg, percutaneous endoscopic gastrostomy tube).</para>
+      </footnote>
+    </Footnote>
+    <Footnote xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" FootnotesID="1119871" ContentOwner="GA" FootnoteID="8a523c8a-cc2b-4ad8-b967-681d261d75f6" VersionNumber="30.0" ProductCode="ISC" HSIM="9ED8A6497925AD6" DisplayValue="H" ClientID="6676">
+      <footnote id="f0555010b_5912_1_74" display_value="H" cl="cl_f_8">
+        <para>The most useful and powerful risk factors for infection with antibiotic-resistant organisms are those that are locally developed and validated, as prevalence can vary significantly.<citation db_id="19225420" linkend="cit_259797" cl="cl_c_60" display_value="3" /> Concerning methicillin-resistant <micro-organism>Staphylococcus aureus</micro-organism> (MRSA) and <micro-organism>Pseudomonas</micro-organism> species, an evidence-based specialty society guideline concludes that the most consistently strong individual risk factors, other than those developed locally, are a patient having had either organism previously isolated, especially from the respiratory tract, or recent (within past 90 days) hospitalization with exposure to parenteral antibiotics.<citation db_id="19225420" linkend="cit_259797" cl="cl_c_61" display_value="3" /> This same guideline recommends that, when empiric coverage for <micro-organism>Pseudomonas</micro-organism> species or MRSA is used, therapy should be de-escalated (reversion to routine antibiotic coverage) if microbiological results (eg, blood culture, sputum culture) do not confirm infection with a resistant organism within 48 hours.<citation db_id="19225420" linkend="cit_259797" cl="cl_c_62" display_value="3" /></para>
+      </footnote>
+    </Footnote>
+    <Footnote xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" FootnotesID="1119872" ContentOwner="GA" FootnoteID="3c031c25-079d-4ec1-9f44-0f63623020bb" VersionNumber="30.0" ProductCode="ISC" HSIM="9ED8A6497925AD6" DisplayValue="I" ClientID="6676">
+      <footnote id="f0555010b_5912_1_193" display_value="I" cl="cl_f_9">
+        <para>In pneumonia patients, the absence of nasal methicillin-resistant <micro-organism>Staphylococcus aureus</micro-organism> (MRSA) colonization upon admission indicates a very low likelihood of MRSA infection. A systematic review and meta-analysis (22 studies, 5163 patients) examining nasal colonization screening found a pooled sensitivity for MRSA pneumonia of 71% and a pooled specificity of 90%.<citation db_id="19225420" linkend="cit_259797" cl="cl_c_63" display_value="3" /><citation db_id="19225439" linkend="cit_227262" cl="cl_c_64" display_value="24" /> Assuming a 10% prevalence of MRSA pneumonia, this would translate to a positive predictive value (PPV) of 45% and a negative predictive value (NPV) of 97%, indicating that a negative screen can essentially rule out MRSA pneumonia.<citation db_id="19225420" linkend="cit_259797" cl="cl_c_65" display_value="3" /><citation db_id="19225439" linkend="cit_227262" cl="cl_c_66" display_value="24" /> In settings with a lower prevalence of MRSA pneumonia, the NPV would be even higher. The PPV, on the other hand, does not allow this screening to rule in MRSA pneumonia, although it may yield a likelihood that rises above the treatment (eg, IV vancomycin) threshold. Two studies, encompassing 901 patients admitted for community-acquired pneumonia, reported that a Drug Resistance in Pneumonia (DRIP) score of less than 4 had a 99% NPV for having a drug-resistant pathogen.<citation db_id="19225440" linkend="cit_2507109" cl="cl_c_67" display_value="25" /><citation db_id="19225441" linkend="cit_2507459" cl="cl_c_68" display_value="26" /> Low PPV for a DRIP score of 4 or greater (4.7% to 8.4%) in these studies indicates the need to continue using antibiotic stewardship and de-escalation practices in conjunction with this score after broad-spectrum antibiotics are started.<citation db_id="19225440" linkend="cit_2507109" cl="cl_c_69" display_value="25" /><citation db_id="19225441" linkend="cit_2507459" cl="cl_c_70" display_value="26" /> A calculator is available at <website>www.mdcalc.com/drug-resistance-pneumonia-drip-score</website>.</para>
+      </footnote>
+    </Footnote>
+    <Footnote xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" FootnotesID="1119873" ContentOwner="GA" FootnoteID="91e2da03-854d-46d7-b717-9c09ef1bd810" VersionNumber="30.0" ProductCode="ISC" HSIM="9ED8A6497925AD6" DisplayValue="J" ClientID="6676">
+      <footnote id="f1701060d_mcg20051212_7" display_value="J" cl="cl_f_10">
+        <para>Discharge instructions should be given in the patient's and caregiver's native language using trained language interpreters whenever possible.<citation db_id="19225446" linkend="cit_2604176" cl="cl_c_79" display_value="31" /></para>
+      </footnote>
+    </Footnote>
+  </Footnotes>
+  <Citations>
+    <Citation xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" CitationID="19225418" VersionNumber="30.0" ContentOwner="GA" Format="Vaughn VM, Dickson RP, Horowitz JK, Flanders SA. Community-aquired pneumonia: a review. Journal of the American Medical Association 2024;332(15):1282-1295. DOI: 10.1001/jama.2024.14796. " ClientName="" Abstract="https://www.ncbi.nlm.nih.gov/pubmed/39283629" />
+    <Citation xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" CitationID="19225419" VersionNumber="30.0" ContentOwner="GA" Format="Waxman MA, Moran GJ. Pneumonia. In: Walls RM, editor. Rosen's Emergency Medicine: Concepts and Clinical Practice. 10th ed. Elsevier; 2023:829-838.e2." ClientName="" Abstract="" />
+    <Citation xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" CitationID="19225420" VersionNumber="30.0" ContentOwner="GA" Format="Metlay JP, et al. Diagnosis and treatment of adults with community-acquired pneumonia. an Official Clinical Practice Guideline of the American Thoracic Society and Infectious Diseases Society of America. American Journal of Respiratory and Critical Care Medicine 2019;200(7):e45-e67. DOI: 10.1164/rccm.201908-1581ST. (Reaffirmed 2025 Apr) " ClientName="" Abstract="https://www.ncbi.nlm.nih.gov/pubmed/31573350" />
+    <Citation xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" CitationID="19225421" VersionNumber="30.0" ContentOwner="GA" Format="Kalil AC, et al. Management of adults with hospital-acquired and ventilator-associated pneumonia: 2016 clinical practice guidelines by the Infectious Diseases Society of America and the American Thoracic Society. Clinical Infectious Diseases 2016;63(5):e61-e111. DOI: 10.1093/cid/ciw353. (Reaffirmed 2025 Jul) " ClientName="" Abstract="https://www.ncbi.nlm.nih.gov/pubmed/27418577" />
+    <Citation xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" CitationID="19225422" VersionNumber="30.0" ContentOwner="GA" Format="Ewig S, Kolditz M, Pletz MW, Chalmers J. Healthcare-associated pneumonia: is there any reason to continue to utilize this label in 2019? Clinical Microbiology and Infection 2019;25(10):1173-1179. DOI: 10.1016/j.cmi.2019.02.022. " ClientName="" Abstract="https://www.ncbi.nlm.nih.gov/pubmed/30825674" />
+    <Citation xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" CitationID="19225423" VersionNumber="30.0" ContentOwner="GA" Format="American College of Emergency Physicians Clinical Policies Subcommittee (Writing Committee) on Commu, et al. Clinical policy: critical issues in the management of adult patients presenting to the emergency department with community-acquired pneumonia. Annals of Emergency Medicine 2021;77(1):e1-e57. DOI: 10.1016/j.annemergmed.2020.10.024. " ClientName="" Abstract="https://www.ncbi.nlm.nih.gov/pubmed/33349374" />
+    <Citation xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" CitationID="19225431" VersionNumber="30.0" ContentOwner="GA" Format="Nair GB, Niederman MS. Updates on community acquired pneumonia management in the ICU. Pharmacology &amp; Therapeutics 2021;217:Online. DOI: 10.1016/j.pharmthera.2020.107663. " ClientName="" Abstract="https://www.ncbi.nlm.nih.gov/pubmed/32805298" />
+    <Citation xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" CitationID="19225432" VersionNumber="30.0" ContentOwner="GA" Format="Chalmers JD, et al. Validation of the Infectious Diseases Society of America/American Thoratic Society minor criteria for intensive care unit admission in community-acquired pneumonia patients without major criteria or contraindications to intensive care unit care. Clinical Infectious Diseases 2011;53(6):503-511. DOI: 10.1093/cid/cir463. " ClientName="" Abstract="https://www.ncbi.nlm.nih.gov/pubmed/21865188" />
+    <Citation xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" CitationID="19225439" VersionNumber="30.0" ContentOwner="GA" Format="Parente DM, Cunha CB, Mylonakis E, Timbrook TT. The clinical utility of methicillin resistant Staphylococcus aureus (MRSA) nasal screening to rule out MRSA pneumonia: a diagnostic meta-analysis with antimicrobial stewardship implications. Clinical Infectious Diseases 2018;67(1):1-7. DOI: 10.1093/cid/ciy024. " ClientName="" Abstract="https://www.ncbi.nlm.nih.gov/pubmed/29340593" />
+    <Citation xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" CitationID="19225440" VersionNumber="30.0" ContentOwner="GA" Format="Webb BJ, et al. Antibiotic use and outcomes after implementation of the drug resistance in pneumonia score in ED patients with community-onset pneumonia. Chest 2019;156(5):843-851. DOI: 10.1016/j.chest.2019.04.093. " ClientName="" Abstract="https://www.ncbi.nlm.nih.gov/pubmed/31077649" />
+    <Citation xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" CitationID="19225441" VersionNumber="30.0" ContentOwner="GA" Format="Babbel D, Sutton J, Rose R, Yarbrough P, Spivak ES. Application of the DRIP score at a veterans affairs hospital. Antimicrobial Agents and Chemotherapy 2018;62(3):e02277-17. DOI: 10.1128/AAC.02277-17. " ClientName="" Abstract="https://www.ncbi.nlm.nih.gov/pubmed/29475891" />
+    <Citation xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" CitationID="19225446" VersionNumber="30.0" ContentOwner="GA" Format="Hudson T. The role of social determinates of health in discharge practices. Nursing Clinics of North America 2021;56(3):369-378. DOI: 10.1016/j.cnur.2021.04.004. " ClientName="" Abstract="https://www.ncbi.nlm.nih.gov/pubmed/34366157" />
+    <Citation xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" CitationID="19225424" VersionNumber="30.0" ContentOwner="GA" Format="Elhassan EA, Schrier RW. Disorders of sodium and water balance. In: McKean SC, Ross JJ, Dressler DD, Scheurer DB, editors. Principles and Practice of Hospital Medicine. 2nd ed. New York, NY: McGraw-Hill Education; 2017:1982-1992." ClientName="" Abstract="" />
+    <Citation xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" CitationID="19225425" VersionNumber="30.0" ContentOwner="GA" Format="Gelaidan A, et al. Comparative effectiveness of CURB-65 and qSOFA scores in predicting pneumonia outcomes: a systematic review. Cureus 2024;16(10):e71394. DOI: 10.7759/cureus.71394. " ClientName="" Abstract="https://www.ncbi.nlm.nih.gov/pubmed/39539877" />
+    <Citation xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" CitationID="19225426" VersionNumber="30.0" ContentOwner="GA" Format="Hill NS, Garpestad  E, Schumaker GL. Acute ventilatory failure. In: Broaddus VC, et al., editors. Murray &amp; Nadel's Textbook of Respiratory Medicine. 7th ed. Elsevier Saunders; 2022:1843-1859.e5." ClientName="" Abstract="" />
+    <Citation xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" CitationID="19225427" VersionNumber="30.0" ContentOwner="GA" Format="Davis AS, Mohr NM. Pleural disease. In: Walls RM, editor. Rosen's Emergency Medicine: Concepts and Clinical Practice. 10th ed. Elsevier; 2023:839-848.e1." ClientName="" Abstract="" />
+    <Citation xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" CitationID="19225428" VersionNumber="30.0" ContentOwner="GA" Format="Pneumonia in adults: diagnosis and management. NICE Clinical Guideline CG191 [Internet] National Institute for Health and Care Excellence. 2023 Oct Accessed at: http://guidance.nice.org.uk. [created 2014; accessed 2024 Oct 01] " ClientName="" Abstract="" />
+    <Citation xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" CitationID="19225429" VersionNumber="30.0" ContentOwner="GA" Format="Pena ME, Kazan VM, Helmreich MN, Mace SE. Care of respiratory conditions in an observation unit. Emergency Medicine Clinics of North America 2017;35(3):625-645. DOI: 10.1016/j.emc.2017.03.008. " ClientName="" Abstract="https://www.ncbi.nlm.nih.gov/pubmed/28711128" />
+    <Citation xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" CitationID="19225430" VersionNumber="30.0" ContentOwner="GA" Format="Levine DM, et al. Hospital-level care at home for acutely Ill adults: a randomized controlled trial. Annals of Internal Medicine 2020;172(2):77-85. DOI: 10.7326/M19-0600. " ClientName="" Abstract="https://www.ncbi.nlm.nih.gov/pubmed/31842232" />
+    <Citation xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" CitationID="19225433" VersionNumber="30.0" ContentOwner="GA" Format="Premier PINC AI™ Healthcare Database (PHD), 01/01/2023-12/31/2024. Premier, Inc. " ClientName="" Abstract="" />
+    <Citation xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" CitationID="19225434" VersionNumber="30.0" ContentOwner="GA" Format="Martin-Loeches I, et al. ERS/ESICM/ESCMID/ALAT guidelines for the management of severe community-acquired pneumonia. Intensive Care Medicine 2023;49(6):615-632. DOI: 10.1007/s00134-023-07033-8. " ClientName="" Abstract="https://www.ncbi.nlm.nih.gov/pubmed/37012484" />
+    <Citation xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" CitationID="19225435" VersionNumber="30.0" ContentOwner="GA" Format="Niederman MS, Torres A. Severe community-acquired pneumonia. European Respiratory Review 2022;31(166):Online. DOI: 10.1183/16000617.0123-2022. " ClientName="" Abstract="https://www.ncbi.nlm.nih.gov/pubmed/36517046" />
+    <Citation xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" CitationID="19225436" VersionNumber="30.0" ContentOwner="GA" Format="Peyrani P, et al. Incidence and mortality of adults hospitalized with community-acquired pneumonia according to clinical course. Chest 2020;157(1):34-41. DOI: 10.1016/j.chest.2019.09.022. " ClientName="" Abstract="https://www.ncbi.nlm.nih.gov/pubmed/31610158" />
+    <Citation xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" CitationID="19225437" VersionNumber="30.0" ContentOwner="GA" Format="Seo H, et al. Clinical relevance of necrotizing change in patients with community-acquired pneumonia. Respirology 2017;22(3):551-558. DOI: 10.1111/resp.12943. " ClientName="" Abstract="https://www.ncbi.nlm.nih.gov/pubmed/27862706" />
+    <Citation xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" CitationID="19225438" VersionNumber="30.0" ContentOwner="GA" Format="Bartley PS, et al. Bacterial coinfection in influenza pneumonia: Rates, pathogens, and outcomes. Infection Control and Hospital Epidemiology 2022;43(2):212-217. DOI: 10.1017/ice.2021.96. " ClientName="" Abstract="https://www.ncbi.nlm.nih.gov/pubmed/33890558" />
+    <Citation xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" CitationID="19225442" VersionNumber="30.0" ContentOwner="GA" Format="Cilloniz C, Dominedo C, Torres A. Multidrug resistant gram-negative bacteria in community-acquired pneumonia. Critical Care 2019;23(1):79. DOI: 10.1186/s13054-019-2371-3. " ClientName="" Abstract="https://www.ncbi.nlm.nih.gov/pubmed/30850010" />
+    <Citation xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" CitationID="19225443" VersionNumber="30.0" ContentOwner="GA" Format="Qaseem A, Etxeandia-Ikobaltzeta I, Fitterman N, Williams JW, Kansagara D. Appropriate use of high-flow nasal oxygen in hospitalized patients for initial or postextubation management of acute respiratory failure: a clinical guideline from the American College of Physicians. Annals of Internal Medicine 2021;174(7):977-984. DOI: 10.7326/M20-7533. " ClientName="" Abstract="https://www.ncbi.nlm.nih.gov/pubmed/33900796" />
+    <Citation xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" CitationID="19225444" VersionNumber="30.0" ContentOwner="GA" Format="Yu Y, Liu W, Jiang HL, Mao B. Pneumonia is associated with increased mortality in hospitalized COPD patients: a systematic review and meta-analysis. Respiration 2021;100(1):64-76. DOI: 10.1159/000510615. " ClientName="" Abstract="https://www.ncbi.nlm.nih.gov/pubmed/33454702" />
+    <Citation xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" CitationID="19225445" VersionNumber="30.0" ContentOwner="GA" Format="Gonakoti S, Osifo IF. Protein-energy malnutrition increases mortality in patients hospitalized with bacterial pneumonia: a retrospective nationwide database analysis. Cureus 2021;13(1):e12645. DOI: 10.7759/cureus.12645. " ClientName="" Abstract="https://www.ncbi.nlm.nih.gov/pubmed/33585131" />
+    <Citation xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" CitationID="19225447" VersionNumber="30.0" ContentOwner="GA" Format="Chovanec KA, Arsene C, Beck A, Zachrich K, Liedel B, Wolff-Elliott J. Association of discharge disposition with outcomes. Population Health Management 2021;24(1):116-121. DOI: 10.1089/pop.2019.0176. " ClientName="" Abstract="https://www.ncbi.nlm.nih.gov/pubmed/32096686" />
+    <Citation xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" CitationID="19225448" VersionNumber="30.0" ContentOwner="GA" Format="Admitting, transfer, and discharge. In: Perry AG, Potter PA, Ostendorf WR, Laplante N, editors. Clinical Nursing Skills and Techniques. 11th ed. Elsevier; 2025:40-51." ClientName="" Abstract="" />
+    <Citation xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" CitationID="19225449" VersionNumber="30.0" ContentOwner="GA" Format="Centers for Medicare and Medicaid Services. &quot;Condition of participation: Discharge planning.&quot; 42 CFR Pt. 482.43 Washington, DC 2025 Jan 01 [accessed 2025 Jul 22] Accessed at: https://www.ecfr.gov/. " ClientName="" Abstract="" />
+    <Citation xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" CitationID="19225450" VersionNumber="30.0" ContentOwner="GA" Format="Adverse drug reactions and medication errors. In: Burchum JR, Rosenthal LD, editors. Lehne's Pharmacology for Nursing Care. 12th ed. Elsevier; 2025:64-75." ClientName="" Abstract="" />
+    <Citation xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" CitationID="19225451" VersionNumber="30.0" ContentOwner="GA" Format="Mondor EE. Lower respiratory problems. In: Harding MM, Kwong J, Hagler D, Reinisch C, editors. Lewis's Medical-Surgical Nursing: Assessment and Management of Clinical Problems. 12th ed. St. Louis, MO: Mosby; 2023:596-631." ClientName="" Abstract="" />
+    <Citation xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" CitationID="19225452" VersionNumber="30.0" ContentOwner="GA" Format="Targeted care planning and care transitions. In: Perez R, editor. CMSA's Integrated Case Management. 2nd ed. Springer Publishing Company LLC; 2023:178-189." ClientName="" Abstract="" />
+    <Citation xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" CitationID="19225453" VersionNumber="30.0" ContentOwner="GA" Format="Communication and collaboration. In: Perry AG, Potter PA, Ostendorf WR, Laplante N, editors. Clinical Nursing Skills and Techniques. 11th ed. Elsevier; 2025:17-39." ClientName="" Abstract="" />
+    <Citation xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" CitationID="19225454" VersionNumber="30.0" ContentOwner="GA" Format="Elements of Excellence in Transitions of Care (TOC). TOC Checklist [Internet] National Transitions of Care Coalition. 2006 Accessed at: https://www.ntocc.org. [accessed 2025 Sep 16] " ClientName="" Abstract="" />
+    <Citation xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" CitationID="19225455" VersionNumber="30.0" ContentOwner="GA" Format="Medical-surgical nursing. In: Hinkle JL, Cheever KH, Overbaugh KJ, editors. Brunner &amp; Suddarth's Textbook of Medical-Surgical Nursing. 15th ed. Wolters Kluwer; 2022:33-55." ClientName="" Abstract="" />
+    <Citation xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" CitationID="19225456" VersionNumber="30.0" ContentOwner="GA" Format="Transition of care. In: Gillingham DC, editor. Foundations of Case Management. Blue Bayou Press; 2021:137-144." ClientName="" Abstract="" />
+    <Citation xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" CitationID="19225457" VersionNumber="30.0" ContentOwner="GA" Format="Becker C, et al. Interventions to improve communication at hospital discharge and rates of readmission: a systematic review and meta-analysis. JAMA Network Open 2021;4(8):e2119346. DOI: 10.1001/jamanetworkopen.2021.19346. " ClientName="" Abstract="https://www.ncbi.nlm.nih.gov/pubmed/34448868" />
+    <Citation xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" CitationID="19225458" VersionNumber="30.0" ContentOwner="GA" Format="The nursing process in drug therapy and patient safety. In: Tucker RG, editor. Karch's Focus on Nursing Pharmacology. 9th ed. Wolters Kluwer; 2023:47-57." ClientName="" Abstract="" />
+    <Citation xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" CitationID="19225459" VersionNumber="30.0" ContentOwner="GA" Format="Safe medication preparation. In: Perry AG, Potter PA, Ostendorf WR, Laplante N, editors. Clinical Nursing Skills and Techniques. 11th ed. Elsevier; 2025:586-607." ClientName="" Abstract="" />
+    <Citation xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" CitationID="19225460" VersionNumber="30.0" ContentOwner="GA" Format="The case manager's roles, functions, and activities. In: Gillingham DC, editor. Foundations of Case Management. Blue Bayou Press; 2021:9-14." ClientName="" Abstract="" />
+    <Citation xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" CitationID="19225461" VersionNumber="30.0" ContentOwner="GA" Format="Anderson TS, Ayanian JZ, Herzig SJ, Souza J, Landon BE. Gaps in primary care follow-up after hospital discharge among Medicare beneficiaries. Journal of the American Geriatrics Society 2025;DOI: 10.1111/jgs.19496. " ClientName="" Abstract="https://www.ncbi.nlm.nih.gov/pubmed/40317736" />
+    <Citation xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" CitationID="19225462" VersionNumber="30.0" ContentOwner="GA" Format="Pulmonary care plans. In: Gulanick M, Myers JL, Bowman-Woodall C, editors. Nursing Care Plans. 11th ed. Elsevier; 2025:395-481." ClientName="" Abstract="" />
+    <Citation xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" CitationID="19225463" VersionNumber="30.0" ContentOwner="GA" Format="Morris BC. Patient and caregiver teaching. In: Harding MM, Kwong J, Hagler D, Reinisch C, editors. Lewis's Medical-Surgical Nursing: Assessment and Management of Clinical Problems. 12th ed. St. Louis, MO: Mosby; 2023:49-62." ClientName="" Abstract="" />
+    <Citation xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" CitationID="19225464" VersionNumber="30.0" ContentOwner="GA" Format="Troutman-Jordan M. Substance abuse. In: Nies MA, editor. Community/Public Health Nursing. 8th ed. Elsevier; 2024:593-626." ClientName="" Abstract="" />
+    <Citation xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" CitationID="19225465" VersionNumber="30.0" ContentOwner="GA" Format="Harding MM. Substance use disorders in acute care. In: Harding MM, Kwong J, Hagler D, Reinisch C, editors. Lewis's Medical-Surgical Nursing: Assessment and Management of Clinical Problems. 12th ed. St. Louis, MO: Mosby; 2023:162-178." ClientName="" Abstract="" />
+    <Citation xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" CitationID="19225466" VersionNumber="30.0" ContentOwner="GA" Format="Proprietary health insurance data sources, 2024; and Medicare 5% Standard Analytical File, 2023. " ClientName="" Abstract="" />
+    <Citation xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" CitationID="19225467" VersionNumber="30.0" ContentOwner="GA" Format="Centers for Medicare and Medicaid Services. &quot;Admissions.&quot; 42 CFR 412.3 Washington, DC 2025 Jul [accessed 2025 Jul 22] Accessed at: https://www.ecfr.gov/current/title-42/chapter-IV/subchapter-B/part-412. " ClientName="" Abstract="" />
+    <Citation xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" CitationID="19225468" VersionNumber="30.0" ContentOwner="GA" Format="Centers for Medicare and Medicaid Services. &quot;Hospital services excluded from payment under the hospital outpatient prospective payment system.&quot; 42 CFR 419.22 Washington, DC 2023 Jul [accessed 2025 Jul 22] Accessed at: https://www.ecfr.gov/. " ClientName="" Abstract="" />
+    <Citation xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" CitationID="19225469" VersionNumber="30.0" ContentOwner="GA" Format="Centers for Medicare and Medicaid Services. &quot;Requirements relating to basic benefits.&quot; 42 CFR 422.101 Washington, DC 2025 Jun 03 [accessed 2025 Jul 23] Accessed at: https://www.ecfr.gov/. " ClientName="" Abstract="" />
+    <Citation xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" CitationID="19225470" VersionNumber="30.0" ContentOwner="GA" Format="Centers for Medicare and Medicaid Services. Medicare Benefit Policy Manual. Chapter 1 - Inpatient Hospital Services Covered Under Part A Rev. 10892 [Internet] Centers for Medicare and Medicaid Services. 2021 Aug Accessed at: https://www.cms.gov/manuals/. [accessed 2025 Sep 09] " ClientName="" Abstract="" />
+    <Citation xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" CitationID="19225471" VersionNumber="30.0" ContentOwner="GA" Format="Centers for Medicare and Medicaid Services. Medicare Benefit Policy Manual. Chapter 6 - Hospital Services Covered Under Part B Rev. 12425 [Internet] Centers for Medicare and Medicaid Services. 2023 Dec Accessed at: http://www.cms.gov/manuals/. [accessed 2025 Sep 09] " ClientName="" Abstract="" />
+    <Citation xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" CitationID="19225472" VersionNumber="30.0" ContentOwner="GA" Format="Centers for Medicare and Medicaid Services. Medicare Benefit Policy Manual. Chapter 15 - Covered Medical and Other Health Services Rev. 13108 [Internet] Centers for Medicare and Medicaid Services. 2025 Apr 11 Accessed at: https://www.cms.gov/manuals/. [accessed 2025 Sep 09] " ClientName="" Abstract="" />
+    <Citation xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" CitationID="19225473" VersionNumber="30.0" ContentOwner="GA" Format="Centers for Medicare and Medicaid Services. Medicare Program Integrity Manual. Chapter 6, Section 6.5 - Medical Review of Inpatient Hospital Claims for Part A Payment Rev. 10365 [Internet] Centers for Medicare and Medicaid Services. 2020 Oct 02 Accessed at: https://www.cms.gov/medicare/regulations-guidance/manuals/internet-only-manuals-ioms. [accessed 2025 Sep 09] " ClientName="" Abstract="" />
+    <Citation xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" CitationID="19225474" VersionNumber="30.0" ContentOwner="GA" Format="Medicare Coverage Database. [Internet] Centers for Medicare and Medicaid Services. Accessed at: https://www.cms.gov/medicare-coverage-database/search.aspx?  Updated 2025 [accessed 2025 Oct 23]" ClientName="" Abstract="" />
+  </Citations>
+  <Codes>
+    <Code xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" SearchCodeID="24679845" Value="A21.2" Blos_A="" Blos_G="" Blos_P="" BlosComments="" Description="Pulmonary tularemia" CodeType="ICD10-D" CodeNum="8" HSIMCode="9ED8A6497925AD6" ContentOwner="" VersionNumber="" CodeKey="ICD10-D_A21.2" ProductCode="GRG&amp;AUTO&amp;HC&amp;ISC&amp;MCM&amp;RFC&amp;TC" ClientID="6676" ClientName="" />
+    <Code xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" SearchCodeID="24679846" Value="A22.1" Blos_A="" Blos_G="" Blos_P="" BlosComments="" Description="Pulmonary anthrax" CodeType="ICD10-D" CodeNum="8" HSIMCode="9ED8A6497925AD6" ContentOwner="" VersionNumber="" CodeKey="ICD10-D_A22.1" ProductCode="GRG&amp;AUTO&amp;HC&amp;ISC&amp;MCM&amp;RFC&amp;TC" ClientID="6676" ClientName="" />
+    <Code xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" SearchCodeID="24679866" Value="A37.01" Blos_A="" Blos_G="" Blos_P="" BlosComments="" Description="Whooping cough due to Bordetella pertussis with pneumonia" CodeType="ICD10-D" CodeNum="8" HSIMCode="9ED8A6497925AD6" ContentOwner="" VersionNumber="" CodeKey="ICD10-D_A37.01" ProductCode="AC&amp;AUTO&amp;GRG&amp;HC&amp;ISC&amp;MCM&amp;RFC&amp;TC" ClientID="6676" ClientName="" />
+    <Code xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" SearchCodeID="24679867" Value="A37.11" Blos_A="" Blos_G="" Blos_P="" BlosComments="" Description="Whooping cough due to Bordetella parapertussis with pneumonia" CodeType="ICD10-D" CodeNum="8" HSIMCode="9ED8A6497925AD6" ContentOwner="" VersionNumber="" CodeKey="ICD10-D_A37.11" ProductCode="AC&amp;AUTO&amp;GRG&amp;HC&amp;ISC&amp;MCM&amp;RFC&amp;TC" ClientID="6676" ClientName="" />
+    <Code xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" SearchCodeID="24679868" Value="A37.81" Blos_A="" Blos_G="" Blos_P="" BlosComments="" Description="Whooping cough due to other Bordetella species with pneumonia" CodeType="ICD10-D" CodeNum="8" HSIMCode="9ED8A6497925AD6" ContentOwner="" VersionNumber="" CodeKey="ICD10-D_A37.81" ProductCode="AC&amp;AUTO&amp;GRG&amp;HC&amp;ISC&amp;MCM&amp;RFC&amp;TC" ClientID="6676" ClientName="" />
+    <Code xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" SearchCodeID="24679869" Value="A37.91" Blos_A="" Blos_G="" Blos_P="" BlosComments="" Description="Whooping cough, unspecified species with pneumonia" CodeType="ICD10-D" CodeNum="8" HSIMCode="9ED8A6497925AD6" ContentOwner="" VersionNumber="" CodeKey="ICD10-D_A37.91" ProductCode="AC&amp;AUTO&amp;GRG&amp;HC&amp;ISC&amp;MCM&amp;RFC&amp;TC" ClientID="6676" ClientName="" />
+    <Code xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" SearchCodeID="24679847" Value="A48.1" Blos_A="" Blos_G="" Blos_P="" BlosComments="" Description="Legionnaires' disease" CodeType="ICD10-D" CodeNum="8" HSIMCode="9ED8A6497925AD6" ContentOwner="" VersionNumber="" CodeKey="ICD10-D_A48.1" ProductCode="AC&amp;AUTO&amp;HC&amp;ISC&amp;MCM&amp;RFC&amp;TC" ClientID="6676" ClientName="" />
+    <Code xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" SearchCodeID="24679848" Value="A70" Blos_A="" Blos_G="" Blos_P="" BlosComments="" Description="Chlamydia psittaci infections" CodeType="ICD10-D" CodeNum="8" HSIMCode="9ED8A6497925AD6" ContentOwner="" VersionNumber="" CodeKey="ICD10-D_A70" ProductCode="GRG&amp;AUTO&amp;HC&amp;ISC&amp;MCM&amp;RFC&amp;TC" ClientID="6676" ClientName="" />
+    <Code xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" SearchCodeID="24679836" Value="A78" Blos_A="" Blos_G="" Blos_P="" BlosComments="" Description="Q fever" CodeType="ICD10-D" CodeNum="8" HSIMCode="9ED8A6497925AD6" ContentOwner="" VersionNumber="" CodeKey="ICD10-D_A78" ProductCode="GRG&amp;AUTO&amp;HC&amp;ISC&amp;MCM&amp;RFC&amp;TC" ClientID="6676" ClientName="" />
+    <Code xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" SearchCodeID="24679849" Value="B37.1" Blos_A="" Blos_G="" Blos_P="" BlosComments="" Description="Pulmonary candidiasis" CodeType="ICD10-D" CodeNum="8" HSIMCode="9ED8A6497925AD6" ContentOwner="" VersionNumber="" CodeKey="ICD10-D_B37.1" ProductCode="AC&amp;AUTO&amp;GRG&amp;HC&amp;ISC&amp;MCM&amp;RFC&amp;TC" ClientID="6676" ClientName="" />
+    <Code xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" SearchCodeID="24679850" Value="B44.0" Blos_A="" Blos_G="" Blos_P="" BlosComments="" Description="Invasive pulmonary aspergillosis" CodeType="ICD10-D" CodeNum="8" HSIMCode="9ED8A6497925AD6" ContentOwner="" VersionNumber="" CodeKey="ICD10-D_B44.0" ProductCode="GRG&amp;AUTO&amp;HC&amp;ISC&amp;MCM&amp;RFC&amp;TC" ClientID="6676" ClientName="" />
+    <Code xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" SearchCodeID="24679851" Value="J13" Blos_A="" Blos_G="" Blos_P="" BlosComments="" Description="Pneumonia due to Streptococcus pneumoniae" CodeType="ICD10-D" CodeNum="8" HSIMCode="9ED8A6497925AD6" ContentOwner="" VersionNumber="" CodeKey="ICD10-D_J13" ProductCode="AC&amp;AUTO&amp;HC&amp;ISC&amp;MCM&amp;RFC&amp;TC" ClientID="6676" ClientName="" />
+    <Code xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" SearchCodeID="24679852" Value="J14" Blos_A="" Blos_G="" Blos_P="" BlosComments="" Description="Pneumonia due to Hemophilus influenzae" CodeType="ICD10-D" CodeNum="8" HSIMCode="9ED8A6497925AD6" ContentOwner="" VersionNumber="" CodeKey="ICD10-D_J14" ProductCode="AC&amp;AUTO&amp;HC&amp;ISC&amp;MCM&amp;RFC&amp;TC" ClientID="6676" ClientName="" />
+    <Code xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" SearchCodeID="24679853" Value="J15.0" Blos_A="" Blos_G="" Blos_P="" BlosComments="" Description="Pneumonia due to Klebsiella pneumoniae" CodeType="ICD10-D" CodeNum="8" HSIMCode="9ED8A6497925AD6" ContentOwner="" VersionNumber="" CodeKey="ICD10-D_J15.0" ProductCode="AC&amp;AUTO&amp;HC&amp;ISC&amp;MCM&amp;RFC&amp;TC" ClientID="6676" ClientName="" />
+    <Code xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" SearchCodeID="24679854" Value="J15.1" Blos_A="" Blos_G="" Blos_P="" BlosComments="" Description="Pneumonia due to Pseudomonas" CodeType="ICD10-D" CodeNum="8" HSIMCode="9ED8A6497925AD6" ContentOwner="" VersionNumber="" CodeKey="ICD10-D_J15.1" ProductCode="AC&amp;AUTO&amp;HC&amp;ISC&amp;MCM&amp;RFC&amp;TC" ClientID="6676" ClientName="" />
+    <Code xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" SearchCodeID="24679862" Value="J15.20" Blos_A="" Blos_G="" Blos_P="" BlosComments="" Description="Pneumonia due to staphylococcus, unspecified" CodeType="ICD10-D" CodeNum="8" HSIMCode="9ED8A6497925AD6" ContentOwner="" VersionNumber="" CodeKey="ICD10-D_J15.20" ProductCode="AC&amp;AUTO&amp;HC&amp;ISC&amp;MCM&amp;RFC&amp;TC" ClientID="6676" ClientName="" />
+    <Code xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" SearchCodeID="24679863" Value="J15.211" Blos_A="" Blos_G="" Blos_P="" BlosComments="" Description="Pneumonia due to Methicillin susceptible Staphylococcus aureus" CodeType="ICD10-D" CodeNum="8" HSIMCode="9ED8A6497925AD6" ContentOwner="" VersionNumber="" CodeKey="ICD10-D_J15.211" ProductCode="AC&amp;AUTO&amp;HC&amp;ISC&amp;MCM&amp;RFC&amp;TC" ClientID="6676" ClientName="" />
+    <Code xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" SearchCodeID="24679837" Value="J15.212" Blos_A="" Blos_G="" Blos_P="" BlosComments="" Description="Pneumonia due to Methicillin resistant Staphylococcus aureus" CodeType="ICD10-D" CodeNum="8" HSIMCode="9ED8A6497925AD6" ContentOwner="" VersionNumber="" CodeKey="ICD10-D_J15.212" ProductCode="AC&amp;AUTO&amp;HC&amp;ISC&amp;MCM&amp;RFC&amp;TC" ClientID="6676" ClientName="" />
+    <Code xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" SearchCodeID="24679838" Value="J15.29" Blos_A="" Blos_G="" Blos_P="" BlosComments="" Description="Pneumonia due to other staphylococcus" CodeType="ICD10-D" CodeNum="8" HSIMCode="9ED8A6497925AD6" ContentOwner="" VersionNumber="" CodeKey="ICD10-D_J15.29" ProductCode="AC&amp;AUTO&amp;HC&amp;ISC&amp;MCM&amp;RFC&amp;TC" ClientID="6676" ClientName="" />
+    <Code xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" SearchCodeID="24679839" Value="J15.3" Blos_A="" Blos_G="" Blos_P="" BlosComments="" Description="Pneumonia due to streptococcus, group B" CodeType="ICD10-D" CodeNum="8" HSIMCode="9ED8A6497925AD6" ContentOwner="" VersionNumber="" CodeKey="ICD10-D_J15.3" ProductCode="AC&amp;AUTO&amp;HC&amp;ISC&amp;MCM&amp;RFC&amp;TC" ClientID="6676" ClientName="" />
+    <Code xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" SearchCodeID="24679855" Value="J15.4" Blos_A="" Blos_G="" Blos_P="" BlosComments="" Description="Pneumonia due to other streptococci" CodeType="ICD10-D" CodeNum="8" HSIMCode="9ED8A6497925AD6" ContentOwner="" VersionNumber="" CodeKey="ICD10-D_J15.4" ProductCode="AC&amp;AUTO&amp;HC&amp;ISC&amp;MCM&amp;RFC&amp;TC" ClientID="6676" ClientName="" />
+    <Code xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" SearchCodeID="24679856" Value="J15.5" Blos_A="" Blos_G="" Blos_P="" BlosComments="" Description="Pneumonia due to Escherichia coli" CodeType="ICD10-D" CodeNum="8" HSIMCode="9ED8A6497925AD6" ContentOwner="" VersionNumber="" CodeKey="ICD10-D_J15.5" ProductCode="AC&amp;AUTO&amp;HC&amp;ISC&amp;MCM&amp;RFC&amp;TC" ClientID="6676" ClientName="" />
+    <Code xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" SearchCodeID="24679857" Value="J15.61" Blos_A="" Blos_G="" Blos_P="" BlosComments="" Description="Pneumonia due to Acinetobacter baumannii" CodeType="ICD10-D" CodeNum="8" HSIMCode="9ED8A6497925AD6" ContentOwner="" VersionNumber="" CodeKey="ICD10-D_J15.61" ProductCode="AC&amp;AUTO&amp;HC&amp;ISC&amp;MCM&amp;RFC&amp;TC" ClientID="6676" ClientName="" />
+    <Code xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" SearchCodeID="24679858" Value="J15.69" Blos_A="" Blos_G="" Blos_P="" BlosComments="" Description="Pneumonia due to other Gram-negative bacteria" CodeType="ICD10-D" CodeNum="8" HSIMCode="9ED8A6497925AD6" ContentOwner="" VersionNumber="" CodeKey="ICD10-D_J15.69" ProductCode="AC&amp;AUTO&amp;HC&amp;ISC&amp;MCM&amp;RFC&amp;TC" ClientID="6676" ClientName="" />
+    <Code xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" SearchCodeID="24679859" Value="J15.7" Blos_A="" Blos_G="" Blos_P="" BlosComments="" Description="Pneumonia due to Mycoplasma pneumoniae" CodeType="ICD10-D" CodeNum="8" HSIMCode="9ED8A6497925AD6" ContentOwner="" VersionNumber="" CodeKey="ICD10-D_J15.7" ProductCode="AC&amp;AUTO&amp;HC&amp;ISC&amp;MCM&amp;RFC&amp;TC" ClientID="6676" ClientName="" />
+    <Code xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" SearchCodeID="24679864" Value="J15.8" Blos_A="" Blos_G="" Blos_P="" BlosComments="" Description="Pneumonia due to other specified bacteria" CodeType="ICD10-D" CodeNum="8" HSIMCode="9ED8A6497925AD6" ContentOwner="" VersionNumber="" CodeKey="ICD10-D_J15.8" ProductCode="AC&amp;AUTO&amp;HC&amp;ISC&amp;MCM&amp;RFC&amp;TC" ClientID="6676" ClientName="" />
+    <Code xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" SearchCodeID="24679865" Value="J15.9" Blos_A="" Blos_G="" Blos_P="" BlosComments="" Description="Unspecified bacterial pneumonia" CodeType="ICD10-D" CodeNum="8" HSIMCode="9ED8A6497925AD6" ContentOwner="" VersionNumber="" CodeKey="ICD10-D_J15.9" ProductCode="AC&amp;AUTO&amp;HC&amp;ISC&amp;MCM&amp;RFC&amp;TC" ClientID="6676" ClientName="" />
+    <Code xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" SearchCodeID="24679840" Value="J16.0" Blos_A="" Blos_G="" Blos_P="" BlosComments="" Description="Chlamydial pneumonia" CodeType="ICD10-D" CodeNum="8" HSIMCode="9ED8A6497925AD6" ContentOwner="" VersionNumber="" CodeKey="ICD10-D_J16.0" ProductCode="AC&amp;AUTO&amp;HC&amp;ISC&amp;MCM&amp;RFC&amp;TC" ClientID="6676" ClientName="" />
+    <Code xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" SearchCodeID="24679841" Value="J16.8" Blos_A="" Blos_G="" Blos_P="" BlosComments="" Description="Pneumonia due to other specified infectious organisms" CodeType="ICD10-D" CodeNum="8" HSIMCode="9ED8A6497925AD6" ContentOwner="" VersionNumber="" CodeKey="ICD10-D_J16.8" ProductCode="AC&amp;AUTO&amp;HC&amp;ISC&amp;MCM&amp;RFC&amp;TC" ClientID="6676" ClientName="" />
+    <Code xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" SearchCodeID="24679842" Value="J17" Blos_A="" Blos_G="" Blos_P="" BlosComments="" Description="Pneumonia in diseases classified elsewhere" CodeType="ICD10-D" CodeNum="8" HSIMCode="9ED8A6497925AD6" ContentOwner="" VersionNumber="" CodeKey="ICD10-D_J17" ProductCode="AC&amp;AUTO&amp;HC&amp;ISC&amp;MCM&amp;RFC&amp;TC" ClientID="6676" ClientName="" />
+    <Code xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" SearchCodeID="24679843" Value="J18.0" Blos_A="" Blos_G="" Blos_P="" BlosComments="" Description="Bronchopneumonia, unspecified organism" CodeType="ICD10-D" CodeNum="8" HSIMCode="9ED8A6497925AD6" ContentOwner="" VersionNumber="" CodeKey="ICD10-D_J18.0" ProductCode="AC&amp;AUTO&amp;HC&amp;ISC&amp;MCM&amp;RFC&amp;TC" ClientID="6676" ClientName="" />
+    <Code xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" SearchCodeID="24679844" Value="J18.1" Blos_A="" Blos_G="" Blos_P="" BlosComments="" Description="Lobar pneumonia, unspecified organism" CodeType="ICD10-D" CodeNum="8" HSIMCode="9ED8A6497925AD6" ContentOwner="" VersionNumber="" CodeKey="ICD10-D_J18.1" ProductCode="AC&amp;AUTO&amp;HC&amp;ISC&amp;MCM&amp;RFC&amp;TC" ClientID="6676" ClientName="" />
+    <Code xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" SearchCodeID="24679860" Value="J18.8" Blos_A="" Blos_G="" Blos_P="" BlosComments="" Description="Other pneumonia, unspecified organism" CodeType="ICD10-D" CodeNum="8" HSIMCode="9ED8A6497925AD6" ContentOwner="" VersionNumber="" CodeKey="ICD10-D_J18.8" ProductCode="AC&amp;AUTO&amp;HC&amp;ISC&amp;MCM&amp;RFC&amp;TC" ClientID="6676" ClientName="" />
+    <Code xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" SearchCodeID="24679861" Value="J18.9" Blos_A="" Blos_G="" Blos_P="" BlosComments="" Description="Pneumonia, unspecified organism" CodeType="ICD10-D" CodeNum="8" HSIMCode="9ED8A6497925AD6" ContentOwner="" VersionNumber="" CodeKey="ICD10-D_J18.9" ProductCode="AC&amp;AUTO&amp;HC&amp;ISC&amp;MCM&amp;RFC&amp;TC" ClientID="6676" ClientName="" />
+  </Codes>
+  <Keywords />
+</ExportedGuideline>

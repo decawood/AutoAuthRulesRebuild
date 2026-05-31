@@ -172,6 +172,7 @@ h3 {
 .rule-card,
 .request-summary,
 .objective-hero,
+.guideline-selector,
 .objective-metric,
 .guideline-panel,
 .table-wrap,
@@ -596,12 +597,14 @@ h3 {
 
 .rule-description:hover,
 select:hover,
+input[type="search"]:hover,
 input[type="number"]:hover {
   border-color: var(--m-stroke-1);
 }
 
 .rule-description:focus,
 select:focus,
+input[type="search"]:focus,
 input[type="number"]:focus {
   border-color: var(--m-stroke-focus-1);
   outline: 2px solid var(--m-stroke-focus-2);
@@ -631,6 +634,7 @@ input[type="number"]:focus {
 }
 
 select,
+input[type="search"],
 input[type="number"] {
   width: 100%;
   min-height: var(--m-40);
@@ -733,6 +737,40 @@ input[type="range"] {
 .objective-view {
   display: grid;
   gap: var(--m-14);
+}
+
+.guideline-selector {
+  display: grid;
+  grid-template-columns: minmax(220px, 1fr) minmax(280px, 1.35fr) auto;
+  align-items: end;
+  gap: var(--m-12);
+  padding: var(--m-14);
+}
+
+.guideline-selector label > span {
+  display: block;
+  margin-bottom: var(--m-6);
+  color: var(--m-fg-3);
+  font-size: var(--m-14);
+  line-height: var(--m-16);
+  font-weight: var(--m-font-semibold);
+}
+
+.guideline-selector__meta {
+  display: grid;
+  justify-items: end;
+  gap: var(--m-2);
+  min-width: 108px;
+  color: var(--m-fg-3);
+  font-size: var(--m-12);
+  line-height: var(--m-16);
+  font-weight: var(--m-font-semibold);
+}
+
+.guideline-selector__meta strong {
+  color: var(--m-fg-1);
+  font-size: var(--m-20);
+  line-height: var(--m-24);
 }
 
 .objective-hero {
@@ -1004,6 +1042,10 @@ button.guideline-node__row:hover {
   background: var(--m-bg-2);
 }
 
+.guideline-node__row--sample {
+  box-shadow: inset 3px 0 0 var(--m-warn-bg);
+}
+
 .guideline-node__row--selected {
   background: var(--m-posi-bg-light);
   box-shadow: inset 3px 0 0 var(--m-posi-bg);
@@ -1147,6 +1189,13 @@ button.guideline-node__row:hover {
   color: var(--m-fg-3);
   font-size: var(--m-12);
   line-height: var(--m-16);
+  font-weight: var(--m-font-semibold);
+}
+
+.guideline-table__empty {
+  padding: var(--m-18) var(--m-16);
+  border-top: 1px solid var(--m-stroke-3);
+  color: var(--m-fg-3);
   font-weight: var(--m-font-semibold);
 }
 
@@ -1331,6 +1380,7 @@ button.guideline-node__row:hover {
   .rule-card-header,
   .request-summary,
   .objective-hero,
+  .guideline-selector,
   .guideline-panel__header,
   .decision-banner,
   .audit-card {
@@ -1347,6 +1397,14 @@ button.guideline-node__row:hover {
   .objective-hero__badges {
     justify-content: flex-start;
     max-width: none;
+  }
+
+  .guideline-selector {
+    grid-template-columns: 1fr;
+  }
+
+  .guideline-selector__meta {
+    justify-items: start;
   }
 
   .workspace-grid {

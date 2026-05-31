@@ -6,6 +6,7 @@ var builder = WebApplication.CreateBuilder(args);
 
 builder.Services.AddSingleton<PrototypeStore>();
 builder.Services.AddSingleton<RulesEvaluator>();
+builder.Services.AddSingleton<ObjectiveGuidelineService>();
 builder.Services.AddCors(options =>
 {
     options.AddPolicy("LocalReact", policy =>
@@ -61,6 +62,20 @@ app.MapPost("/api/shutdown", (ShutdownRequest request, IHostApplicationLifetime 
 });
 
 app.MapGet("/api/prototype", (PrototypeStore store) => Results.Ok(store.Snapshot()));
+
+app.MapGet("/api/objective-guidelines", (ObjectiveGuidelineService guidelines) => Results.Ok(guidelines.Summaries()));
+
+app.MapGet("/api/objective-guidelines/{hsim}", (string hsim, ObjectiveGuidelineService guidelines) =>
+{
+    try
+    {
+        return Results.Ok(guidelines.Detail(hsim));
+    }
+    catch (InvalidOperationException exception)
+    {
+        return Results.NotFound(new { message = exception.Message });
+    }
+});
 
 app.MapGet("/api/dashboard", (PrototypeStore store) => Results.Ok(store.Dashboard()));
 

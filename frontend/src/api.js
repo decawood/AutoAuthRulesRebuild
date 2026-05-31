@@ -26,6 +26,10 @@ const api = async (path, options = {}) => {
 
 export const getPrototype = () => api('/api/prototype');
 
+export const getObjectiveGuidelines = () => api('/api/objective-guidelines');
+
+export const getObjectiveGuideline = (hsim) => api(`/api/objective-guidelines/${encodeURIComponent(hsim)}`);
+
 export const updateRule = (id, rule) =>
   api(`/api/rules/${id}`, {
     method: 'PUT',
