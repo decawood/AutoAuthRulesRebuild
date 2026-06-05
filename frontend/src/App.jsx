@@ -1,11 +1,11 @@
 import { useEffect, useMemo, useState } from 'react';
-import { evaluateRequest, getObjectiveGuideline, getObjectiveGuidelines, getPrototype, shutdownPrototype, updateRule } from './api.js';
+import { evaluateRequest, getObjectiveGuideline, getObjectiveGuidelines, getPrecisionPreview, getPrototype, shutdownPrototype, updateRule } from './api.js';
 
 const memberSegments = ['Medicare', 'Commercial', 'Medicaid'];
 const serviceLines = ['Inpatient admission', 'Elective procedure'];
 
 const modeLabels = {
-  ConfidenceThreshold: 'Confidence threshold',
+  ConfidenceThreshold: 'Precision threshold',
   DataPointCombination: 'Data point combination',
   PathwayThreshold: 'Pathway threshold'
 };
@@ -19,6 +19,17 @@ const modeKeys = Object.keys(modeLabels);
 const actionKeys = Object.keys(actionLabels);
 const decisionKeys = ['AutoApproved', 'PendedForReview'];
 const percentFormatter = new Intl.NumberFormat('en-US', { maximumFractionDigits: 1 });
+const evidenceSources = {
+  synapse: 'synapse',
+  synapseException: 'synapseException',
+  providerAttestation: 'providerAttestation'
+};
+
+const evidenceSourceLabels = {
+  [evidenceSources.synapse]: 'Synapse',
+  [evidenceSources.synapseException]: 'Synapse exception',
+  [evidenceSources.providerAttestation]: 'Provider attestation'
+};
 
 const viewLabels = {
   configure: 'Rule configuration',
@@ -35,6 +46,18 @@ const metricDefinitions = {
   precision: {
     term: 'Precision',
     definition: 'Of what Synapse selected, how much the human also selected'
+  },
+  providerUsage: {
+    term: 'Provider selected',
+    definition: 'Projected percentage of reviewed cases where the provider selected this indication'
+  },
+  payerUsage: {
+    term: 'Payer selected',
+    definition: 'Projected percentage of reviewed cases where the payer selected this indication'
+  },
+  combinedUsage: {
+    term: 'Provider + payer',
+    definition: 'Projected percentage of reviewed cases where both provider and payer selected this indication'
   }
 };
 
@@ -62,6 +85,7 @@ function App() {
   const [modeFilter, setModeFilter] = useState('All');
   const [status, setStatus] = useState({ type: 'idle', message: '' });
   const [appStopped, setAppStopped] = useState(false);
+  const [metricMode, setMetricMode] = useState('sample');
 
   const requests = snapshot?.requests ?? [];
   const rules = snapshot?.rules ?? [];
@@ -170,6 +194,16 @@ function App() {
         <div className="header-badges" aria-label="Prototype status">
           <Badge variant="info">{dashboard.deploymentModel}</Badge>
           <Badge>{dashboard.dataRetention}</Badge>
+          <details className="dev-settings">
+            <summary>Demo settings</summary>
+            <label>
+              <span>Metric mode</span>
+              <select value={metricMode} onChange={(event) => setMetricMode(event.target.value)}>
+                <option value="sample">Projected sample metrics</option>
+                <option value="real">Real spreadsheet metrics</option>
+              </select>
+            </label>
+          </details>
           <Button variant="negative-text" className="shutdown-button" onClick={handleShutdown}>
             Shut down
           </Button>
@@ -208,7 +242,7 @@ function App() {
           modeFilter={modeFilter}
           setModeFilter={setModeFilter}
           onSaveRule={handleSaveRule}
-          requests={requests}
+          metricMode={metricMode}
         />
       )}
 
@@ -223,7 +257,7 @@ function App() {
       )}
 
       {activeView === 'objective' && (
-        <ObjectiveIndicationsView />
+        <ObjectiveIndicationsView metricMode={metricMode} />
       )}
 
       {activeView === 'audit' && (
@@ -243,10 +277,9 @@ function Metric({ label, value, helper }) {
   );
 }
 
-function ConfigurationView({ rules, modeFilter, setModeFilter, onSaveRule, requests }) {
+function ConfigurationView({ rules, modeFilter, setModeFilter, onSaveRule, metricMode }) {
   const modes = ['All', ...Object.keys(modeLabels)];
   const filteredRules = modeFilter === 'All' ? rules : rules.filter((rule) => getRuleMode(rule.mode) === modeFilter);
-  const indications = uniqueIndications(requests);
 
   return (
     <section className="workspace-grid">
@@ -271,8 +304,8 @@ function ConfigurationView({ rules, modeFilter, setModeFilter, onSaveRule, reque
           <RuleCard
             key={rule.id}
             rule={rule}
-            indications={indications}
             onSaveRule={onSaveRule}
+            metricMode={metricMode}
           />
         ))}
       </section>
@@ -280,12 +313,48 @@ function ConfigurationView({ rules, modeFilter, setModeFilter, onSaveRule, reque
   );
 }
 
-function RuleCard({ rule, indications, onSaveRule }) {
+function RuleCard({ rule, onSaveRule, metricMode }) {
   const [draft, setDraft] = useState(rule);
+  const [preview, setPreview] = useState(null);
+  const [previewStatus, setPreviewStatus] = useState({ type: 'busy', message: 'Loading pathway preview...' });
+  const [drawerOpen, setDrawerOpen] = useState(false);
 
   useEffect(() => {
     setDraft(rule);
   }, [rule]);
+
+  const precisionThreshold = Number(draft.precisionThreshold ?? draft.confidenceThreshold ?? 90);
+  const confidenceThreshold = Number(draft.confidenceThreshold ?? 90);
+  const useConfidenceThreshold = Boolean(draft.useConfidenceThreshold);
+
+  useEffect(() => {
+    let cancelled = false;
+    const timeout = window.setTimeout(async () => {
+      setPreviewStatus({ type: 'busy', message: 'Loading pathway preview...' });
+      try {
+        const data = await getPrecisionPreview({
+          precisionThreshold,
+          useConfidenceThreshold,
+          confidenceThreshold,
+          metricMode
+        });
+        if (!cancelled) {
+          setPreview(data);
+          setPreviewStatus({ type: 'idle', message: '' });
+        }
+      } catch (error) {
+        if (!cancelled) {
+          setPreview(null);
+          setPreviewStatus({ type: 'error', message: error.message });
+        }
+      }
+    }, 250);
+
+    return () => {
+      cancelled = true;
+      window.clearTimeout(timeout);
+    };
+  }, [precisionThreshold, useConfidenceThreshold, confidenceThreshold, metricMode]);
 
   const updateDraft = (field, value) => {
     setDraft((current) => ({ ...current, [field]: value }));
@@ -305,116 +374,564 @@ function RuleCard({ rule, indications, onSaveRule }) {
   };
 
   const modeDescription = {
-    ConfidenceThreshold: 'Builds a medically necessary bucket from Synapse confidence.',
-    DataPointCombination: 'Requires provider attestation and Synapse support for the same indication.',
-    PathwayThreshold: 'Requires more met pathways than the base guideline threshold.'
+    ConfidenceThreshold: 'Uses the saved Medical Necessity Bucket; sliders only stage candidate pathways.',
+    DataPointCombination: 'Requires provider attestation and a saved bucket pathway for the same indication.',
+    PathwayThreshold: 'Requires more saved bucket pathways than the base guideline threshold.'
   }[getRuleMode(draft.mode)];
 
   return (
-    <article className={`rule-card ${draft.enabled ? '' : 'muted'}`}>
-      <div className="rule-card-header">
-        <div>
-          <p className="mode-label">{modeLabels[getRuleMode(draft.mode)]}</p>
-          <input
-            className="rule-title"
-            value={draft.name}
-            onChange={(event) => updateDraft('name', event.target.value)}
-            aria-label="Rule name"
-          />
+    <>
+      <article className={`rule-card ${draft.enabled ? '' : 'muted'}`}>
+        <div className="rule-card-header">
+          <div>
+            <p className="mode-label">{modeLabels[getRuleMode(draft.mode)]}</p>
+            <input
+              className="rule-title"
+              value={draft.name}
+              onChange={(event) => updateDraft('name', event.target.value)}
+              aria-label="Rule name"
+            />
+          </div>
+          <label className="switch" aria-label="Rule enabled state">
+            <input
+              type="checkbox"
+              checked={draft.enabled}
+              onChange={(event) => updateDraft('enabled', event.target.checked)}
+            />
+            <Badge variant={draft.enabled ? 'positive' : 'neutral'}>{draft.enabled ? 'Enabled' : 'Disabled'}</Badge>
+          </label>
         </div>
-        <label className="switch" aria-label="Rule enabled state">
-          <input
-            type="checkbox"
-            checked={draft.enabled}
-            onChange={(event) => updateDraft('enabled', event.target.checked)}
-          />
-          <Badge variant={draft.enabled ? 'positive' : 'neutral'}>{draft.enabled ? 'Enabled' : 'Disabled'}</Badge>
-        </label>
-      </div>
 
-      <textarea
-        className="rule-description"
-        value={draft.description}
-        onChange={(event) => updateDraft('description', event.target.value)}
-        aria-label="Rule description"
-      />
+        <textarea
+          className="rule-description"
+          value={draft.description}
+          onChange={(event) => updateDraft('description', event.target.value)}
+          aria-label="Rule description"
+        />
 
-      <p className="rule-context">{modeDescription}</p>
+        <p className="rule-context">{modeDescription}</p>
 
-      <div className="field-grid">
-        <label>
-          <span>Action</span>
-          <select value={getRuleAction(draft.action)} onChange={(event) => updateDraft('action', event.target.value)}>
-            {Object.entries(actionLabels).map(([value, label]) => (
-              <option key={value} value={value}>{label}</option>
-            ))}
-          </select>
-        </label>
-
-        <label>
-          <span>Priority</span>
-          <input
-            type="number"
-            min="1"
-            max="99"
-            value={draft.priority}
-            onChange={(event) => updateDraft('priority', Number(event.target.value))}
-          />
-        </label>
-
-        <label className="wide">
-          <span>Synapse confidence threshold: {draft.confidenceThreshold}%</span>
-          <input
-            type="range"
-            min="50"
-            max="100"
-            value={draft.confidenceThreshold}
-            onChange={(event) => updateDraft('confidenceThreshold', Number(event.target.value))}
-          />
-        </label>
-
-        {getRuleMode(draft.mode) === 'PathwayThreshold' && (
+        <div className="field-grid">
           <label>
-            <span>Minimum pathways</span>
+            <span>Action</span>
+            <select value={getRuleAction(draft.action)} onChange={(event) => updateDraft('action', event.target.value)}>
+              {Object.entries(actionLabels).map(([value, label]) => (
+                <option key={value} value={value}>{label}</option>
+              ))}
+            </select>
+          </label>
+
+          <label>
+            <span>Priority</span>
             <input
               type="number"
               min="1"
-              max="5"
-              value={draft.minimumPathways}
-              onChange={(event) => updateDraft('minimumPathways', Number(event.target.value))}
+              max="99"
+              value={draft.priority}
+              onChange={(event) => updateDraft('priority', Number(event.target.value))}
             />
           </label>
+
+          <label className="wide">
+            <span>Precision threshold: {formatPercent(precisionThreshold)}</span>
+            <input
+              type="range"
+              min="50"
+              max="100"
+              value={precisionThreshold}
+              onChange={(event) => updateDraft('precisionThreshold', Number(event.target.value))}
+            />
+          </label>
+
+          {getRuleMode(draft.mode) === 'PathwayThreshold' && (
+            <label>
+              <span>Minimum pathways</span>
+              <input
+                type="number"
+                min="1"
+                max="5"
+                value={draft.minimumPathways}
+                onChange={(event) => updateDraft('minimumPathways', Number(event.target.value))}
+              />
+            </label>
+          )}
+        </div>
+
+        <div className="confidence-filter">
+          <label className="check-control">
+            <input
+              type="checkbox"
+              checked={useConfidenceThreshold}
+              onChange={(event) => updateDraft('useConfidenceThreshold', event.target.checked)}
+            />
+            <span>Apply Synapse confidence filter</span>
+          </label>
+          {useConfidenceThreshold && (
+            <label className="confidence-slider">
+              <span>Synapse confidence threshold: {formatPercent(confidenceThreshold)}</span>
+              <input
+                type="range"
+                min="50"
+                max="100"
+                value={confidenceThreshold}
+                onChange={(event) => updateDraft('confidenceThreshold', Number(event.target.value))}
+              />
+            </label>
+          )}
+        </div>
+
+        <PathwayPreviewSummary
+          preview={preview}
+          status={previewStatus}
+          bucketCount={draft.medicalNecessityBucket?.length ?? 0}
+          onOpen={() => setDrawerOpen(true)}
+        />
+
+        <OptionGroup
+          title="Member segments"
+          options={memberSegments}
+          selected={draft.memberSegments}
+          onToggle={(value) => toggleArrayValue('memberSegments', value)}
+        />
+
+        <OptionGroup
+          title="Service lines"
+          options={serviceLines}
+          selected={draft.serviceLines}
+          onToggle={(value) => toggleArrayValue('serviceLines', value)}
+        />
+
+        <div className="card-actions">
+          <span>Last updated by {draft.updatedBy}</span>
+          <Button variant="filled" onClick={() => onSaveRule(draft)}>Save rule</Button>
+        </div>
+      </article>
+      <PathwayDrawer
+        open={drawerOpen}
+        preview={preview}
+        bucket={draft.medicalNecessityBucket ?? []}
+        onAddToBucket={(items) => {
+          setDraft((current) => ({
+            ...current,
+            medicalNecessityBucket: mergeBucketItems(current.medicalNecessityBucket ?? [], items)
+          }));
+        }}
+        onRemoveFromBucket={(item) => {
+          setDraft((current) => ({
+            ...current,
+            medicalNecessityBucket: (current.medicalNecessityBucket ?? []).filter((bucketItem) => bucketKey(bucketItem) !== bucketKey(item))
+          }));
+        }}
+        onClose={() => setDrawerOpen(false)}
+      />
+    </>
+  );
+}
+
+function PathwayPreviewSummary({ preview, status, bucketCount, onOpen }) {
+  const hasPreview = preview && status.type !== 'error';
+
+  return (
+    <section className="pathway-preview-summary" aria-label="Matching pathway preview">
+      <div>
+        <p className="eyebrow">Matching pathway preview</p>
+        {status.type === 'busy' && <p>Calculating guideline impact...</p>}
+        {status.type === 'error' && <p>{status.message}</p>}
+        {hasPreview && (
+          <div className="preview-counts">
+            <strong>{preview.guidelineCount}</strong>
+            <span>guidelines</span>
+            <strong>{preview.pathwayCount}</strong>
+            <span>pathways</span>
+            <strong>{bucketCount}</strong>
+            <span>in bucket</span>
+          </div>
         )}
       </div>
+      <Button
+        variant="outline"
+        onClick={onOpen}
+        disabled={!hasPreview || preview.guidelines.length === 0}
+      >
+        View pathways
+      </Button>
+    </section>
+  );
+}
 
-      <OptionGroup
-        title="Member segments"
-        options={memberSegments}
-        selected={draft.memberSegments}
-        onToggle={(value) => toggleArrayValue('memberSegments', value)}
-      />
+function PathwayDrawer({ open, preview, bucket = [], onAddToBucket, onRemoveFromBucket, onClose }) {
+  const selectableItems = useMemo(() => flattenPreviewBucketItems(preview), [preview]);
+  const [evidenceSelections, setEvidenceSelections] = useState({});
+  const completedMixedItems = useMemo(() => buildCompletedMixedAllBucketItems(preview, evidenceSelections), [preview, evidenceSelections]);
+  const addableItems = useMemo(() => [...selectableItems, ...completedMixedItems], [selectableItems, completedMixedItems]);
+  const selectableKeySet = useMemo(() => new Set(addableItems.map(bucketKey)), [addableItems]);
+  const bucketGroups = useMemo(() => groupBucketByGuideline(bucket), [bucket]);
+  const bucketKeySet = useMemo(() => new Set(bucket.map(bucketKey)), [bucket]);
+  const previewNodeMap = useMemo(() => mapPreviewNodes(preview), [preview]);
+  const [selectedKeys, setSelectedKeys] = useState(new Set());
 
-      <OptionGroup
-        title="Service lines"
-        options={serviceLines}
-        selected={draft.serviceLines}
-        onToggle={(value) => toggleArrayValue('serviceLines', value)}
-      />
+  useEffect(() => {
+    if (open) {
+      setEvidenceSelections(buildInitialEvidenceSelections(preview));
+      setSelectedKeys(new Set(selectableItems.map(bucketKey)));
+    }
+  }, [open, preview, selectableItems]);
 
-      <OptionGroup
-        title="Eligible indications"
-        options={indications.map((indication) => indication.id)}
-        selected={draft.eligibleIndicationIds}
-        labels={Object.fromEntries(indications.map((indication) => [indication.id, indication.name]))}
-        onToggle={(value) => toggleArrayValue('eligibleIndicationIds', value)}
-        allowEmptyLabel="All indications"
-      />
+  useEffect(() => {
+    if (!open) {
+      return;
+    }
 
-      <div className="card-actions">
-        <span>Last updated by {draft.updatedBy}</span>
-        <Button variant="filled" onClick={() => onSaveRule(draft)}>Save rule</Button>
+    setSelectedKeys((current) => {
+      const next = new Set(current);
+      completedMixedItems.forEach((item) => next.add(bucketKey(item)));
+      return next;
+    });
+  }, [open, completedMixedItems]);
+
+  if (!open) {
+    return null;
+  }
+
+  const selectedItems = addableItems.filter((item) => selectedKeys.has(bucketKey(item)));
+  const addableCount = selectedItems.filter((item) => !bucketKeySet.has(bucketKey(item))).length;
+  const selectedCount = selectedItems.length;
+
+  const toggleSelected = (item) => {
+    const key = bucketKey(item);
+    setSelectedKeys((current) => {
+      const next = new Set(current);
+      if (next.has(key)) {
+        next.delete(key);
+      } else {
+        next.add(key);
+      }
+
+      return next;
+    });
+  };
+  const updateEvidenceSelection = (groupKey, childId, evidenceSource) => {
+    setEvidenceSelections((current) => ({
+      ...current,
+      [groupKey]: {
+        ...(current[groupKey] ?? {}),
+        [childId]: evidenceSource
+      }
+    }));
+  };
+
+  return (
+    <div className="drawer-layer" role="presentation">
+      <button className="drawer-scrim" type="button" aria-label="Close pathway drawer" onClick={onClose} />
+      <aside className="pathway-drawer" role="dialog" aria-modal="true" aria-label="Matching guideline pathways">
+        <div className="drawer-header">
+          <div>
+            <p className="eyebrow">Matching pathways</p>
+            <h2>{preview?.guidelineCount ?? 0} guidelines, {preview?.pathwayCount ?? 0} pathways</h2>
+          </div>
+          <Button variant="outline" onClick={onClose}>Close</Button>
+        </div>
+        <div className="drawer-workspace">
+          <main className="drawer-main">
+            <div className="drawer-action-bar">
+              <div>
+                <strong>{selectedCount} selected</strong>
+                <span>{addableCount} ready to add</span>
+              </div>
+              <Button
+                variant="filled"
+                onClick={() => onAddToBucket(selectedItems)}
+                disabled={selectedCount === 0}
+              >
+                Add selected to bucket
+              </Button>
+            </div>
+
+            <div className="drawer-body">
+              {preview?.guidelines?.length ? (
+                preview.guidelines.map((guideline) => (
+                  <section className="drawer-guideline" key={guideline.hsim}>
+                    <div className="drawer-guideline__header">
+                      <h3>{guideline.code} - {guideline.title}</h3>
+                      <Badge variant="info-subtle">{guideline.pathwayCount} pathway{guideline.pathwayCount === 1 ? '' : 's'}</Badge>
+                    </div>
+                    <div className="drawer-tree">
+                      <PreviewNodeList
+                        nodes={guideline.nodes}
+                        depth={0}
+                        guideline={guideline}
+                        preview={preview}
+                        selectedKeys={selectedKeys}
+                        evidenceSelections={evidenceSelections}
+                        onToggleSelection={toggleSelected}
+                        onEvidenceSelection={updateEvidenceSelection}
+                      />
+                    </div>
+                  </section>
+                ))
+              ) : (
+                <div className="empty-state">No pathways match the current filters.</div>
+              )}
+            </div>
+          </main>
+
+          <aside className="bucket-side-panel" aria-label="Medical necessity bucket">
+            <div className="bucket-side-panel__header">
+              <div>
+                <p className="eyebrow">Medical necessity bucket</p>
+                <h3>{bucket.length} selected pathway{bucket.length === 1 ? '' : 's'}</h3>
+              </div>
+            </div>
+
+            {bucketGroups.length === 0 ? (
+              <div className="bucket-empty">Nothing has been added to this rule yet.</div>
+            ) : (
+              <div className="bucket-group-list">
+                {bucketGroups.map((group) => (
+                  <section className="bucket-group" key={group.hsim}>
+                    <h4>{group.code} - {group.title}</h4>
+                    <div className="bucket-item-list">
+                      {group.items.map((item) => {
+                        const filterStatus = bucketFilterStatus(item, preview, selectableKeySet);
+
+                        return (
+                          <article className="bucket-item" key={bucketKey(item)}>
+                            <div>
+                              <strong>{item.pathwayText}</strong>
+                              <span>{item.logicText || item.logicType || 'Pathway'}</span>
+                            </div>
+                            <div className="bucket-item__meta">
+                              <Badge variant={badgeVariant(agreementTone(item.precision))}>{formatPercent(item.precision)}</Badge>
+                              <Badge variant={badgeVariant(metricTone(item.confidence))}>{formatPercent(item.confidence)}</Badge>
+                              {filterStatus && <Badge variant={filterStatus.variant}>{filterStatus.label}</Badge>}
+                            </div>
+                            {item.childEvidence?.length > 0 && (
+                              <div className="bucket-item__children">
+                                {item.childEvidence.map((child) => (
+                                  <div className="bucket-child-evidence" key={`${bucketKey(item)}-${child.pathwayId}`}>
+                                    <strong>{child.pathwayText}</strong>
+                                    <div className="bucket-item__meta">
+                                      <Badge variant="info-subtle">{evidenceSourceLabels[child.evidenceSource] ?? child.evidenceSource}</Badge>
+                                      <Badge variant={badgeVariant(agreementTone(currentChildPrecision(child, item, previewNodeMap)))}>{formatPercent(currentChildPrecision(child, item, previewNodeMap))}</Badge>
+                                      {savedExceptionStatus(child, item, previewNodeMap) && (
+                                        <Badge variant={savedExceptionStatus(child, item, previewNodeMap).variant}>
+                                          {savedExceptionStatus(child, item, previewNodeMap).label}
+                                        </Badge>
+                                      )}
+                                    </div>
+                                  </div>
+                                ))}
+                              </div>
+                            )}
+                            <Button variant="negative-text" onClick={() => onRemoveFromBucket(item)}>Remove</Button>
+                          </article>
+                        );
+                      })}
+                    </div>
+                  </section>
+                ))}
+              </div>
+            )}
+          </aside>
+        </div>
+      </aside>
+    </div>
+  );
+}
+
+function PreviewNodeList({
+  nodes,
+  depth,
+  guideline,
+  preview,
+  selectedKeys,
+  evidenceSelections,
+  onToggleSelection,
+  onEvidenceSelection,
+  ancestorSatisfiedAll = false
+}) {
+  return nodes.map((node, index) => (
+    <PreviewNode
+      key={`${node.id}-${depth}-${index}`}
+      node={node}
+      depth={depth}
+      guideline={guideline}
+      preview={preview}
+      selectedKeys={selectedKeys}
+      evidenceSelections={evidenceSelections}
+      onToggleSelection={onToggleSelection}
+      onEvidenceSelection={onEvidenceSelection}
+      ancestorSatisfiedAll={ancestorSatisfiedAll}
+    />
+  ));
+}
+
+function PreviewNode({
+  node,
+  depth,
+  guideline,
+  preview,
+  selectedKeys,
+  evidenceSelections,
+  onToggleSelection,
+  onEvidenceSelection,
+  ancestorSatisfiedAll
+}) {
+  const hasChildren = node.items?.length > 0;
+  const normalSelectable = isPreviewNodeSelectable(node, ancestorSatisfiedAll);
+  const mixedAllCandidate = isMixedAllCandidate(node, ancestorSatisfiedAll);
+  const mixedChildren = mixedAllCandidate ? requiredEvidenceChildren(node) : [];
+  const mixedGroupKey = bucketKey(bucketItemFromPreviewNode(guideline, node));
+  const mixedAllComplete = mixedAllCandidate && isMixedAllComplete(mixedChildren, evidenceSelections[mixedGroupKey]);
+  const selectable = normalSelectable || mixedAllComplete;
+  const selectableItem = normalSelectable
+    ? bucketItemFromPreviewNode(guideline, node)
+    : mixedAllComplete
+      ? mixedAllBucketItemFromPreviewNode(preview, guideline, node, mixedChildren, evidenceSelections[mixedGroupKey])
+      : null;
+  const selected = selectableItem ? selectedKeys.has(bucketKey(selectableItem)) : false;
+  const satisfiedAll = isSatisfiedAllNode(node);
+  const statusVariant = node.isExample
+    ? 'neutral'
+    : selectable
+      ? 'positive-subtle'
+      : mixedAllCandidate
+        ? 'warning'
+      : node.isTriggerable
+        ? 'info-subtle'
+      : node.isPrecisionQualified
+        ? 'warning'
+        : 'neutral';
+  const statusText = node.isExample
+    ? 'Context'
+    : selectable
+      ? 'Ready to add'
+      : mixedAllCandidate
+        ? 'Needs evidence'
+      : node.isTriggerable
+        ? 'Matches filter'
+      : node.isPrecisionQualified
+        ? 'Partial'
+        : 'Not met';
+
+  return (
+    <div className="preview-node" style={{ '--tree-indent': `${depth * 18}px` }}>
+      <div className="preview-node__row">
+        <div className="preview-node__select">
+          {selectableItem ? (
+            <label>
+              <input
+                type="checkbox"
+                checked={selected}
+                onChange={() => onToggleSelection(selectableItem)}
+              />
+              <span className="sr-only">Select {node.text}</span>
+            </label>
+          ) : (
+            <span aria-hidden="true" />
+          )}
+        </div>
+        <div className="preview-node__text">
+          <strong>{node.text}</strong>
+          {node.logicText && <span>{node.logicText}</span>}
+        </div>
+        <div className="preview-node__metrics">
+          <Badge variant={badgeVariant(agreementTone(node.precision))}>{formatPercent(node.precision)}</Badge>
+          <Badge variant={badgeVariant(metricTone(node.confidence))}>{formatPercent(node.confidence)}</Badge>
+          <Badge variant={statusVariant}>{statusText}</Badge>
+        </div>
       </div>
-    </article>
+      {mixedAllCandidate && (
+        <AllEvidenceSelector
+          groupKey={mixedGroupKey}
+          children={mixedChildren}
+          preview={preview}
+          selections={evidenceSelections[mixedGroupKey] ?? {}}
+          onChange={onEvidenceSelection}
+        />
+      )}
+      {hasChildren && (
+        <div className="preview-node__children">
+          <PreviewNodeList
+            nodes={node.items}
+            depth={depth + 1}
+            guideline={guideline}
+            preview={preview}
+            selectedKeys={selectedKeys}
+            evidenceSelections={evidenceSelections}
+            onToggleSelection={onToggleSelection}
+            onEvidenceSelection={onEvidenceSelection}
+            ancestorSatisfiedAll={ancestorSatisfiedAll || satisfiedAll}
+          />
+        </div>
+      )}
+    </div>
+  );
+}
+
+function AllEvidenceSelector({ groupKey, children, preview, selections, onChange }) {
+  return (
+    <div className="preview-node__evidence">
+      <strong>Complete this ALL pathway with explicit evidence</strong>
+      {children.map((child) => {
+        const selectedSource = selections[child.id] ?? '';
+        const synapseAvailable = child.isTriggerable;
+        const exceptionAvailable = canUseSynapseException(child, preview);
+
+        return (
+          <div className="evidence-row" key={`${groupKey}-${child.id}`}>
+            <div className="evidence-row__summary">
+              <strong>{child.text}</strong>
+              <div className="bucket-item__meta">
+                <Badge variant={badgeVariant(agreementTone(child.precision))}>{formatPercent(child.precision)}</Badge>
+                <Badge variant={badgeVariant(metricTone(child.confidence))}>{formatPercent(child.confidence)}</Badge>
+                {exceptionAvailable && <Badge variant="warning">Below current filter</Badge>}
+              </div>
+            </div>
+            <div className="evidence-choice-row">
+              <EvidenceChoice
+                groupKey={groupKey}
+                childId={child.id}
+                source={evidenceSources.synapse}
+                selectedSource={selectedSource}
+                disabled={!synapseAvailable}
+                onChange={onChange}
+              />
+              <EvidenceChoice
+                groupKey={groupKey}
+                childId={child.id}
+                source={evidenceSources.synapseException}
+                selectedSource={selectedSource}
+                disabled={!exceptionAvailable}
+                onChange={onChange}
+              />
+              <EvidenceChoice
+                groupKey={groupKey}
+                childId={child.id}
+                source={evidenceSources.providerAttestation}
+                selectedSource={selectedSource}
+                onChange={onChange}
+              />
+            </div>
+          </div>
+        );
+      })}
+    </div>
+  );
+}
+
+function EvidenceChoice({ groupKey, childId, source, selectedSource, disabled = false, onChange }) {
+  return (
+    <label className={disabled ? 'evidence-choice is-disabled' : 'evidence-choice'}>
+      <input
+        type="radio"
+        name={`${groupKey}-${childId}`}
+        checked={selectedSource === source}
+        disabled={disabled}
+        onChange={() => onChange(groupKey, childId, source)}
+      />
+      <span>{evidenceSourceLabels[source]}</span>
+    </label>
   );
 }
 
@@ -453,7 +970,7 @@ function SimulatorView({ requests, selectedRequest, setSelectedRequestId, curren
               onClick={() => setSelectedRequestId(request.id)}
             >
               <strong>{request.id}</strong>
-              <span>{request.memberSegment} - {request.caseType}</span>
+              <span>{request.guidelineCode} - {request.memberSegment}</span>
             </Button>
           ))}
         </div>
@@ -464,16 +981,16 @@ function SimulatorView({ requests, selectedRequest, setSelectedRequestId, curren
           <article className="request-summary">
             <div>
               <p className="eyebrow">Authorization request</p>
-              <h2>{selectedRequest.guidelineName}</h2>
+              <h2>{selectedRequest.guidelineCode} - {selectedRequest.guidelineName}</h2>
             </div>
             <Button variant="filled" className="primary-action" onClick={onRunEvaluation}>Run evaluation</Button>
           </article>
 
           <div className="summary-grid">
             <Fact label="Request ID" value={selectedRequest.id} />
+            <Fact label="Guideline" value={selectedRequest.guidelineCode} />
             <Fact label="Member segment" value={selectedRequest.memberSegment} />
             <Fact label="Service line" value={selectedRequest.serviceLine} />
-            <Fact label="Case type" value={selectedRequest.caseType} />
           </div>
 
           <IndicationTable request={selectedRequest} />
@@ -498,7 +1015,7 @@ function Fact({ label, value }) {
   );
 }
 
-function ObjectiveIndicationsView() {
+function ObjectiveIndicationsView({ metricMode }) {
   const [guidelines, setGuidelines] = useState([]);
   const [selectedGuidelineId, setSelectedGuidelineId] = useState('');
   const [guideline, setGuideline] = useState(null);
@@ -513,7 +1030,7 @@ function ObjectiveIndicationsView() {
       setListStatus({ type: 'busy', message: 'Loading guideline XMLs...' });
 
       try {
-        const data = await getObjectiveGuidelines();
+        const data = await getObjectiveGuidelines(metricMode);
         if (cancelled) {
           return;
         }
@@ -540,7 +1057,7 @@ function ObjectiveIndicationsView() {
     return () => {
       cancelled = true;
     };
-  }, []);
+  }, [metricMode]);
 
   useEffect(() => {
     if (!selectedGuidelineId) {
@@ -554,7 +1071,7 @@ function ObjectiveIndicationsView() {
       setDetailStatus({ type: 'busy', message: 'Loading guideline indications...' });
 
       try {
-        const data = await getObjectiveGuideline(selectedGuidelineId);
+        const data = await getObjectiveGuideline(selectedGuidelineId, metricMode);
         if (!cancelled) {
           setGuideline(data);
           setDetailStatus({ type: 'idle', message: '' });
@@ -572,7 +1089,7 @@ function ObjectiveIndicationsView() {
     return () => {
       cancelled = true;
     };
-  }, [selectedGuidelineId]);
+  }, [selectedGuidelineId, metricMode]);
 
   const filteredGuidelines = useMemo(() => {
     const normalizedQuery = query.trim().toLowerCase();
@@ -581,7 +1098,7 @@ function ObjectiveIndicationsView() {
     }
 
     return guidelines.filter((candidate) => (
-      [candidate.title, candidate.code, candidate.productCode, candidate.guidelineType]
+      [candidate.title, candidate.rawTitle, candidate.code, candidate.productCode, candidate.guidelineType, candidate.hsim, candidate.fileName]
         .filter(Boolean)
         .some((value) => value.toLowerCase().includes(normalizedQuery))
     ));
@@ -617,7 +1134,7 @@ function ObjectiveIndicationsView() {
       )}
 
       {guideline && (
-        <GuidelineDetail guideline={guideline} />
+        <GuidelineDetail guideline={guideline} metricMode={metricMode} />
       )}
     </section>
   );
@@ -656,7 +1173,7 @@ function GuidelineSelector({
           ) : (
             guidelines.map((candidate) => (
               <option key={candidate.id} value={candidate.id}>
-                {candidate.title} ({candidate.code})
+                {guidelineLabel(candidate)}
               </option>
             ))
           )}
@@ -670,10 +1187,11 @@ function GuidelineSelector({
   );
 }
 
-function GuidelineDetail({ guideline }) {
+function GuidelineDetail({ guideline, metricMode }) {
   const { summary, metrics } = guideline;
-  const matchText = summary.usesSampleMetrics
-    ? 'No matched performance rows'
+  const isSampleMode = metricMode !== 'real';
+  const matchText = isSampleMode
+    ? 'Projected sample metrics'
     : `${summary.matchedIndicationCount} of ${summary.indicationCount} indication IDs matched`;
 
   return (
@@ -681,15 +1199,15 @@ function GuidelineDetail({ guideline }) {
       <article className="objective-hero">
         <div>
           <p className="eyebrow">Guideline indications</p>
-          <h2>{summary.title} ({summary.code})</h2>
-          <p>Showing auto-authorization indication criteria parsed from the guideline XML. Metrics are populated from matched performance workbook rows when available.</p>
+          <h2>{guidelineLabel(summary)}</h2>
+          <p>Showing auto-authorization indication criteria parsed from the guideline XML. Metrics use projected sample values by default, with real spreadsheet precision available in demo settings and projected provider/payer usage for each indication.</p>
         </div>
         <div className="objective-hero__badges">
           <Badge variant="info-subtle">{summary.productCode}</Badge>
           <Badge variant="highlight-subtle">v{summary.version}</Badge>
           {summary.glos && <Badge>{summary.glos}</Badge>}
-          <Badge variant={summary.usesSampleMetrics ? 'warning' : 'positive-subtle'}>
-            {summary.usesSampleMetrics ? 'Sample metrics' : matchText}
+          <Badge variant={isSampleMode ? 'warning' : 'positive-subtle'}>
+            {matchText}
           </Badge>
         </div>
       </article>
@@ -702,9 +1220,9 @@ function GuidelineDetail({ guideline }) {
           tone={metrics?.metAi == null ? 'neutral' : 'info'}
         />
         <ObjectiveMetric
-          label="MCG avg confidence"
+          label="Synapse confidence"
           value={formatPercent(metrics?.confidence)}
-          helper="Temporary placeholder"
+          helper="Projected signal"
           tone={metricTone(metrics?.confidence)}
         />
         <ObjectiveMetric
@@ -722,6 +1240,30 @@ function GuidelineDetail({ guideline }) {
           definition={metricDefinitions.recall}
           definitionsId="objective-recall-metric-definition"
         />
+        <ObjectiveMetric
+          label="Provider selected"
+          value={formatPercent(metrics?.providerSelectionRate)}
+          helper={metrics?.usageIsProjected ? 'Projected selection rate' : undefined}
+          tone={metrics?.providerSelectionRate == null ? 'neutral' : 'info'}
+          definition={metricDefinitions.providerUsage}
+          definitionsId="objective-provider-usage-metric-definition"
+        />
+        <ObjectiveMetric
+          label="Payer selected"
+          value={formatPercent(metrics?.payerSelectionRate)}
+          helper={metrics?.usageIsProjected ? 'Projected selection rate' : undefined}
+          tone={metrics?.payerSelectionRate == null ? 'neutral' : 'info'}
+          definition={metricDefinitions.payerUsage}
+          definitionsId="objective-payer-usage-metric-definition"
+        />
+        <ObjectiveMetric
+          label="Provider + payer"
+          value={formatPercent(metrics?.providerAndPayerSelectionRate)}
+          helper={metrics?.usageIsProjected ? 'Projected overlap rate' : undefined}
+          tone={metrics?.providerAndPayerSelectionRate == null ? 'neutral' : 'info'}
+          definition={metricDefinitions.combinedUsage}
+          definitionsId="objective-combined-usage-metric-definition"
+        />
       </section>
 
       <section className="guideline-panel">
@@ -732,7 +1274,6 @@ function GuidelineDetail({ guideline }) {
           </div>
           <div className="objective-hero__badges">
             <Badge variant="info-subtle">{summary.autoAuthorizationSectionCount} AutoAuth section{summary.autoAuthorizationSectionCount === 1 ? '' : 's'}</Badge>
-            {summary.usesSampleMetrics && <Badge variant="warning">Sample metrics</Badge>}
           </div>
         </div>
 
@@ -741,7 +1282,7 @@ function GuidelineDetail({ guideline }) {
             <div className="guideline-table__head" role="row">
               <span>Indication</span>
               <span># Met (AI)</span>
-              <span>MCG Avg Confidence</span>
+              <span>Synapse Confidence</span>
               <span className="guideline-table__head-cell guideline-table__head-cell--with-info">
                 Precision / User Agreement
                 <MetricDefinitionTooltip
@@ -755,6 +1296,30 @@ function GuidelineDetail({ guideline }) {
                 <MetricDefinitionTooltip
                   id="objective-recall-header-definition"
                   definition={metricDefinitions.recall}
+                  align="left"
+                />
+              </span>
+              <span className="guideline-table__head-cell guideline-table__head-cell--with-info">
+                Provider selected
+                <MetricDefinitionTooltip
+                  id="objective-provider-usage-header-definition"
+                  definition={metricDefinitions.providerUsage}
+                  align="left"
+                />
+              </span>
+              <span className="guideline-table__head-cell guideline-table__head-cell--with-info">
+                Payer selected
+                <MetricDefinitionTooltip
+                  id="objective-payer-usage-header-definition"
+                  definition={metricDefinitions.payerUsage}
+                  align="left"
+                />
+              </span>
+              <span className="guideline-table__head-cell guideline-table__head-cell--with-info">
+                Both selected
+                <MetricDefinitionTooltip
+                  id="objective-combined-usage-header-definition"
+                  definition={metricDefinitions.combinedUsage}
                   align="left"
                 />
               </span>
@@ -820,8 +1385,8 @@ function MetricDefinitionTooltip({ id, definition, align = 'right' }) {
 }
 
 function GuidelineNodeList({ nodes, depth }) {
-  return nodes.map((node) => (
-    <GuidelineNode key={node.id} node={node} depth={depth} />
+  return nodes.map((node, index) => (
+    <GuidelineNode key={`${node.id}-${depth}-${index}`} node={node} depth={depth} />
   ));
 }
 
@@ -878,11 +1443,6 @@ function GuidelineNodeLabel({ node, expanded, hasChildren = false }) {
       </span>
       <div className="guideline-node__text">
         <strong>{node.text}</strong>
-        {node.metrics?.isSample && (
-          <div className="guideline-node__meta">
-            <Badge variant="warning">Sample metrics</Badge>
-          </div>
-        )}
       </div>
     </div>
   );
@@ -892,9 +1452,12 @@ function GuidelineMetricCells({ metrics }) {
   return (
     <>
       <MetricBadge value={metrics?.metAi} suffix="%" variant="info-subtle" label="# Met AI" />
-      <MetricBadge value={metrics?.confidence} suffix="%" variant={badgeVariant(metricTone(metrics?.confidence))} label="MCG avg confidence" />
+      <MetricBadge value={metrics?.confidence} suffix="%" variant={badgeVariant(metricTone(metrics?.confidence))} label="Synapse confidence" />
       <AgreementCell metrics={metrics} />
       <MetricBadge value={metrics?.recall} suffix="%" variant={badgeVariant(metricTone(metrics?.recall))} label="Recall" />
+      <MetricBadge value={metrics?.providerSelectionRate} suffix="%" variant="info-subtle" label="Provider selected" />
+      <MetricBadge value={metrics?.payerSelectionRate} suffix="%" variant="info-subtle" label="Payer selected" />
+      <MetricBadge value={metrics?.providerAndPayerSelectionRate} suffix="%" variant="info-subtle" label="Provider and payer selected" />
     </>
   );
 }
@@ -929,39 +1492,92 @@ function AgreementCell({ metrics }) {
 }
 
 function IndicationTable({ request }) {
+  const synapseRows = request.synapseResults.map((result) => ({
+    id: result.indicationId,
+    name: result.indicationName,
+    category: result.category,
+    sourceDocument: result.sourceDocument,
+    attested: Boolean(request.providerAttestations[result.indicationId]),
+    precision: result.precision,
+    confidence: result.confidence,
+    pathwayMet: result.pathwayMet,
+    evidenceType: 'Synapse-produced result'
+  }));
+  const synapseIds = new Set(synapseRows.map((row) => row.id));
+  const providerOnlyRows = (request.providerAttestationEvidence ?? [])
+    .filter((evidence) => !synapseIds.has(evidence.indicationId))
+    .map((evidence) => ({
+      id: evidence.indicationId,
+      name: evidence.indicationName,
+      category: evidence.category,
+      sourceDocument: evidence.sourceDocument,
+      attested: Boolean(evidence.attested),
+      precision: null,
+      confidence: null,
+      pathwayMet: null,
+      evidenceType: 'Provider attestation only'
+    }));
+  const evidenceRows = [...synapseRows, ...providerOnlyRows];
+
   return (
     <section className="table-wrap" aria-label="Indications">
       <div className="table-row table-head">
-        <span>Indication</span>
+        <span>Evidence</span>
         <span>Attested</span>
-        <span>Synapse</span>
+        <span>Precision</span>
+        <span>Confidence</span>
         <span>Pathway</span>
       </div>
-      {request.synapseResults.map((result) => (
-        <div className="table-row" key={result.indicationId}>
+      {evidenceRows.map((row) => (
+        <div className={row.evidenceType === 'Provider attestation only' ? 'table-row provider-only-row' : 'table-row'} key={row.id}>
           <div>
-            <strong>{result.indicationName}</strong>
-            <small>{result.category} - {result.sourceDocument}</small>
+            <strong>{row.name}</strong>
+            <small>{row.evidenceType} - {row.category} - {row.sourceDocument}</small>
           </div>
-          <Badge variant={request.providerAttestations[result.indicationId] ? 'positive-subtle' : 'neutral'}>
-            {request.providerAttestations[result.indicationId] ? 'Yes' : 'No'}
+          <Badge variant={row.attested ? 'positive-subtle' : 'neutral'}>
+            {row.attested ? 'Yes' : 'No'}
           </Badge>
-          <div className="confidence-cell">
-            <div
-              className="confidence-track"
-              role="progressbar"
-              aria-label={`${result.indicationName} Synapse confidence`}
-              aria-valuenow={Number(result.confidence)}
-              aria-valuemin="0"
-              aria-valuemax="100"
-            >
-              <span style={{ width: `${result.confidence}%` }} />
+          {row.precision == null ? (
+            <Badge variant="neutral">N/A</Badge>
+          ) : (
+            <div className="confidence-cell">
+              <div
+                className="confidence-track"
+                role="progressbar"
+                aria-label={`${row.name} precision`}
+                aria-valuenow={Number(row.precision)}
+                aria-valuemin="0"
+                aria-valuemax="100"
+              >
+                <span style={{ width: `${row.precision}%` }} />
+              </div>
+              <strong>{formatPercent(row.precision)}</strong>
             </div>
-            <strong>{result.confidence}%</strong>
-          </div>
-          <Badge variant={result.pathwayMet ? 'positive' : 'neutral'} className="pill">
-            {result.pathwayMet ? 'Met' : 'Not met'}
-          </Badge>
+          )}
+          {row.confidence == null ? (
+            <Badge variant="neutral">N/A</Badge>
+          ) : (
+            <div className="confidence-cell">
+              <div
+                className="confidence-track"
+                role="progressbar"
+                aria-label={`${row.name} Synapse confidence`}
+                aria-valuenow={Number(row.confidence)}
+                aria-valuemin="0"
+                aria-valuemax="100"
+              >
+                <span style={{ width: `${row.confidence}%` }} />
+              </div>
+              <strong>{formatPercent(row.confidence)}</strong>
+            </div>
+          )}
+          {row.pathwayMet == null ? (
+            <Badge variant="info-subtle" className="pill">Attestation</Badge>
+          ) : (
+            <Badge variant={row.pathwayMet ? 'positive' : 'neutral'} className="pill">
+              {row.pathwayMet ? 'Met' : 'Not met'}
+            </Badge>
+          )}
         </div>
       ))}
     </section>
@@ -1061,6 +1677,9 @@ function normalizeRuleForSave(rule) {
     serviceLines: rule.serviceLines,
     guidelineIds: rule.guidelineIds,
     eligibleIndicationIds: rule.eligibleIndicationIds,
+    medicalNecessityBucket: rule.medicalNecessityBucket ?? [],
+    precisionThreshold: Number(rule.precisionThreshold ?? rule.confidenceThreshold),
+    useConfidenceThreshold: Boolean(rule.useConfidenceThreshold),
     confidenceThreshold: Number(rule.confidenceThreshold),
     requireProviderAttestation: rule.requireProviderAttestation,
     minimumPathways: Number(rule.minimumPathways),
@@ -1068,19 +1687,274 @@ function normalizeRuleForSave(rule) {
   };
 }
 
-function uniqueIndications(requests) {
-  const byId = new Map();
+function flattenPreviewBucketItems(preview) {
+  const items = [];
 
-  requests.forEach((request) => {
-    request.synapseResults.forEach((result) => {
-      byId.set(result.indicationId, {
-        id: result.indicationId,
-        name: result.indicationName
-      });
+  (preview?.guidelines ?? []).forEach((guideline) => {
+    const visit = (node, ancestorSatisfiedAll = false) => {
+      if (isPreviewNodeSelectable(node, ancestorSatisfiedAll)) {
+        items.push(bucketItemFromPreviewNode(guideline, node));
+      }
+
+      const nextAncestorSatisfiedAll = ancestorSatisfiedAll || isSatisfiedAllNode(node);
+      (node.items ?? []).forEach((child) => visit(child, nextAncestorSatisfiedAll));
+    };
+
+    (guideline.nodes ?? []).forEach((node) => visit(node));
+  });
+
+  return items;
+}
+
+function buildCompletedMixedAllBucketItems(preview, evidenceSelections) {
+  return flattenMixedAllSpecs(preview)
+    .map((spec) => mixedAllBucketItemFromPreviewNode(
+      preview,
+      spec.guideline,
+      spec.node,
+      spec.children,
+      evidenceSelections[spec.key] ?? {}
+    ))
+    .filter(Boolean);
+}
+
+function flattenMixedAllSpecs(preview) {
+  const specs = [];
+
+  (preview?.guidelines ?? []).forEach((guideline) => {
+    const visit = (node, ancestorSatisfiedAll = false) => {
+      if (isMixedAllCandidate(node, ancestorSatisfiedAll)) {
+        specs.push({
+          key: bucketKey(bucketItemFromPreviewNode(guideline, node)),
+          guideline,
+          node,
+          children: requiredEvidenceChildren(node)
+        });
+      }
+
+      const nextAncestorSatisfiedAll = ancestorSatisfiedAll || isSatisfiedAllNode(node);
+      (node.items ?? []).forEach((child) => visit(child, nextAncestorSatisfiedAll));
+    };
+
+    (guideline.nodes ?? []).forEach((node) => visit(node));
+  });
+
+  return specs;
+}
+
+function buildInitialEvidenceSelections(preview) {
+  const selections = {};
+
+  flattenMixedAllSpecs(preview).forEach((spec) => {
+    selections[spec.key] = {};
+    spec.children.forEach((child) => {
+      if (child.isTriggerable) {
+        selections[spec.key][child.id] = evidenceSources.synapse;
+      }
     });
   });
 
-  return [...byId.values()].sort((a, b) => a.name.localeCompare(b.name));
+  return selections;
+}
+
+function bucketItemFromPreviewNode(guideline, node) {
+  return {
+    hsim: guideline.hsim,
+    guidelineCode: guideline.code,
+    guidelineTitle: guideline.title,
+    pathwayId: node.id,
+    pathwayText: node.text,
+    logicType: node.logicType ?? null,
+    logicText: node.logicText ?? null,
+    precision: node.precision ?? null,
+    confidence: node.confidence ?? null,
+    addedAt: new Date().toISOString()
+  };
+}
+
+function mixedAllBucketItemFromPreviewNode(preview, guideline, node, children, selections) {
+  if (!isMixedAllComplete(children, selections)) {
+    return null;
+  }
+
+  return {
+    ...bucketItemFromPreviewNode(guideline, node),
+    childEvidence: children.map((child) => ({
+      pathwayId: child.id,
+      pathwayText: child.text,
+      evidenceSource: selections[child.id],
+      logicType: child.logicType ?? null,
+      logicText: child.logicText ?? null,
+      precision: child.precision ?? null,
+      confidence: child.confidence ?? null,
+      precisionThreshold: Number(preview?.precisionThreshold ?? 0),
+      useConfidenceThreshold: Boolean(preview?.useConfidenceThreshold),
+      confidenceThreshold: Number(preview?.confidenceThreshold ?? 0),
+      addedAt: new Date().toISOString()
+    }))
+  };
+}
+
+function isPreviewNodeSelectable(node, ancestorSatisfiedAll = false) {
+  const hasChildren = node.items?.length > 0;
+  return Boolean(node.isTriggerable && !ancestorSatisfiedAll && (isAllLogicNode(node) || !hasChildren));
+}
+
+function isMixedAllCandidate(node, ancestorSatisfiedAll = false) {
+  return Boolean(
+    !ancestorSatisfiedAll
+    && isAllLogicNode(node)
+    && node.items?.length > 0
+    && !node.isTriggerable
+    && requiredEvidenceChildren(node).length > 0
+  );
+}
+
+function isSatisfiedAllNode(node) {
+  return Boolean(node.isTriggerable && isAllLogicNode(node));
+}
+
+function isAllLogicNode(node) {
+  return node.logicType === 'A' || /all of/i.test(node.logicText ?? '');
+}
+
+function isExampleLogicNode(node) {
+  return node.logicType === 'E' || /examples include/i.test(node.logicText ?? '');
+}
+
+function requiredEvidenceChildren(node) {
+  const children = [];
+
+  const visit = (candidate) => {
+    if (isExampleLogicNode(candidate)) {
+      return;
+    }
+
+    if (!candidate.items?.length) {
+      children.push(candidate);
+      return;
+    }
+
+    candidate.items.forEach(visit);
+  };
+
+  (node.items ?? []).forEach(visit);
+  return children;
+}
+
+function isMixedAllComplete(children, selections = {}) {
+  return children.length > 0 && children.every((child) => Boolean(selections[child.id]));
+}
+
+function canUseSynapseException(node, preview) {
+  return node.precision != null && Number(node.precision) < Number(preview?.precisionThreshold ?? 0);
+}
+
+function bucketKey(item) {
+  return `${item.hsim ?? ''}::${item.pathwayId ?? ''}`;
+}
+
+function mergeBucketItems(existingItems, newItems) {
+  const byKey = new Map();
+
+  existingItems.forEach((item) => {
+    byKey.set(bucketKey(item), item);
+  });
+
+  newItems.forEach((item) => {
+    const key = bucketKey(item);
+    if (!byKey.has(key)) {
+      byKey.set(key, {
+        ...item,
+        addedAt: item.addedAt ?? new Date().toISOString()
+      });
+    }
+  });
+
+  return [...byKey.values()];
+}
+
+function groupBucketByGuideline(bucket) {
+  const groups = new Map();
+
+  bucket.forEach((item) => {
+    const hsim = item.hsim ?? '';
+    if (!groups.has(hsim)) {
+      groups.set(hsim, {
+        hsim,
+        code: item.guidelineCode ?? hsim,
+        title: item.guidelineTitle ?? 'Guideline',
+        items: []
+      });
+    }
+
+    groups.get(hsim).items.push(item);
+  });
+
+  return [...groups.values()].sort((left, right) => {
+    const leftLabel = `${left.code} ${left.title}`;
+    const rightLabel = `${right.code} ${right.title}`;
+    return leftLabel.localeCompare(rightLabel);
+  });
+}
+
+function bucketFilterStatus(item, preview, selectableKeySet) {
+  if (!preview) {
+    return null;
+  }
+
+  if (item.childEvidence?.length > 0) {
+    return null;
+  }
+
+  const precision = item.precision == null ? null : Number(item.precision);
+  const confidence = item.confidence == null ? null : Number(item.confidence);
+  const precisionThreshold = Number(preview.precisionThreshold ?? 0);
+  const confidenceThreshold = Number(preview.confidenceThreshold ?? 0);
+  const belowPrecision = precision == null || precision < precisionThreshold;
+  const belowConfidence = Boolean(preview.useConfidenceThreshold) && (confidence == null || confidence < confidenceThreshold);
+
+  if (belowPrecision || belowConfidence) {
+    return { label: 'Below current filter', variant: 'warning' };
+  }
+
+  if (!selectableKeySet.has(bucketKey(item))) {
+    return { label: 'Not currently addable', variant: 'neutral' };
+  }
+
+  return null;
+}
+
+function mapPreviewNodes(preview) {
+  const nodes = new Map();
+
+  (preview?.guidelines ?? []).forEach((guideline) => {
+    const visit = (node) => {
+      nodes.set(`${guideline.hsim}::${node.id}`, node);
+      (node.items ?? []).forEach(visit);
+    };
+
+    (guideline.nodes ?? []).forEach(visit);
+  });
+
+  return nodes;
+}
+
+function currentChildPrecision(child, bucketItem, previewNodeMap) {
+  return previewNodeMap.get(`${bucketItem.hsim}::${child.pathwayId}`)?.precision ?? child.precision;
+}
+
+function savedExceptionStatus(child, bucketItem, previewNodeMap) {
+  if (child.evidenceSource !== evidenceSources.synapseException) {
+    return null;
+  }
+
+  const currentPrecision = currentChildPrecision(child, bucketItem, previewNodeMap);
+  if (currentPrecision != null && Number(currentPrecision) >= Number(child.precisionThreshold ?? 0)) {
+    return { label: 'Previous exception: now meets threshold', variant: 'positive-subtle' };
+  }
+
+  return { label: 'Saved exception: below threshold', variant: 'warning' };
 }
 
 function formatDecision(decision) {
@@ -1097,6 +1971,11 @@ function formatNumber(value) {
 
 function formatPercent(value) {
   return value == null ? '-' : `${formatNumber(value)}%`;
+}
+
+function guidelineLabel(guideline) {
+  const title = guideline?.title || guideline?.rawTitle || guideline?.fileName || guideline?.hsim || 'Untitled guideline';
+  return guideline?.code ? `${title} (${guideline.code})` : title;
 }
 
 function metricTone(value) {

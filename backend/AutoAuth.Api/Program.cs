@@ -12,7 +12,18 @@ builder.Services.AddCors(options =>
     options.AddPolicy("LocalReact", policy =>
     {
         policy
-            .WithOrigins("http://localhost:5173", "http://127.0.0.1:5173")
+            .SetIsOriginAllowed(origin =>
+            {
+                if (!Uri.TryCreate(origin, UriKind.Absolute, out var uri))
+                {
+                    return false;
+                }
+
+                var isLocalHost = uri.Host.Equals("localhost", StringComparison.OrdinalIgnoreCase)
+                    || uri.Host.Equals("127.0.0.1", StringComparison.OrdinalIgnoreCase);
+
+                return isLocalHost && uri.Port is >= 5173 and <= 5179;
+            })
             .AllowAnyHeader()
             .AllowAnyMethod();
     });
@@ -63,13 +74,27 @@ app.MapPost("/api/shutdown", (ShutdownRequest request, IHostApplicationLifetime 
 
 app.MapGet("/api/prototype", (PrototypeStore store) => Results.Ok(store.Snapshot()));
 
-app.MapGet("/api/objective-guidelines", (ObjectiveGuidelineService guidelines) => Results.Ok(guidelines.Summaries()));
+app.MapGet("/api/objective-guidelines", (string? metricMode, ObjectiveGuidelineService guidelines) => Results.Ok(guidelines.Summaries(metricMode)));
 
-app.MapGet("/api/objective-guidelines/{hsim}", (string hsim, ObjectiveGuidelineService guidelines) =>
+app.MapGet("/api/objective-guidelines/precision-preview", (
+    decimal? precisionThreshold,
+    bool? useConfidenceThreshold,
+    decimal? confidenceThreshold,
+    string? metricMode,
+    ObjectiveGuidelineService guidelines) =>
+{
+    return Results.Ok(guidelines.PrecisionPreview(
+        precisionThreshold ?? 90m,
+        useConfidenceThreshold ?? false,
+        confidenceThreshold ?? 90m,
+        metricMode));
+});
+
+app.MapGet("/api/objective-guidelines/{hsim}", (string hsim, string? metricMode, ObjectiveGuidelineService guidelines) =>
 {
     try
     {
-        return Results.Ok(guidelines.Detail(hsim));
+        return Results.Ok(guidelines.Detail(hsim, metricMode));
     }
     catch (InvalidOperationException exception)
     {

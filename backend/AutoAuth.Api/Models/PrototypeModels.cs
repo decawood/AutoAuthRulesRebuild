@@ -19,14 +19,29 @@ public enum AuthorizationDecision
     PendedForReview
 }
 
+public static class MedicalNecessityEvidenceSource
+{
+    public const string Synapse = "synapse";
+    public const string SynapseException = "synapseException";
+    public const string ProviderAttestation = "providerAttestation";
+}
+
 public sealed record SynapseIndicationResult(
     string IndicationId,
     string IndicationName,
     string Category,
     bool IsObjective,
+    decimal Precision,
     decimal Confidence,
     bool PathwayMet,
     string EvidenceSnippet,
+    string SourceDocument);
+
+public sealed record ProviderAttestationEvidence(
+    string IndicationId,
+    string IndicationName,
+    string Category,
+    bool Attested,
     string SourceDocument);
 
 public sealed record AuthorizationRequest(
@@ -35,10 +50,40 @@ public sealed record AuthorizationRequest(
     string ServiceLine,
     string CaseType,
     string GuidelineId,
+    string GuidelineCode,
     string GuidelineName,
     DateTimeOffset ReceivedAt,
     Dictionary<string, bool> ProviderAttestations,
+    List<ProviderAttestationEvidence> ProviderAttestationEvidence,
     List<SynapseIndicationResult> SynapseResults);
+
+public sealed record MedicalNecessityChildEvidence(
+    string PathwayId,
+    string PathwayText,
+    string EvidenceSource,
+    string? LogicType,
+    string? LogicText,
+    decimal? Precision,
+    decimal? Confidence,
+    decimal PrecisionThreshold,
+    bool UseConfidenceThreshold,
+    decimal ConfidenceThreshold,
+    DateTimeOffset AddedAt);
+
+public sealed record MedicalNecessityBucketItem(
+    string Hsim,
+    string GuidelineCode,
+    string GuidelineTitle,
+    string PathwayId,
+    string PathwayText,
+    string? LogicType,
+    string? LogicText,
+    decimal? Precision,
+    decimal? Confidence,
+    DateTimeOffset AddedAt)
+{
+    public List<MedicalNecessityChildEvidence> ChildEvidence { get; init; } = [];
+}
 
 public sealed class RuleDefinition
 {
@@ -53,6 +98,9 @@ public sealed class RuleDefinition
     public List<string> ServiceLines { get; set; } = [];
     public List<string> GuidelineIds { get; set; } = [];
     public List<string> EligibleIndicationIds { get; set; } = [];
+    public List<MedicalNecessityBucketItem> MedicalNecessityBucket { get; set; } = [];
+    public decimal PrecisionThreshold { get; set; } = 90;
+    public bool UseConfidenceThreshold { get; set; }
     public decimal ConfidenceThreshold { get; set; } = 90;
     public bool RequireProviderAttestation { get; set; }
     public int MinimumPathways { get; set; } = 1;
@@ -71,6 +119,9 @@ public sealed record RuleUpdateRequest(
     List<string> ServiceLines,
     List<string> GuidelineIds,
     List<string> EligibleIndicationIds,
+    List<MedicalNecessityBucketItem> MedicalNecessityBucket,
+    decimal PrecisionThreshold,
+    bool UseConfidenceThreshold,
     decimal ConfidenceThreshold,
     bool RequireProviderAttestation,
     int MinimumPathways,

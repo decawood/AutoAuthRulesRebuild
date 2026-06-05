@@ -27,6 +27,8 @@ public sealed record ObjectiveGuidelineNode(
     string Type,
     string Text,
     string? Requirement,
+    string? LogicType,
+    string? LogicText,
     ObjectiveGuidelineMetricSet? Metrics,
     List<ObjectiveGuidelineNode> Items);
 
@@ -41,4 +43,43 @@ public sealed record ObjectiveGuidelineMetricSet(
     int? TrueNegative,
     int? FalseNegative,
     int? TotalCases,
+    decimal? ProviderSelectionRate,
+    decimal? PayerSelectionRate,
+    decimal? ProviderAndPayerSelectionRate,
+    bool UsageIsProjected,
     bool IsSample);
+
+public sealed record ObjectiveGuidelinePreview(
+    decimal PrecisionThreshold,
+    bool UseConfidenceThreshold,
+    decimal ConfidenceThreshold,
+    string MetricMode,
+    int GuidelineCount,
+    int PathwayCount,
+    int PrecisionQualifiedCount,
+    int ConfidenceQualifiedCount,
+    List<ObjectiveGuidelinePreviewGroup> Guidelines);
+
+public sealed record ObjectiveGuidelinePreviewGroup(
+    string Hsim,
+    string Code,
+    string Title,
+    int PathwayCount,
+    int PrecisionQualifiedCount,
+    int ConfidenceQualifiedCount,
+    List<ObjectiveGuidelinePreviewNode> Nodes);
+
+public sealed record ObjectiveGuidelinePreviewNode(
+    string Id,
+    string Type,
+    string Text,
+    string? LogicType,
+    string? LogicText,
+    decimal? Precision,
+    decimal? Confidence,
+    bool IsExample,
+    bool IsTriggerable,
+    bool IsPrecisionQualified,
+    bool IsConfidenceQualified,
+    int PathwayCount,
+    List<ObjectiveGuidelinePreviewNode> Items);

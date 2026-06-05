@@ -5,8 +5,14 @@ namespace AutoAuth.Api.Services;
 public sealed class PrototypeStore
 {
     private readonly List<RuleDefinition> _rules = SeedRules();
-    private readonly List<AuthorizationRequest> _requests = SeedRequests();
+    private readonly List<AuthorizationRequest> _requests;
     private readonly List<EvaluationResult> _evaluations = [];
+
+    public PrototypeStore(ObjectiveGuidelineService guidelines)
+    {
+        _requests = guidelines.DemoRequests().ToList();
+        SeedMedicalNecessityBuckets(_rules, _requests);
+    }
 
     public IReadOnlyList<RuleDefinition> Rules => _rules;
     public IReadOnlyList<AuthorizationRequest> Requests => _requests;
@@ -60,6 +66,9 @@ public sealed class PrototypeStore
         existing.ServiceLines = update.ServiceLines;
         existing.GuidelineIds = update.GuidelineIds;
         existing.EligibleIndicationIds = update.EligibleIndicationIds;
+        existing.MedicalNecessityBucket = DeduplicateBucket(update.MedicalNecessityBucket);
+        existing.PrecisionThreshold = update.PrecisionThreshold;
+        existing.UseConfidenceThreshold = update.UseConfidenceThreshold;
         existing.ConfidenceThreshold = update.ConfidenceThreshold;
         existing.RequireProviderAttestation = update.RequireProviderAttestation;
         existing.MinimumPathways = update.MinimumPathways;
@@ -81,29 +90,31 @@ public sealed class PrototypeStore
         [
             new RuleDefinition
             {
-                Id = "rule-confidence-95",
-                Name = "High-confidence medical necessity",
-                Description = "Auto-approve Medicare and Commercial requests when Synapse places at least one eligible indication in the medically necessary bucket.",
+                Id = "rule-precision-95",
+                Name = "High-precision medical necessity",
+                Description = "Auto-approve Medicare and Commercial requests when at least one saved bucket pathway is met.",
                 Mode = RuleMode.ConfidenceThreshold,
                 Action = RuleAction.AutoApprove,
                 Priority = 10,
                 MemberSegments = ["Medicare", "Commercial"],
                 ServiceLines = ["Elective procedure", "Inpatient admission"],
-                ConfidenceThreshold = 95,
+                PrecisionThreshold = 95,
+                ConfidenceThreshold = 90,
                 UpdatedBy = "Daniel"
             },
             new RuleDefinition
             {
-                Id = "rule-attestation-synapse",
-                Name = "Provider attestation plus Synapse agreement",
-                Description = "Auto-approve when the provider attests to an objective indication and Synapse agrees with high confidence.",
+                Id = "rule-attestation-precision",
+                Name = "Provider attestation plus high precision",
+                Description = "Auto-approve when provider attestation lines up with a saved bucket pathway.",
                 Mode = RuleMode.DataPointCombination,
                 Action = RuleAction.AutoApprove,
                 Priority = 20,
                 MemberSegments = ["Medicare", "Commercial", "Medicaid"],
                 ServiceLines = ["Elective procedure", "Inpatient admission"],
-                EligibleIndicationIds = ["hypoxemia", "failed-conservative-therapy", "progressive-neuro-deficit"],
-                ConfidenceThreshold = 90,
+                PrecisionThreshold = 90,
+                UseConfidenceThreshold = true,
+                ConfidenceThreshold = 88,
                 RequireProviderAttestation = true,
                 UpdatedBy = "Daniel"
             },
@@ -111,119 +122,84 @@ public sealed class PrototypeStore
             {
                 Id = "rule-two-pathways",
                 Name = "Two-pathway inpatient threshold",
-                Description = "Auto-approve inpatient admission requests only when at least two qualifying pathways are met.",
+                Description = "Auto-approve inpatient admission requests only when at least two saved bucket pathways are met.",
                 Mode = RuleMode.PathwayThreshold,
                 Action = RuleAction.AutoApprove,
                 Priority = 30,
                 MemberSegments = ["Medicare", "Medicaid"],
                 ServiceLines = ["Inpatient admission"],
                 MinimumPathways = 2,
-                ConfidenceThreshold = 82,
+                PrecisionThreshold = 88,
+                ConfidenceThreshold = 85,
                 UpdatedBy = "Daniel"
             },
             new RuleDefinition
             {
-                Id = "rule-subjective-review",
-                Name = "Subjective indication review guardrail",
-                Description = "Keep cases with only subjective indications in manual review until customer risk tolerance is validated.",
+                Id = "rule-manual-review-example",
+                Name = "Manual-review guardrail example",
+                Description = "Disabled example guardrail for showing that manual-review rules still appear in execution traces without firing.",
                 Mode = RuleMode.ConfidenceThreshold,
                 Action = RuleAction.PendForReview,
                 Priority = 40,
+                Enabled = false,
                 MemberSegments = ["Medicare", "Commercial", "Medicaid"],
                 ServiceLines = ["Inpatient admission", "Elective procedure"],
-                EligibleIndicationIds = ["altered-mental-status", "pain-severe-persistent"],
+                PrecisionThreshold = 92,
                 ConfidenceThreshold = 92,
                 UpdatedBy = "Daniel"
             }
         ];
     }
 
-    private static List<AuthorizationRequest> SeedRequests()
+    private static void SeedMedicalNecessityBuckets(List<RuleDefinition> rules, IReadOnlyList<AuthorizationRequest> requests)
     {
-        var now = DateTimeOffset.UtcNow;
+        var firstRule = rules.FirstOrDefault(rule => rule.Id == "rule-precision-95");
+        if (firstRule is not null)
+        {
+            firstRule.MedicalNecessityBucket = requests
+                .SelectMany(request => request.SynapseResults
+                    .Where(result => result.Precision >= 95m && result.PathwayMet)
+                    .OrderByDescending(result => result.Precision)
+                    .Take(2)
+                    .Select(result => BucketItemFromRequest(request, result)))
+                .Take(5)
+                .ToList();
+        }
 
-        return
-        [
-            new AuthorizationRequest(
-                Id: "AUTH-1001",
-                MemberSegment: "Medicare",
-                ServiceLine: "Inpatient admission",
-                CaseType: "Emergent",
-                GuidelineId: "M-160",
-                GuidelineName: "Respiratory Failure Admission",
-                ReceivedAt: now.AddMinutes(-42),
-                ProviderAttestations: new Dictionary<string, bool>
-                {
-                    ["hypoxemia"] = true,
-                    ["altered-mental-status"] = false,
-                    ["tachypnea"] = true
-                },
-                SynapseResults:
-                [
-                    new SynapseIndicationResult("hypoxemia", "Hypoxemia", "Objective", true, 97, true, "Oxygen saturation documented at 86% on room air.", "ED triage note"),
-                    new SynapseIndicationResult("tachypnea", "Tachypnea", "Objective", true, 91, true, "Respiratory rate recorded at 32 breaths per minute.", "Vitals flowsheet"),
-                    new SynapseIndicationResult("altered-mental-status", "Altered mental status, severe or persistent", "Subjective", false, 64, false, "Nursing note mentions confusion but no persistence documented.", "Nursing assessment")
-                ]),
-            new AuthorizationRequest(
-                Id: "AUTH-1002",
-                MemberSegment: "Commercial",
-                ServiceLine: "Elective procedure",
-                CaseType: "Elective",
-                GuidelineId: "S-430",
-                GuidelineName: "Lumbar Spine Procedure",
-                ReceivedAt: now.AddMinutes(-35),
-                ProviderAttestations: new Dictionary<string, bool>
-                {
-                    ["failed-conservative-therapy"] = true,
-                    ["progressive-neuro-deficit"] = false,
-                    ["pain-severe-persistent"] = true
-                },
-                SynapseResults:
-                [
-                    new SynapseIndicationResult("failed-conservative-therapy", "Failed conservative therapy", "Objective", true, 94, true, "Six weeks of physical therapy and NSAID trial documented.", "Orthopedic clinic note"),
-                    new SynapseIndicationResult("progressive-neuro-deficit", "Progressive neurologic deficit", "Objective", true, 72, false, "No worsening motor deficit found in latest exam.", "Neurology consult"),
-                    new SynapseIndicationResult("pain-severe-persistent", "Severe persistent pain", "Subjective", false, 88, true, "Patient reports persistent 8/10 pain despite treatment.", "Pain assessment")
-                ]),
-            new AuthorizationRequest(
-                Id: "AUTH-1003",
-                MemberSegment: "Medicaid",
-                ServiceLine: "Inpatient admission",
-                CaseType: "Emergent",
-                GuidelineId: "M-280",
-                GuidelineName: "Neurologic Event Admission",
-                ReceivedAt: now.AddMinutes(-28),
-                ProviderAttestations: new Dictionary<string, bool>
-                {
-                    ["progressive-neuro-deficit"] = true,
-                    ["altered-mental-status"] = true,
-                    ["hypoxemia"] = false
-                },
-                SynapseResults:
-                [
-                    new SynapseIndicationResult("progressive-neuro-deficit", "Progressive neurologic deficit", "Objective", true, 87, true, "Exam documents worsening unilateral weakness.", "Neurology consult"),
-                    new SynapseIndicationResult("altered-mental-status", "Altered mental status, severe or persistent", "Subjective", false, 93, true, "Confusion persisted across two documented assessments.", "Hospitalist H&P"),
-                    new SynapseIndicationResult("hypoxemia", "Hypoxemia", "Objective", true, 31, false, "Oxygen saturation remained above 95%.", "Vitals flowsheet")
-                ]),
-            new AuthorizationRequest(
-                Id: "AUTH-1004",
-                MemberSegment: "Commercial",
-                ServiceLine: "Elective procedure",
-                CaseType: "Elective",
-                GuidelineId: "S-880",
-                GuidelineName: "Advanced Imaging",
-                ReceivedAt: now.AddMinutes(-18),
-                ProviderAttestations: new Dictionary<string, bool>
-                {
-                    ["red-flag-symptoms"] = false,
-                    ["failed-conservative-therapy"] = false,
-                    ["prior-imaging-inconclusive"] = true
-                },
-                SynapseResults:
-                [
-                    new SynapseIndicationResult("red-flag-symptoms", "Red flag symptoms", "Objective", true, 46, false, "No red flag symptoms found.", "Primary care note"),
-                    new SynapseIndicationResult("failed-conservative-therapy", "Failed conservative therapy", "Objective", true, 58, false, "Only two weeks of conservative management documented.", "Primary care note"),
-                    new SynapseIndicationResult("prior-imaging-inconclusive", "Prior imaging inconclusive", "Objective", true, 96, true, "Prior x-ray report recommends advanced imaging for clarification.", "Radiology report")
-                ])
-        ];
+        var attestationRule = rules.FirstOrDefault(rule => rule.Id == "rule-attestation-precision");
+        if (attestationRule is not null)
+        {
+            attestationRule.MedicalNecessityBucket = requests
+                .SelectMany(request => request.SynapseResults
+                    .Where(result => result.Precision >= 90m && request.ProviderAttestations.GetValueOrDefault(result.IndicationId))
+                    .OrderByDescending(result => result.Precision)
+                    .Take(1)
+                    .Select(result => BucketItemFromRequest(request, result)))
+                .Take(4)
+                .ToList();
+        }
+    }
+
+    private static MedicalNecessityBucketItem BucketItemFromRequest(AuthorizationRequest request, SynapseIndicationResult result)
+    {
+        return new MedicalNecessityBucketItem(
+            Hsim: request.GuidelineId,
+            GuidelineCode: request.GuidelineCode,
+            GuidelineTitle: request.GuidelineName,
+            PathwayId: result.IndicationId,
+            PathwayText: result.IndicationName,
+            LogicType: null,
+            LogicText: string.IsNullOrWhiteSpace(result.Category) ? null : result.Category,
+            Precision: result.Precision,
+            Confidence: result.Confidence,
+            AddedAt: DateTimeOffset.UtcNow);
+    }
+
+    private static List<MedicalNecessityBucketItem> DeduplicateBucket(IEnumerable<MedicalNecessityBucketItem> items)
+    {
+        return items
+            .GroupBy(item => $"{item.Hsim}::{item.PathwayId}", StringComparer.OrdinalIgnoreCase)
+            .Select(group => group.First())
+            .ToList();
     }
 }

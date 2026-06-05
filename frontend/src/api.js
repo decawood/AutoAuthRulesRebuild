@@ -26,9 +26,35 @@ const api = async (path, options = {}) => {
 
 export const getPrototype = () => api('/api/prototype');
 
-export const getObjectiveGuidelines = () => api('/api/objective-guidelines');
+const metricModeQuery = (metricMode) => {
+  const params = new URLSearchParams();
+  if (metricMode) {
+    params.set('metricMode', metricMode);
+  }
 
-export const getObjectiveGuideline = (hsim) => api(`/api/objective-guidelines/${encodeURIComponent(hsim)}`);
+  const query = params.toString();
+  return query ? `?${query}` : '';
+};
+
+export const getObjectiveGuidelines = (metricMode) => api(`/api/objective-guidelines${metricModeQuery(metricMode)}`);
+
+export const getObjectiveGuideline = (hsim, metricMode) => api(`/api/objective-guidelines/${encodeURIComponent(hsim)}${metricModeQuery(metricMode)}`);
+
+export const getPrecisionPreview = ({
+  precisionThreshold,
+  useConfidenceThreshold,
+  confidenceThreshold,
+  metricMode
+}) => {
+  const params = new URLSearchParams({
+    precisionThreshold: String(precisionThreshold),
+    useConfidenceThreshold: String(Boolean(useConfidenceThreshold)),
+    confidenceThreshold: String(confidenceThreshold),
+    metricMode: metricMode || 'sample'
+  });
+
+  return api(`/api/objective-guidelines/precision-preview?${params.toString()}`);
+};
 
 export const updateRule = (id, rule) =>
   api(`/api/rules/${id}`, {

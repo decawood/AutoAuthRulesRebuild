@@ -22,25 +22,135 @@ public sealed class ObjectiveGuidelineService
         _performanceWorkbookPath = Path.Combine(projectRoot, "Precision Recall Data", "indication_guideline_performance.xlsx");
     }
 
-    public IReadOnlyList<ObjectiveGuidelineSummary> Summaries()
+    public IReadOnlyList<ObjectiveGuidelineSummary> Summaries(string? metricMode = null)
     {
         var performanceRows = LoadPerformanceRows();
+        var resolvedMode = ResolveMetricMode(metricMode);
 
         return GetGuidelineFiles()
-            .Select(file => BuildGuideline(file, performanceRows).Summary)
+            .Select(file => BuildGuideline(file, performanceRows, resolvedMode).Summary)
             .OrderBy(summary => summary.Title)
             .ThenBy(summary => summary.Code)
             .ToList();
     }
 
-    public ObjectiveGuidelineDetail Detail(string hsim)
+    public ObjectiveGuidelineDetail Detail(string hsim, string? metricMode = null)
     {
         var performanceRows = LoadPerformanceRows();
+        var resolvedMode = ResolveMetricMode(metricMode);
         var guideline = GetGuidelineFiles()
-            .Select(file => BuildGuideline(file, performanceRows))
+            .Select(file => BuildGuideline(file, performanceRows, resolvedMode))
             .FirstOrDefault(detail => detail.Summary.Hsim.Equals(hsim, StringComparison.OrdinalIgnoreCase));
 
         return guideline ?? throw new InvalidOperationException($"Guideline '{hsim}' was not found.");
+    }
+
+    public ObjectiveGuidelinePreview PrecisionPreview(
+        decimal precisionThreshold,
+        bool useConfidenceThreshold,
+        decimal confidenceThreshold,
+        string? metricMode = null)
+    {
+        var performanceRows = LoadPerformanceRows();
+        var resolvedMode = ResolveMetricMode(metricMode);
+        var groups = GetGuidelineFiles()
+            .Select(file => BuildGuideline(file, performanceRows, resolvedMode))
+            .Select(detail => BuildPreviewGroup(detail, precisionThreshold, useConfidenceThreshold, confidenceThreshold))
+            .Where(group => group.PathwayCount > 0)
+            .OrderBy(group => group.Title)
+            .ThenBy(group => group.Code)
+            .ToList();
+
+        return new ObjectiveGuidelinePreview(
+            PrecisionThreshold: precisionThreshold,
+            UseConfidenceThreshold: useConfidenceThreshold,
+            ConfidenceThreshold: confidenceThreshold,
+            MetricMode: MetricModeName(resolvedMode),
+            GuidelineCount: groups.Count,
+            PathwayCount: groups.Sum(group => group.PathwayCount),
+            PrecisionQualifiedCount: groups.Sum(group => group.PrecisionQualifiedCount),
+            ConfidenceQualifiedCount: groups.Sum(group => group.ConfidenceQualifiedCount),
+            Guidelines: groups);
+    }
+
+    public IReadOnlyList<AuthorizationRequest> DemoRequests(string? metricMode = null)
+    {
+        var performanceRows = LoadPerformanceRows();
+        var resolvedMode = ResolveMetricMode(metricMode);
+        var now = DateTimeOffset.UtcNow;
+        var segments = new[] { "Medicare", "Commercial", "Medicaid" };
+
+        return GetGuidelineFiles()
+            .Select(file => BuildGuideline(file, performanceRows, resolvedMode))
+            .OrderBy(detail => detail.Summary.Title)
+            .Select((detail, index) =>
+            {
+                var indications = FlattenNodes(detail.Nodes)
+                    .Where(node => node.Items.Count == 0 && node.Metrics?.AgreementAgree is not null)
+                    .OrderByDescending(node => node.Metrics!.AgreementAgree)
+                    .ThenBy(node => node.Text)
+                    .GroupBy(node => node.Id, StringComparer.OrdinalIgnoreCase)
+                    .Select(group => group.First())
+                    .Take(8)
+                    .Select(node => new SynapseIndicationResult(
+                        IndicationId: node.Id,
+                        IndicationName: node.Text,
+                        Category: node.LogicText ?? "Objective AutoAuth criterion",
+                        IsObjective: true,
+                        Precision: node.Metrics!.AgreementAgree!.Value,
+                        Confidence: node.Metrics.Confidence ?? ProjectedConfidence(detail.Summary.Hsim, node.Id),
+                        PathwayMet: node.Metrics.AgreementAgree >= 84m,
+                        EvidenceSnippet: node.LogicText is null
+                            ? "Guideline-derived demo criterion."
+                            : $"Guideline logic: {node.LogicText}.",
+                        SourceDocument: $"{detail.Summary.Code} - {detail.Summary.Title}"))
+                    .ToList();
+                var synapseIndicationIds = indications
+                    .Select(indication => indication.IndicationId)
+                    .ToHashSet(StringComparer.OrdinalIgnoreCase);
+                var providerOnlyEvidence = FlattenNodes(detail.Nodes)
+                    .Where(node => node.Items.Count == 0
+                        && !IsExampleLogic(node)
+                        && !synapseIndicationIds.Contains(node.Id))
+                    .OrderBy(node => StableSeed($"{detail.Summary.Hsim}:{node.Id}:provider-attestation"))
+                    .Take(3)
+                    .Select(node => new ProviderAttestationEvidence(
+                        IndicationId: node.Id,
+                        IndicationName: node.Text,
+                        Category: string.IsNullOrWhiteSpace(node.LogicText) ? "Provider-attested criterion" : node.LogicText,
+                        Attested: true,
+                        SourceDocument: $"{detail.Summary.Code} - {detail.Summary.Title}"))
+                    .ToList();
+                var providerAttestations = indications
+                    .ToDictionary(
+                        indication => indication.IndicationId,
+                        indication => indication.Precision >= 88m,
+                        StringComparer.OrdinalIgnoreCase);
+
+                foreach (var evidence in providerOnlyEvidence)
+                {
+                    providerAttestations[evidence.IndicationId] = evidence.Attested;
+                }
+
+                return new AuthorizationRequest(
+                    Id: $"AUTH-{index + 1001}",
+                    MemberSegment: segments[index % segments.Length],
+                    ServiceLine: detail.Summary.ProductCode.Equals("AC", StringComparison.OrdinalIgnoreCase)
+                        ? "Elective procedure"
+                        : "Inpatient admission",
+                    CaseType: detail.Summary.GuidelineType.Equals("auth", StringComparison.OrdinalIgnoreCase)
+                        ? "Elective"
+                        : "Emergent",
+                    GuidelineId: detail.Summary.Hsim,
+                    GuidelineCode: detail.Summary.Code,
+                    GuidelineName: detail.Summary.Title,
+                    ReceivedAt: now.AddMinutes(-15 * (index + 1)),
+                    ProviderAttestations: providerAttestations,
+                    ProviderAttestationEvidence: providerOnlyEvidence,
+                    SynapseResults: indications);
+            })
+            .Where(request => request.SynapseResults.Count > 0)
+            .ToList();
     }
 
     private IEnumerable<string> GetGuidelineFiles()
@@ -53,7 +163,10 @@ public sealed class ObjectiveGuidelineService
         return Directory.EnumerateFiles(_guidelineDirectory, "*.xml", SearchOption.TopDirectoryOnly);
     }
 
-    private ObjectiveGuidelineDetail BuildGuideline(string path, IReadOnlyDictionary<string, PerformanceRow> performanceRows)
+    private ObjectiveGuidelineDetail BuildGuideline(
+        string path,
+        IReadOnlyDictionary<string, PerformanceRow> performanceRows,
+        ObjectiveMetricMode metricMode)
     {
         var document = XDocument.Load(path);
         var guideline = document.Descendants().FirstOrDefault(element => IsNamed(element, "Guideline"))
@@ -62,28 +175,48 @@ public sealed class ObjectiveGuidelineService
         var baseNodes = BuildSectionNodes(sections);
         var nodeIds = FlattenNodes(baseNodes).Select(node => node.Id).Distinct(StringComparer.OrdinalIgnoreCase).ToList();
         var matchedIds = nodeIds.Where(performanceRows.ContainsKey).ToHashSet(StringComparer.OrdinalIgnoreCase);
-        var usesSampleMetrics = nodeIds.Count > 0 && matchedIds.Count == 0;
-        var nodes = baseNodes.Select(node => AttachMetrics(node, performanceRows, usesSampleMetrics)).ToList();
-        var metrics = usesSampleMetrics
+        var usesSampleMetrics = metricMode == ObjectiveMetricMode.Sample;
+        var rawTitle = FirstNonEmpty(
+            AttributeValue(guideline, "Title"),
+            DirectChildText(guideline, "title"),
+            Path.GetFileNameWithoutExtension(path));
+        var hsim = FirstNonEmpty(AttributeValue(guideline, "HSIM"), Path.GetFileNameWithoutExtension(path));
+        var nodes = baseNodes.Select(node => AttachMetrics(node, hsim, performanceRows, metricMode)).ToList();
+        var topLevelUsageMetrics = FirstTopLevelMetric(nodes);
+        var performanceMetrics = FirstTopLevelPerformanceMetric(nodes) ?? (usesSampleMetrics
             ? AggregateSampleMetrics(nodes)
-            : AggregatePerformanceMetrics(matchedIds.Select(id => performanceRows[id]));
-        var rawTitle = AttributeValue(guideline, "Title");
-        var hsim = AttributeValue(guideline, "HSIM");
+            : AggregatePerformanceMetrics(matchedIds.Select(id => performanceRows[id])));
+        var metrics = MergeReviewerUsage(performanceMetrics, topLevelUsageMetrics);
+        var code = FirstNonEmpty(
+            AttributeValue(guideline, "GCode"),
+            AttributeValue(guideline, "mcg"),
+            DirectChildText(guideline, "mcg"));
+        var productCode = FirstNonEmpty(
+            AttributeValue(guideline, "ProductCode"),
+            AttributeValue(guideline, "product"));
+        var guidelineType = FirstNonEmpty(
+            AttributeValue(guideline, "GuidelineType"),
+            AttributeValue(guideline, "type"),
+            AttributeValue(guideline, "mcgtype"));
+        var version = FirstNonEmpty(
+            AttributeValue(guideline, "VersionNumber"),
+            AttributeValue(guideline, "version"),
+            ExtractRevisionVersion(rawTitle));
         var summary = new ObjectiveGuidelineSummary(
             Id: hsim,
             Hsim: hsim,
-            Code: AttributeValue(guideline, "GCode"),
+            Code: code,
             Title: CleanTitle(rawTitle),
             RawTitle: rawTitle,
-            ProductCode: AttributeValue(guideline, "ProductCode"),
-            GuidelineType: AttributeValue(guideline, "GuidelineType"),
-            Version: AttributeValue(guideline, "VersionNumber"),
+            ProductCode: productCode,
+            GuidelineType: guidelineType,
+            Version: version,
             Glos: EmptyToNull(AttributeValue(guideline, "GLOS")),
             FileName: Path.GetFileName(path),
             AutoAuthorizationSectionCount: sections.Count,
             IndicationCount: nodeIds.Count,
             MatchedIndicationCount: matchedIds.Count,
-            HasPerformanceData: matchedIds.Count > 0,
+            HasPerformanceData: usesSampleMetrics || matchedIds.Count > 0,
             UsesSampleMetrics: usesSampleMetrics);
 
         return new ObjectiveGuidelineDetail(summary, metrics, nodes);
@@ -93,10 +226,7 @@ public sealed class ObjectiveGuidelineService
     {
         return document
             .Descendants()
-            .Where(element => IsNamed(element, "Section"))
-            .Select(section => section.Elements().FirstOrDefault(IsGuidelineSection))
-            .Where(section => section is not null && IsTrue(AttributeValue(section, "isautoauthorization")))
-            .Cast<XElement>()
+            .Where(element => IsGuidelineSection(element) && IsTrue(AttributeValue(element, "isautoauthorization")))
             .OrderBy(section => ParseInt(AttributeValue(section, "displayorder")))
             .ToList();
     }
@@ -131,6 +261,8 @@ public sealed class ObjectiveGuidelineService
                     Type: "group",
                     Text: sectionTitle,
                     Requirement: null,
+                    LogicType: null,
+                    LogicText: null,
                     Metrics: null,
                     Items: listItems)
             ];
@@ -166,30 +298,85 @@ public sealed class ObjectiveGuidelineService
             Type: children.Count > 0 ? "group" : "indication",
             Text: string.IsNullOrWhiteSpace(text) ? "Untitled indication" : text,
             Requirement: ExtractRequirement(para),
+            LogicType: ExtractLogicType(para),
+            LogicText: ExtractRequirement(para),
             Metrics: null,
             Items: children);
     }
 
     private static ObjectiveGuidelineNode AttachMetrics(
         ObjectiveGuidelineNode node,
+        string hsim,
         IReadOnlyDictionary<string, PerformanceRow> performanceRows,
-        bool usesSampleMetrics)
+        ObjectiveMetricMode metricMode,
+        int depth = 0)
     {
-        ObjectiveGuidelineMetricSet? metrics = null;
-        if (performanceRows.TryGetValue(node.Id, out var row))
+        ObjectiveGuidelineMetricSet? performanceMetrics = null;
+        if (metricMode == ObjectiveMetricMode.Sample)
         {
-            metrics = MetricFromPerformanceRow(row);
+            performanceMetrics = SampleMetric(hsim, node.Id);
         }
-        else if (usesSampleMetrics)
+        else if (performanceRows.TryGetValue(node.Id, out var row))
         {
-            metrics = SampleMetric(node.Id);
+            performanceMetrics = MetricFromPerformanceRow(row);
         }
+
+        var metrics = WithProjectedReviewerUsage(performanceMetrics, hsim, node.Id, depth);
 
         return node with
         {
             Metrics = metrics,
-            Items = node.Items.Select(child => AttachMetrics(child, performanceRows, usesSampleMetrics)).ToList()
+            Items = node.Items.Select(child => AttachMetrics(child, hsim, performanceRows, metricMode, depth + 1)).ToList()
         };
+    }
+
+    private static ObjectiveGuidelineMetricSet? FirstTopLevelMetric(IEnumerable<ObjectiveGuidelineNode> nodes)
+    {
+        return nodes.Select(node => node.Metrics).FirstOrDefault(metric => metric is not null);
+    }
+
+    private static ObjectiveGuidelineMetricSet? FirstTopLevelPerformanceMetric(IEnumerable<ObjectiveGuidelineNode> nodes)
+    {
+        return nodes
+            .Select(node => node.Metrics)
+            .FirstOrDefault(metric => metric is not null && HasPerformanceMetric(metric));
+    }
+
+    private static ObjectiveGuidelineMetricSet? MergeReviewerUsage(
+        ObjectiveGuidelineMetricSet? metrics,
+        ObjectiveGuidelineMetricSet? usageMetrics)
+    {
+        if (metrics is null)
+        {
+            return usageMetrics;
+        }
+
+        if (usageMetrics is null)
+        {
+            return metrics;
+        }
+
+        return metrics with
+        {
+            ProviderSelectionRate = usageMetrics.ProviderSelectionRate,
+            PayerSelectionRate = usageMetrics.PayerSelectionRate,
+            ProviderAndPayerSelectionRate = usageMetrics.ProviderAndPayerSelectionRate,
+            UsageIsProjected = metrics.UsageIsProjected || usageMetrics.UsageIsProjected
+        };
+    }
+
+    private static bool HasPerformanceMetric(ObjectiveGuidelineMetricSet metric)
+    {
+        return metric.MetAi is not null
+            || metric.Confidence is not null
+            || metric.AgreementAgree is not null
+            || metric.AgreementDisagree is not null
+            || metric.Recall is not null
+            || metric.TruePositive is not null
+            || metric.FalsePositive is not null
+            || metric.TrueNegative is not null
+            || metric.FalseNegative is not null
+            || metric.TotalCases is not null;
     }
 
     private static IEnumerable<ObjectiveGuidelineNode> FlattenNodes(IEnumerable<ObjectiveGuidelineNode> nodes)
@@ -203,6 +390,137 @@ public sealed class ObjectiveGuidelineService
                 yield return child;
             }
         }
+    }
+
+    private static ObjectiveGuidelinePreviewGroup BuildPreviewGroup(
+        ObjectiveGuidelineDetail detail,
+        decimal precisionThreshold,
+        bool useConfidenceThreshold,
+        decimal confidenceThreshold)
+    {
+        var evaluations = detail.Nodes
+            .Select(node => EvaluatePreviewNode(node, precisionThreshold, useConfidenceThreshold, confidenceThreshold))
+            .ToList();
+        var nodes = evaluations
+            .Select(evaluation => evaluation.Node)
+            .Where(node => node is not null)
+            .Cast<ObjectiveGuidelinePreviewNode>()
+            .ToList();
+
+        return new ObjectiveGuidelinePreviewGroup(
+            Hsim: detail.Summary.Hsim,
+            Code: detail.Summary.Code,
+            Title: detail.Summary.Title,
+            PathwayCount: evaluations.Sum(evaluation => evaluation.PathwayCount),
+            PrecisionQualifiedCount: evaluations.Sum(evaluation => evaluation.PrecisionQualifiedCount),
+            ConfidenceQualifiedCount: evaluations.Sum(evaluation => evaluation.ConfidenceQualifiedCount),
+            Nodes: nodes);
+    }
+
+    private static PreviewEvaluation EvaluatePreviewNode(
+        ObjectiveGuidelineNode node,
+        decimal precisionThreshold,
+        bool useConfidenceThreshold,
+        decimal confidenceThreshold,
+        bool forceInclude = false)
+    {
+        var precision = node.Metrics?.AgreementAgree;
+        var confidence = node.Metrics?.Confidence;
+        var precisionQualified = precision is not null && precision >= precisionThreshold;
+        var confidenceQualified = !useConfidenceThreshold || (confidence is not null && confidence >= confidenceThreshold);
+        var isExample = IsExampleLogic(node);
+
+        if (node.Items.Count == 0)
+        {
+            var triggerable = !isExample && precisionQualified && confidenceQualified;
+            var included = forceInclude || triggerable || precisionQualified;
+            return new PreviewEvaluation(
+                Node: included
+                    ? ToPreviewNode(node, precisionQualified, confidenceQualified, isExample, triggerable, triggerable ? 1 : 0, [])
+                    : null,
+                GatePassed: triggerable,
+                PathwayCount: triggerable ? 1 : 0,
+                PrecisionQualifiedCount: precisionQualified ? 1 : 0,
+                ConfidenceQualifiedCount: precisionQualified && confidenceQualified ? 1 : 0);
+        }
+
+        var childEvaluations = node.Items
+            .Select(child => EvaluatePreviewNode(child, precisionThreshold, useConfidenceThreshold, confidenceThreshold))
+            .ToList();
+        var anyChildRelevant = childEvaluations.Any(evaluation => evaluation.Node is not null || evaluation.GatePassed);
+
+        if (IsAllLogic(node) && anyChildRelevant)
+        {
+            childEvaluations = node.Items
+                .Select(child => EvaluatePreviewNode(child, precisionThreshold, useConfidenceThreshold, confidenceThreshold, forceInclude: !IsExampleLogic(child)))
+                .ToList();
+        }
+
+        var requiredChildEvaluations = node.Items
+            .Zip(childEvaluations)
+            .Where(pair => !IsExampleLogic(pair.First))
+            .Select(pair => pair.Second)
+            .ToList();
+        var childNodes = childEvaluations
+            .Select(evaluation => evaluation.Node)
+            .Where(previewNode => previewNode is not null)
+            .Cast<ObjectiveGuidelinePreviewNode>()
+            .ToList();
+        var nodePrecisionQualified = precisionQualified || childEvaluations.Any(evaluation => evaluation.PrecisionQualifiedCount > 0);
+        var nodeConfidenceQualified = !useConfidenceThreshold || childEvaluations.Any(evaluation => evaluation.ConfidenceQualifiedCount > 0);
+        var gatePassed = false;
+        var pathwayCount = 0;
+
+        if (!isExample && IsAllLogic(node))
+        {
+            gatePassed = requiredChildEvaluations.Count > 0 && requiredChildEvaluations.All(evaluation => evaluation.GatePassed);
+            pathwayCount = gatePassed ? 1 : 0;
+        }
+        else if (!isExample && IsOneOrMoreLogic(node))
+        {
+            pathwayCount = childEvaluations.Sum(evaluation => evaluation.PathwayCount);
+            gatePassed = pathwayCount > 0;
+        }
+        else if (!isExample)
+        {
+            pathwayCount = childEvaluations.Sum(evaluation => evaluation.PathwayCount);
+            gatePassed = pathwayCount > 0;
+        }
+
+        var includeNode = forceInclude || childNodes.Count > 0 || gatePassed || precisionQualified;
+        return new PreviewEvaluation(
+            Node: includeNode
+                ? ToPreviewNode(node, nodePrecisionQualified, nodeConfidenceQualified, isExample, gatePassed, pathwayCount, childNodes)
+                : null,
+            GatePassed: gatePassed,
+            PathwayCount: pathwayCount,
+            PrecisionQualifiedCount: (precisionQualified ? 1 : 0) + childEvaluations.Sum(evaluation => evaluation.PrecisionQualifiedCount),
+            ConfidenceQualifiedCount: (precisionQualified && confidenceQualified ? 1 : 0) + childEvaluations.Sum(evaluation => evaluation.ConfidenceQualifiedCount));
+    }
+
+    private static ObjectiveGuidelinePreviewNode ToPreviewNode(
+        ObjectiveGuidelineNode node,
+        bool precisionQualified,
+        bool confidenceQualified,
+        bool isExample,
+        bool triggerable,
+        int pathwayCount,
+        List<ObjectiveGuidelinePreviewNode> items)
+    {
+        return new ObjectiveGuidelinePreviewNode(
+            Id: node.Id,
+            Type: node.Type,
+            Text: node.Text,
+            LogicType: node.LogicType,
+            LogicText: node.LogicText,
+            Precision: node.Metrics?.AgreementAgree,
+            Confidence: node.Metrics?.Confidence,
+            IsExample: isExample,
+            IsTriggerable: triggerable,
+            IsPrecisionQualified: precisionQualified,
+            IsConfidenceQualified: confidenceQualified,
+            PathwayCount: pathwayCount,
+            Items: items);
     }
 
     private static ObjectiveGuidelineMetricSet? AggregatePerformanceMetrics(IEnumerable<PerformanceRow> rows)
@@ -232,6 +550,10 @@ public sealed class ObjectiveGuidelineService
             TrueNegative: trueNegative,
             FalseNegative: falseNegative,
             TotalCases: totalCases,
+            ProviderSelectionRate: null,
+            PayerSelectionRate: null,
+            ProviderAndPayerSelectionRate: null,
+            UsageIsProjected: false,
             IsSample: false);
     }
 
@@ -256,6 +578,10 @@ public sealed class ObjectiveGuidelineService
             TrueNegative: null,
             FalseNegative: null,
             TotalCases: null,
+            ProviderSelectionRate: Math.Round(metrics.Average(metric => metric.ProviderSelectionRate ?? 0m), 1),
+            PayerSelectionRate: Math.Round(metrics.Average(metric => metric.PayerSelectionRate ?? 0m), 1),
+            ProviderAndPayerSelectionRate: Math.Round(metrics.Average(metric => metric.ProviderAndPayerSelectionRate ?? 0m), 1),
+            UsageIsProjected: metrics.Any(metric => metric.UsageIsProjected),
             IsSample: true);
     }
 
@@ -272,26 +598,119 @@ public sealed class ObjectiveGuidelineService
             TrueNegative: row.TrueNegative,
             FalseNegative: row.FalseNegative,
             TotalCases: row.TotalCases,
+            ProviderSelectionRate: null,
+            PayerSelectionRate: null,
+            ProviderAndPayerSelectionRate: null,
+            UsageIsProjected: false,
             IsSample: false);
     }
 
-    private static ObjectiveGuidelineMetricSet SampleMetric(string id)
+    private static ObjectiveGuidelineMetricSet SampleMetric(string hsim, string id)
     {
-        var seed = StableSeed(id);
-        var precision = 72m + seed % 23;
+        var seed = StableSeed($"{hsim}:{id}:precision");
+        var bucket = seed % 100;
+        var tenths = (seed / 100) % 100;
+        var precision = bucket switch
+        {
+            < 24 => 80m + Math.Round(tenths / 10m, 1),
+            < 58 => 90m + Math.Round(tenths % 50 / 10m, 1),
+            _ => 95m + Math.Round(tenths % 43 / 10m, 1)
+        };
 
         return new ObjectiveGuidelineMetricSet(
-            MetAi: 20m + seed % 55,
-            Confidence: 92m + seed % 8,
+            MetAi: 18m + seed % 62,
+            Confidence: ProjectedConfidence(hsim, id),
             AgreementAgree: precision,
             AgreementDisagree: 100m - precision,
-            Recall: 76m + seed % 21,
+            Recall: 78m + seed % 20,
             TruePositive: null,
             FalsePositive: null,
             TrueNegative: null,
             FalseNegative: null,
             TotalCases: null,
+            ProviderSelectionRate: null,
+            PayerSelectionRate: null,
+            ProviderAndPayerSelectionRate: null,
+            UsageIsProjected: false,
             IsSample: true);
+    }
+
+    private static ObjectiveGuidelineMetricSet WithProjectedReviewerUsage(
+        ObjectiveGuidelineMetricSet? metrics,
+        string hsim,
+        string id,
+        int depth)
+    {
+        var usage = ProjectedReviewerUsage(hsim, id, depth);
+        return (metrics ?? EmptyMetric()) with
+        {
+            ProviderSelectionRate = usage.ProviderSelectionRate,
+            PayerSelectionRate = usage.PayerSelectionRate,
+            ProviderAndPayerSelectionRate = usage.ProviderAndPayerSelectionRate,
+            UsageIsProjected = true
+        };
+    }
+
+    private static ObjectiveGuidelineMetricSet EmptyMetric()
+    {
+        return new ObjectiveGuidelineMetricSet(
+            MetAi: null,
+            Confidence: null,
+            AgreementAgree: null,
+            AgreementDisagree: null,
+            Recall: null,
+            TruePositive: null,
+            FalsePositive: null,
+            TrueNegative: null,
+            FalseNegative: null,
+            TotalCases: null,
+            ProviderSelectionRate: null,
+            PayerSelectionRate: null,
+            ProviderAndPayerSelectionRate: null,
+            UsageIsProjected: false,
+            IsSample: false);
+    }
+
+    private static ReviewerUsageRates ProjectedReviewerUsage(string hsim, string id, int depth)
+    {
+        var safeDepth = Math.Max(0, depth);
+        var depthFactor = (decimal)Math.Pow(0.66d, Math.Pow(safeDepth, 1.22d));
+        var providerSeed = StableSeed($"{hsim}:{id}:provider-usage");
+        var payerSeed = StableSeed($"{hsim}:{id}:payer-usage");
+        var overlapSeed = StableSeed($"{hsim}:{id}:provider-payer-overlap");
+        var providerJitter = providerSeed % 190 / 10m - 8.5m;
+        var payerJitter = payerSeed % 170 / 10m - 7m;
+        var providerSelectionRate = ClampPercent(Math.Round(4m + 68m * depthFactor + providerJitter, 1), 1m, 92m);
+        var payerSelectionRate = ClampPercent(Math.Round(3m + 58m * depthFactor + payerJitter, 1), 1m, 90m);
+        var overlapShare = 0.36m + overlapSeed % 29 / 100m;
+        var providerAndPayerSelectionRate = ClampPercent(
+            Math.Round(Math.Min(providerSelectionRate, payerSelectionRate) * overlapShare - safeDepth * 0.6m, 1),
+            0m,
+            Math.Min(providerSelectionRate, payerSelectionRate));
+
+        return new ReviewerUsageRates(
+            ProviderSelectionRate: providerSelectionRate,
+            PayerSelectionRate: payerSelectionRate,
+            ProviderAndPayerSelectionRate: providerAndPayerSelectionRate);
+    }
+
+    private static decimal ClampPercent(decimal value, decimal min, decimal max)
+    {
+        return Math.Min(max, Math.Max(min, value));
+    }
+
+    private static decimal ProjectedConfidence(string hsim, string id)
+    {
+        var seed = StableSeed($"{hsim}:{id}:confidence");
+        var bucket = seed % 100;
+        var tenths = (seed / 100) % 100;
+
+        return bucket switch
+        {
+            < 20 => 78m + Math.Round(tenths % 90 / 10m, 1),
+            < 55 => 87m + Math.Round(tenths % 80 / 10m, 1),
+            _ => 94m + Math.Round(tenths % 52 / 10m, 1)
+        };
     }
 
     private IReadOnlyDictionary<string, PerformanceRow> LoadPerformanceRows()
@@ -502,6 +921,17 @@ public sealed class ObjectiveGuidelineService
         return NormalizeWhitespace(Regex.Replace(title, @"\bcopy\b", string.Empty, RegexOptions.IgnoreCase)).Trim(' ', '-');
     }
 
+    private static string FirstNonEmpty(params string[] values)
+    {
+        return values.FirstOrDefault(value => !string.IsNullOrWhiteSpace(value)) ?? string.Empty;
+    }
+
+    private static string ExtractRevisionVersion(string title)
+    {
+        var match = Regex.Match(title, @"\bRevision\s+([0-9.]+)\b", RegexOptions.IgnoreCase);
+        return match.Success ? match.Groups[1].Value : string.Empty;
+    }
+
     private static string? EmptyToNull(string value)
     {
         return string.IsNullOrWhiteSpace(value) ? null : value;
@@ -516,6 +946,17 @@ public sealed class ObjectiveGuidelineService
 
         var logic = para.Descendants().FirstOrDefault(element => IsNamed(element, "listlogic"));
         return logic is null ? string.Empty : CleanText(logic);
+    }
+
+    private static string? ExtractLogicType(XElement? para)
+    {
+        if (para is null)
+        {
+            return null;
+        }
+
+        var logic = para.Descendants().FirstOrDefault(element => IsNamed(element, "listlogic"));
+        return EmptyToNull(AttributeValue(logic, "type"));
     }
 
     private static string CleanText(XElement element)
@@ -581,10 +1022,52 @@ public sealed class ObjectiveGuidelineService
         return value.Equals("true", StringComparison.OrdinalIgnoreCase);
     }
 
+    private static bool IsOneOrMoreLogic(ObjectiveGuidelineNode node)
+    {
+        return node.LogicType == "1" || (node.LogicText?.Contains("1 or more", StringComparison.OrdinalIgnoreCase) ?? false);
+    }
+
+    private static bool IsAllLogic(ObjectiveGuidelineNode node)
+    {
+        return node.LogicType?.Equals("A", StringComparison.OrdinalIgnoreCase) == true
+            || (node.LogicText?.Contains("ALL", StringComparison.OrdinalIgnoreCase) ?? false);
+    }
+
+    private static bool IsExampleLogic(ObjectiveGuidelineNode node)
+    {
+        return node.LogicType?.Equals("E", StringComparison.OrdinalIgnoreCase) == true
+            || (node.LogicText?.Contains("examples include", StringComparison.OrdinalIgnoreCase) ?? false);
+    }
+
+    private static ObjectiveMetricMode ResolveMetricMode(string? metricMode)
+    {
+        return metricMode?.Equals("real", StringComparison.OrdinalIgnoreCase) == true
+            ? ObjectiveMetricMode.Real
+            : ObjectiveMetricMode.Sample;
+    }
+
+    private static string MetricModeName(ObjectiveMetricMode metricMode)
+    {
+        return metricMode == ObjectiveMetricMode.Real ? "real" : "sample";
+    }
+
     private static string AttributeValue(XElement? element, string name)
     {
         return element?.Attributes().FirstOrDefault(attribute => attribute.Name.LocalName.Equals(name, StringComparison.OrdinalIgnoreCase))?.Value ?? string.Empty;
     }
+
+    private enum ObjectiveMetricMode
+    {
+        Sample,
+        Real
+    }
+
+    private sealed record PreviewEvaluation(
+        ObjectiveGuidelinePreviewNode? Node,
+        bool GatePassed,
+        int PathwayCount,
+        int PrecisionQualifiedCount,
+        int ConfidenceQualifiedCount);
 
     private sealed record PerformanceRow(
         string Uid,
@@ -595,4 +1078,9 @@ public sealed class ObjectiveGuidelineService
         int TrueNegative,
         int FalseNegative,
         int TotalCases);
+
+    private sealed record ReviewerUsageRates(
+        decimal ProviderSelectionRate,
+        decimal PayerSelectionRate,
+        decimal ProviderAndPayerSelectionRate);
 }
