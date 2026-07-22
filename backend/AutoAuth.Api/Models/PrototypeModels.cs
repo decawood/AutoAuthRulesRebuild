@@ -26,6 +26,23 @@ public static class MedicalNecessityEvidenceSource
     public const string ProviderAttestation = "providerAttestation";
 }
 
+public static class UtilizationReferenceSources
+{
+    public const string Payer = "payer";
+    public const string Provider = "provider";
+    public const string PayerProviderOverlap = "payerProviderOverlap";
+
+    public static string Normalize(string? value)
+    {
+        return value?.Trim().ToLowerInvariant() switch
+        {
+            Provider => Provider,
+            "payerprovideroverlap" => PayerProviderOverlap,
+            _ => Payer
+        };
+    }
+}
+
 public sealed record SynapseIndicationResult(
     string IndicationId,
     string IndicationName,
@@ -102,6 +119,9 @@ public sealed class RuleDefinition
     public decimal PrecisionThreshold { get; set; } = 90;
     public bool UseConfidenceThreshold { get; set; }
     public decimal ConfidenceThreshold { get; set; } = 90;
+    public bool UseSynapseUtilizationRateFilter { get; set; }
+    public string UtilizationReferenceSource { get; set; } = UtilizationReferenceSources.Payer;
+    public decimal SynapseUtilizationDelta { get; set; }
     public bool RequireProviderAttestation { get; set; }
     public int MinimumPathways { get; set; } = 1;
     public string UpdatedBy { get; set; } = "Prototype admin";
@@ -125,7 +145,10 @@ public sealed record RuleUpdateRequest(
     decimal ConfidenceThreshold,
     bool RequireProviderAttestation,
     int MinimumPathways,
-    string UpdatedBy);
+    string UpdatedBy,
+    bool UseSynapseUtilizationRateFilter = false,
+    string UtilizationReferenceSource = UtilizationReferenceSources.Payer,
+    decimal SynapseUtilizationDelta = 0m);
 
 public sealed record EvaluationRequest(string RequestId);
 

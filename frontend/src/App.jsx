@@ -31,6 +31,18 @@ const evidenceSourceLabels = {
   [evidenceSources.providerAttestation]: 'Provider attestation'
 };
 
+const utilizationReferenceSources = {
+  payer: 'payer',
+  provider: 'provider',
+  payerProviderOverlap: 'payerProviderOverlap'
+};
+
+const utilizationReferenceLabels = {
+  [utilizationReferenceSources.payer]: 'Payer selected',
+  [utilizationReferenceSources.provider]: 'Provider selected',
+  [utilizationReferenceSources.payerProviderOverlap]: 'Payer-provider overlap'
+};
+
 const viewLabels = {
   configure: 'Rule configuration',
   simulator: 'Simulator',
@@ -39,6 +51,10 @@ const viewLabels = {
 };
 
 const metricDefinitions = {
+  utilizationRateFilter: {
+    term: 'Synapse versus existing utilization rate',
+    definition: 'Controls how much more or less often Synapse may find an indication met than the selected provider, payer, or overlap rate before it appears as a pathway candidate. A positive value allows Synapse to find it more often; a negative value requires it to find it less often. This does not change pathways already saved in the Medical Necessity Bucket.'
+  },
   recall: {
     term: 'Recall',
     definition: 'Of what the human selected, how much Synapse also selected'
@@ -66,6 +82,23 @@ function Badge({ children, variant = 'neutral', className = '' }) {
     <span className={`m-badge m-badge--${variant} ${className}`.trim()}>
       {children}
     </span>
+  );
+}
+
+function UtilizationComparisonBadge({ node, referenceSource }) {
+  const metAi = node?.metAi;
+  const referenceRate = node?.utilizationReferenceRate;
+  const difference = node?.synapseUtilizationDifference;
+
+  if (metAi == null || referenceRate == null || difference == null) {
+    return <Badge variant="neutral">No AI/utilization data</Badge>;
+  }
+
+  const sourceLabel = utilizationReferenceLabels[normalizeUtilizationReferenceSource(referenceSource)];
+  return (
+    <Badge variant={node.isUtilizationQualified ? 'info-subtle' : 'warning'}>
+      AI {formatPercent(metAi)} vs {sourceLabel} {formatPercent(referenceRate)} ({formatSignedMetricPercentagePoints(difference)})
+    </Badge>
   );
 }
 
@@ -326,6 +359,9 @@ function RuleCard({ rule, onSaveRule, metricMode }) {
   const precisionThreshold = Number(draft.precisionThreshold ?? draft.confidenceThreshold ?? 90);
   const confidenceThreshold = Number(draft.confidenceThreshold ?? 90);
   const useConfidenceThreshold = Boolean(draft.useConfidenceThreshold);
+  const useSynapseUtilizationRateFilter = Boolean(draft.useSynapseUtilizationRateFilter);
+  const utilizationReferenceSource = normalizeUtilizationReferenceSource(draft.utilizationReferenceSource);
+  const synapseUtilizationDelta = clampUtilizationDelta(draft.synapseUtilizationDelta);
 
   useEffect(() => {
     let cancelled = false;
@@ -336,6 +372,9 @@ function RuleCard({ rule, onSaveRule, metricMode }) {
           precisionThreshold,
           useConfidenceThreshold,
           confidenceThreshold,
+          useSynapseUtilizationRateFilter,
+          utilizationReferenceSource,
+          synapseUtilizationDelta,
           metricMode
         });
         if (!cancelled) {
@@ -354,7 +393,15 @@ function RuleCard({ rule, onSaveRule, metricMode }) {
       cancelled = true;
       window.clearTimeout(timeout);
     };
-  }, [precisionThreshold, useConfidenceThreshold, confidenceThreshold, metricMode]);
+  }, [
+    precisionThreshold,
+    useConfidenceThreshold,
+    confidenceThreshold,
+    useSynapseUtilizationRateFilter,
+    utilizationReferenceSource,
+    synapseUtilizationDelta,
+    metricMode
+  ]);
 
   const updateDraft = (field, value) => {
     setDraft((current) => ({ ...current, [field]: value }));
@@ -477,6 +524,63 @@ function RuleCard({ rule, onSaveRule, metricMode }) {
                 onChange={(event) => updateDraft('confidenceThreshold', Number(event.target.value))}
               />
             </label>
+          )}
+        </div>
+
+        <div className="utilization-filter">
+          <label className="check-control">
+            <input
+              type="checkbox"
+              checked={useSynapseUtilizationRateFilter}
+              onChange={(event) => updateDraft('useSynapseUtilizationRateFilter', event.target.checked)}
+            />
+            <span>Apply Synapse versus existing utilization rate</span>
+          </label>
+          {useSynapseUtilizationRateFilter && (
+            <fieldset className="utilization-filter__controls">
+              <legend>Compare # Met (AI) with</legend>
+              <div className="utilization-filter__radios">
+                {Object.entries(utilizationReferenceLabels).map(([value, label]) => (
+                  <label className="radio-control" key={value}>
+                    <input
+                      type="radio"
+                      name={`utilization-reference-${draft.id}`}
+                      value={value}
+                      checked={utilizationReferenceSource === value}
+                      onChange={() => updateDraft('utilizationReferenceSource', value)}
+                    />
+                    <span>{label}</span>
+                  </label>
+                ))}
+              </div>
+              <div className="utilization-slider">
+                <div className="utilization-slider__label">
+                  <span id={`utilization-difference-${draft.id}`}>Allowed Synapse difference: {formatSignedPercentagePoints(synapseUtilizationDelta)}</span>
+                  <MetricDefinitionTooltip
+                    id={`utilization-difference-definition-${draft.id}`}
+                    definition={metricDefinitions.utilizationRateFilter}
+                    align="left"
+                  />
+                </div>
+                <input
+                  type="range"
+                  min="-100"
+                  max="100"
+                  step="1"
+                  value={synapseUtilizationDelta}
+                  aria-labelledby={`utilization-difference-${draft.id}`}
+                  onChange={(event) => updateDraft('synapseUtilizationDelta', Number(event.target.value))}
+                />
+              </div>
+              <div className="utilization-slider__scale" aria-hidden="true">
+                <span>-100 pp</span>
+                <span>0 pp</span>
+                <span>+100 pp</span>
+              </div>
+              <p className="utilization-filter__guidance">
+                {utilizationFilterGuidance(utilizationReferenceSource, synapseUtilizationDelta)}
+              </p>
+            </fieldset>
           )}
         </div>
 
@@ -692,7 +796,8 @@ function PathwayDrawer({ open, preview, bucket = [], onAddToBucket, onRemoveFrom
                     <h4>{group.code} - {group.title}</h4>
                     <div className="bucket-item-list">
                       {group.items.map((item) => {
-                        const filterStatus = bucketFilterStatus(item, preview, selectableKeySet);
+                        const filterStatus = bucketFilterStatus(item, preview, selectableKeySet, previewNodeMap);
+                        const currentPreviewNode = previewNodeMap.get(`${item.hsim}::${item.pathwayId}`);
 
                         return (
                           <article className="bucket-item" key={bucketKey(item)}>
@@ -703,6 +808,9 @@ function PathwayDrawer({ open, preview, bucket = [], onAddToBucket, onRemoveFrom
                             <div className="bucket-item__meta">
                               <Badge variant={badgeVariant(agreementTone(item.precision))}>{formatPercent(item.precision)}</Badge>
                               <Badge variant={badgeVariant(metricTone(item.confidence))}>{formatPercent(item.confidence)}</Badge>
+                              {preview?.useSynapseUtilizationRateFilter && currentPreviewNode && !currentPreviewNode.items?.length && (
+                                <UtilizationComparisonBadge node={currentPreviewNode} referenceSource={preview.utilizationReferenceSource} />
+                              )}
                               {filterStatus && <Badge variant={filterStatus.variant}>{filterStatus.label}</Badge>}
                             </div>
                             {item.childEvidence?.length > 0 && (
@@ -791,11 +899,15 @@ function PreviewNode({
       : null;
   const selected = selectableItem ? selectedKeys.has(bucketKey(selectableItem)) : false;
   const satisfiedAll = isSatisfiedAllNode(node);
+  const utilizationFilterActive = Boolean(preview?.useSynapseUtilizationRateFilter);
+  const failsUtilizationFilter = utilizationFilterActive && !node.isUtilizationQualified;
   const statusVariant = node.isExample
     ? 'neutral'
     : selectable
       ? 'positive-subtle'
       : mixedAllCandidate
+        ? 'warning'
+      : failsUtilizationFilter
         ? 'warning'
       : node.isTriggerable
         ? 'info-subtle'
@@ -808,6 +920,8 @@ function PreviewNode({
       ? 'Ready to add'
       : mixedAllCandidate
         ? 'Needs evidence'
+      : failsUtilizationFilter
+        ? 'Utilization mismatch'
       : node.isTriggerable
         ? 'Matches filter'
       : node.isPrecisionQualified
@@ -838,6 +952,9 @@ function PreviewNode({
         <div className="preview-node__metrics">
           <Badge variant={badgeVariant(agreementTone(node.precision))}>{formatPercent(node.precision)}</Badge>
           <Badge variant={badgeVariant(metricTone(node.confidence))}>{formatPercent(node.confidence)}</Badge>
+          {utilizationFilterActive && !hasChildren && (
+            <UtilizationComparisonBadge node={node} referenceSource={preview.utilizationReferenceSource} />
+          )}
           <Badge variant={statusVariant}>{statusText}</Badge>
         </div>
       </div>
@@ -885,6 +1002,9 @@ function AllEvidenceSelector({ groupKey, children, preview, selections, onChange
               <div className="bucket-item__meta">
                 <Badge variant={badgeVariant(agreementTone(child.precision))}>{formatPercent(child.precision)}</Badge>
                 <Badge variant={badgeVariant(metricTone(child.confidence))}>{formatPercent(child.confidence)}</Badge>
+                {preview?.useSynapseUtilizationRateFilter && (
+                  <UtilizationComparisonBadge node={child} referenceSource={preview.utilizationReferenceSource} />
+                )}
                 {exceptionAvailable && <Badge variant="warning">Below current filter</Badge>}
               </div>
             </div>
@@ -1681,6 +1801,9 @@ function normalizeRuleForSave(rule) {
     precisionThreshold: Number(rule.precisionThreshold ?? rule.confidenceThreshold),
     useConfidenceThreshold: Boolean(rule.useConfidenceThreshold),
     confidenceThreshold: Number(rule.confidenceThreshold),
+    useSynapseUtilizationRateFilter: Boolean(rule.useSynapseUtilizationRateFilter),
+    utilizationReferenceSource: normalizeUtilizationReferenceSource(rule.utilizationReferenceSource),
+    synapseUtilizationDelta: clampUtilizationDelta(rule.synapseUtilizationDelta),
     requireProviderAttestation: rule.requireProviderAttestation,
     minimumPathways: Number(rule.minimumPathways),
     updatedBy: 'Local prototype user'
@@ -1898,7 +2021,7 @@ function groupBucketByGuideline(bucket) {
   });
 }
 
-function bucketFilterStatus(item, preview, selectableKeySet) {
+function bucketFilterStatus(item, preview, selectableKeySet, previewNodeMap) {
   if (!preview) {
     return null;
   }
@@ -1916,6 +2039,11 @@ function bucketFilterStatus(item, preview, selectableKeySet) {
 
   if (belowPrecision || belowConfidence) {
     return { label: 'Below current filter', variant: 'warning' };
+  }
+
+  const currentPreviewNode = previewNodeMap?.get(`${item.hsim}::${item.pathwayId}`);
+  if (Boolean(preview.useSynapseUtilizationRateFilter) && currentPreviewNode && !currentPreviewNode.isUtilizationQualified) {
+    return { label: 'Outside current utilization filter', variant: 'warning' };
   }
 
   if (!selectableKeySet.has(bucketKey(item))) {
@@ -1971,6 +2099,50 @@ function formatNumber(value) {
 
 function formatPercent(value) {
   return value == null ? '-' : `${formatNumber(value)}%`;
+}
+
+function normalizeUtilizationReferenceSource(value) {
+  return Object.values(utilizationReferenceSources).includes(value)
+    ? value
+    : utilizationReferenceSources.payer;
+}
+
+function clampUtilizationDelta(value) {
+  const numericValue = Number(value ?? 0);
+  if (!Number.isFinite(numericValue)) {
+    return 0;
+  }
+
+  return Math.max(-100, Math.min(100, Math.round(numericValue)));
+}
+
+function formatSignedPercentagePoints(value) {
+  const normalizedValue = clampUtilizationDelta(value);
+  return `${normalizedValue > 0 ? '+' : ''}${normalizedValue} pp`;
+}
+
+function formatSignedMetricPercentagePoints(value) {
+  const numericValue = Number(value);
+  if (!Number.isFinite(numericValue)) {
+    return '-';
+  }
+
+  return `${numericValue > 0 ? '+' : ''}${formatNumber(numericValue)} pp`;
+}
+
+function utilizationFilterGuidance(referenceSource, delta) {
+  const sourceLabel = utilizationReferenceLabels[normalizeUtilizationReferenceSource(referenceSource)];
+  const normalizedDelta = clampUtilizationDelta(delta);
+
+  if (normalizedDelta > 0) {
+    return `Synapse may find this indication at most ${normalizedDelta} pp more often than ${sourceLabel}.`;
+  }
+
+  if (normalizedDelta < 0) {
+    return `Synapse must find this indication at least ${Math.abs(normalizedDelta)} pp less often than ${sourceLabel}.`;
+  }
+
+  return `Synapse may find this indication no more often than ${sourceLabel}.`;
 }
 
 function guidelineLabel(guideline) {

@@ -80,6 +80,9 @@ app.MapGet("/api/objective-guidelines/precision-preview", (
     decimal? precisionThreshold,
     bool? useConfidenceThreshold,
     decimal? confidenceThreshold,
+    bool? useSynapseUtilizationRateFilter,
+    string? utilizationReferenceSource,
+    decimal? synapseUtilizationDelta,
     string? metricMode,
     ObjectiveGuidelineService guidelines) =>
 {
@@ -87,6 +90,9 @@ app.MapGet("/api/objective-guidelines/precision-preview", (
         precisionThreshold ?? 90m,
         useConfidenceThreshold ?? false,
         confidenceThreshold ?? 90m,
+        useSynapseUtilizationRateFilter ?? false,
+        utilizationReferenceSource,
+        synapseUtilizationDelta ?? 0m,
         metricMode));
 });
 

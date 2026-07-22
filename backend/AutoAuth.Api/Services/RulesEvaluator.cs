@@ -199,22 +199,42 @@ public sealed class RulesEvaluator(PrototypeStore store, ObjectiveGuidelineServi
             Passed: true,
             Detail: "Precision is used to find and add candidates to the bucket. Saved bucket membership drives this evaluation.");
 
-        if (!rule.UseConfidenceThreshold)
+        if (rule.UseConfidenceThreshold)
+        {
+            var confidenceQualified = bucketPathways
+                .Where(pathway => pathway.Confidence >= rule.ConfidenceThreshold)
+                .OrderByDescending(pathway => pathway.Confidence ?? 0m)
+                .ToList();
+
+            yield return new ConditionResult(
+                Label: "Synapse confidence filter",
+                Expected: $">= {rule.ConfidenceThreshold:0.#}% confidence",
+                Actual: confidenceQualified.Count == 0 ? "No confidence-qualified pathways" : string.Join(", ", confidenceQualified.Select(pathway => $"{pathway.DisplayName} {FormatOptionalPercent(pathway.Confidence)}")),
+                Passed: true,
+                Detail: "Confidence is a secondary staging filter. It does not remove saved bucket pathways during evaluation.");
+        }
+
+        if (!rule.UseSynapseUtilizationRateFilter)
         {
             yield break;
         }
 
-        var confidenceQualified = bucketPathways
-            .Where(pathway => pathway.Confidence >= rule.ConfidenceThreshold)
-            .OrderByDescending(pathway => pathway.Confidence ?? 0m)
-            .ToList();
-
         yield return new ConditionResult(
-            Label: "Synapse confidence filter",
-            Expected: $">= {rule.ConfidenceThreshold:0.#}% confidence",
-            Actual: confidenceQualified.Count == 0 ? "No confidence-qualified pathways" : string.Join(", ", confidenceQualified.Select(pathway => $"{pathway.DisplayName} {FormatOptionalPercent(pathway.Confidence)}")),
+            Label: "Synapse vs existing utilization rate filter",
+            Expected: $"# Met (AI) - {UtilizationReferenceLabel(rule.UtilizationReferenceSource)} <= {rule.SynapseUtilizationDelta:+0.#;-0.#;0} pp",
+            Actual: "Configured for staging only",
             Passed: true,
-            Detail: "Confidence is a secondary staging filter. It does not remove saved bucket pathways during evaluation.");
+            Detail: "This comparison was used to find candidates before they were saved to the bucket. It does not remove saved bucket pathways during evaluation.");
+    }
+
+    private static string UtilizationReferenceLabel(string source)
+    {
+        return UtilizationReferenceSources.Normalize(source) switch
+        {
+            UtilizationReferenceSources.Provider => "Provider selected",
+            UtilizationReferenceSources.PayerProviderOverlap => "Payer-provider overlap",
+            _ => "Payer selected"
+        };
     }
 
     private IEnumerable<BucketPathwayEvaluation> BucketPathways(RuleDefinition rule, AuthorizationRequest request)

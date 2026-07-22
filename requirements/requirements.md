@@ -34,12 +34,19 @@ Rules support:
 - Optional guideline scope.
 - Precision / user agreement staging filter.
 - Optional Synapse confidence staging filter as a secondary narrowing signal.
+- Optional Synapse versus existing utilization-rate staging filter, with one selected reviewer reference rate.
 - Rule-specific Medical Necessity Bucket membership.
 - Mode-specific settings such as minimum pathways.
 
 Rule changes are local only. They update in-memory state in the local API and are not persisted after the backend process stops.
 
 Threshold controls are filters for finding candidate pathways. They do not place anything into the rule by themselves. A pathway becomes part of a rule only after the user deliberately adds it to that rule's Medical Necessity Bucket and saves the rule.
+
+The optional **Synapse versus existing utilization rate** filter compares `# Met (AI)` to exactly one reference rate: payer selected (default), provider selected, or payer-provider overlap. It is off by default. Its signed whole-percentage-point slider ranges from `-100` to `+100` and passes a pathway when:
+
+`AI met rate - selected utilization rate <= configured delta`
+
+For example, `+5` allows Synapse to find an indication up to 5 percentage points more often than the selected reference; `-5` requires it to find the indication at least 5 points less often. If either metric is missing, a pathway does not match while the filter is enabled. Like confidence, this is staging context only: changing it never removes a saved bucket item or changes how that item evaluates.
 
 ### 2. Simulate authorization decisions
 
@@ -60,7 +67,7 @@ When the user runs an evaluation, the app must:
 
 ### 3. Stage and manage Medical Necessity Bucket pathways
 
-The app must let a prototype user use precision and optional confidence filters to find candidate guideline pathways, then deliberately add selected candidates to a rule-specific Medical Necessity Bucket.
+The app must let a prototype user use precision, optional confidence, and optional Synapse-versus-utilization filters to find candidate guideline pathways, then deliberately add selected candidates to a rule-specific Medical Necessity Bucket.
 
 Bucket behavior:
 
@@ -85,7 +92,7 @@ A demo user must be able to understand why a request did or did not auto-approve
 - Whether the request matched the rule's member segment, service line, and guideline scope.
 - Whether saved Medical Necessity Bucket pathways matched and were met.
 - For mixed-evidence `ALL` pathways, which child evidence sources passed or failed.
-- The last precision and optional confidence staging filters as context.
+- The last precision, optional confidence, and optional Synapse-versus-utilization staging filters as context.
 - Whether the rule fired.
 - Which action the rule took if it fired.
 
@@ -190,7 +197,7 @@ A precision-threshold rule fires when at least one saved Medical Necessity Bucke
 
 For a mixed-evidence `ALL` bucket item, pathway-met status means every saved child evidence row passed.
 
-The configured precision threshold and optional Synapse confidence threshold are staging filters for finding candidates. They are stored with the rule as last-used filter settings, but they do not cause auto-approval unless the pathway has been added to the bucket.
+The configured precision threshold, optional Synapse confidence threshold, and optional Synapse-versus-utilization filter are staging filters for finding candidates. They are stored with the rule as last-used filter settings, but they do not cause auto-approval unless the pathway has been added to the bucket.
 
 ### Mixed-evidence ALL pathways
 

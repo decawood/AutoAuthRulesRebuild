@@ -13,6 +13,7 @@ The prototype has two local apps plus local data inputs:
 
 - Precision-first staging: precision filters candidate pathways, then selected pathways are added to a rule-specific Medical Necessity Bucket.
 - Secondary confidence filtering: Synapse confidence can narrow the staging view without becoming the primary automation rule.
+- Optional utilization comparison: `# Met (AI)` can be capped against payer-selected, provider-selected, or payer-provider-overlap rates before pathways are staged.
 - Bucket-based evaluation: saved bucket pathways, not slider matches alone, drive simulated auto-approval.
 - Mixed-evidence ALL pathways: required children can be explicitly covered by Synapse, provider attestation, or a saved Synapse exception.
 - Pathway threshold mode: customers can require more met saved bucket pathways than the base guideline threshold.

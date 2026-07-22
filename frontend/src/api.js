@@ -44,12 +44,18 @@ export const getPrecisionPreview = ({
   precisionThreshold,
   useConfidenceThreshold,
   confidenceThreshold,
+  useSynapseUtilizationRateFilter,
+  utilizationReferenceSource,
+  synapseUtilizationDelta,
   metricMode
 }) => {
   const params = new URLSearchParams({
     precisionThreshold: String(precisionThreshold),
     useConfidenceThreshold: String(Boolean(useConfidenceThreshold)),
     confidenceThreshold: String(confidenceThreshold),
+    useSynapseUtilizationRateFilter: String(Boolean(useSynapseUtilizationRateFilter)),
+    utilizationReferenceSource: utilizationReferenceSource || 'payer',
+    synapseUtilizationDelta: String(synapseUtilizationDelta ?? 0),
     metricMode: metricMode || 'sample'
   });
 

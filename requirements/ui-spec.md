@@ -88,6 +88,8 @@ Each rule card displays:
 - Precision threshold slider.
 - Optional **Apply Synapse confidence filter** checkbox.
 - Conditional Synapse confidence threshold slider when the confidence filter is enabled.
+- Optional **Apply Synapse versus existing utilization rate** checkbox.
+- Conditional radio group and signed slider when the utilization filter is enabled.
 - Matching pathway preview summary.
 - Conditional **Minimum pathways** input for pathway-threshold rules.
 - Member segment chips.
@@ -96,6 +98,16 @@ Each rule card displays:
 - **Save rule** button.
 
 Cards for disabled rules should visually mute, but remain editable.
+
+### Synapse Versus Existing Utilization Rate Filter
+
+The utilization filter is unchecked by default. When checked, it shows a single-select radio group under **Compare # Met (AI) with**:
+
+- **Payer selected** - default.
+- **Provider selected**.
+- **Payer-provider overlap**.
+
+It also shows a signed slider from `-100 pp` through `0 pp` to `+100 pp`, in whole-percentage-point increments, with the thumb initially centered at zero. Its label includes the same small information-tooltip pattern used for Objective Indications metrics; the tooltip explains in business terms that the setting controls how much more or less often Synapse may find an indication before it becomes a candidate, and that saved bucket pathways are unaffected. A live plain-language sentence explains the selected setting. For example, `+5 pp` says Synapse may find the indication at most 5 points more often than the selected rate; `-5 pp` says Synapse must find it at least 5 points less often.
 
 ### Matching Pathway Preview
 
@@ -106,7 +118,7 @@ Each rule card shows a compact preview summary below the threshold controls:
 - Count of pathways already in the rule's Medical Necessity Bucket.
 - **View pathways** button.
 
-Clicking **View pathways** opens a MUCL-style drawer. The drawer groups rows by guideline using `GCode - title`, while HSIM remains the backend identifier. The drawer shows nested indication criteria, precision / user agreement, Synapse confidence, and list logic such as **1 or more of the following**, **ALL of the following**, and **examples include**.
+Clicking **View pathways** opens a MUCL-style drawer. The drawer groups rows by guideline using `GCode - title`, while HSIM remains the backend identifier. The drawer shows nested indication criteria, precision / user agreement, Synapse confidence, and list logic such as **1 or more of the following**, **ALL of the following**, and **examples include**. When the utilization filter is active, eligible leaf rows also show `# Met (AI)`, the selected reviewer rate, and their signed difference; rows that fail it are labeled **Utilization mismatch**.
 
 The drawer is the staging surface for the rule:
 
@@ -118,6 +130,7 @@ The drawer is the staging surface for the rule:
 - Removing an item updates the local rule draft immediately.
 - **Save rule** persists the current draft bucket to the local API.
 - If a saved bucket item no longer matches the current filters or metric mode, keep it visible and show **Below current filter**.
+- If a saved bucket item is outside the active utilization comparison, keep it visible and show **Outside current utilization filter**.
 - Saved Synapse exceptions must be labeled deliberately as **Saved exception: below threshold** or **Previous exception: now meets threshold**.
 
 Selectable rows:
@@ -224,7 +237,7 @@ Each rule execution trace card shows:
 - Condition rows with pass/fail dots, condition label, explanation, and actual value.
 - Bucket membership and pathway-met status as the decision-driving checks.
 - Mixed-evidence `ALL` child evidence source and pass/fail state.
-- Precision and optional confidence staging filters as trace context, not as decision gates.
+- Precision, optional confidence, and optional utilization-comparison staging filters as trace context, not as decision gates.
 
 If no evaluation has been run for the selected request, show an empty state.
 

@@ -53,11 +53,15 @@ public sealed record ObjectiveGuidelinePreview(
     decimal PrecisionThreshold,
     bool UseConfidenceThreshold,
     decimal ConfidenceThreshold,
+    bool UseSynapseUtilizationRateFilter,
+    string UtilizationReferenceSource,
+    decimal SynapseUtilizationDelta,
     string MetricMode,
     int GuidelineCount,
     int PathwayCount,
     int PrecisionQualifiedCount,
     int ConfidenceQualifiedCount,
+    int UtilizationQualifiedCount,
     List<ObjectiveGuidelinePreviewGroup> Guidelines);
 
 public sealed record ObjectiveGuidelinePreviewGroup(
@@ -67,6 +71,7 @@ public sealed record ObjectiveGuidelinePreviewGroup(
     int PathwayCount,
     int PrecisionQualifiedCount,
     int ConfidenceQualifiedCount,
+    int UtilizationQualifiedCount,
     List<ObjectiveGuidelinePreviewNode> Nodes);
 
 public sealed record ObjectiveGuidelinePreviewNode(
@@ -77,9 +82,13 @@ public sealed record ObjectiveGuidelinePreviewNode(
     string? LogicText,
     decimal? Precision,
     decimal? Confidence,
+    decimal? MetAi,
+    decimal? UtilizationReferenceRate,
+    decimal? SynapseUtilizationDifference,
     bool IsExample,
     bool IsTriggerable,
     bool IsPrecisionQualified,
     bool IsConfidenceQualified,
+    bool IsUtilizationQualified,
     int PathwayCount,
     List<ObjectiveGuidelinePreviewNode> Items);

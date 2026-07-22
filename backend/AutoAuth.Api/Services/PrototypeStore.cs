@@ -70,6 +70,9 @@ public sealed class PrototypeStore
         existing.PrecisionThreshold = update.PrecisionThreshold;
         existing.UseConfidenceThreshold = update.UseConfidenceThreshold;
         existing.ConfidenceThreshold = update.ConfidenceThreshold;
+        existing.UseSynapseUtilizationRateFilter = update.UseSynapseUtilizationRateFilter;
+        existing.UtilizationReferenceSource = UtilizationReferenceSources.Normalize(update.UtilizationReferenceSource);
+        existing.SynapseUtilizationDelta = ClampSynapseUtilizationDelta(update.SynapseUtilizationDelta);
         existing.RequireProviderAttestation = update.RequireProviderAttestation;
         existing.MinimumPathways = update.MinimumPathways;
         existing.UpdatedBy = string.IsNullOrWhiteSpace(update.UpdatedBy) ? "Prototype admin" : update.UpdatedBy;
@@ -201,5 +204,10 @@ public sealed class PrototypeStore
             .GroupBy(item => $"{item.Hsim}::{item.PathwayId}", StringComparer.OrdinalIgnoreCase)
             .Select(group => group.First())
             .ToList();
+    }
+
+    private static decimal ClampSynapseUtilizationDelta(decimal value)
+    {
+        return Math.Round(Math.Clamp(value, -100m, 100m), 0, MidpointRounding.AwayFromZero);
     }
 }

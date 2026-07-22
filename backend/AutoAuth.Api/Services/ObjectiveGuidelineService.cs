@@ -49,13 +49,28 @@ public sealed class ObjectiveGuidelineService
         decimal precisionThreshold,
         bool useConfidenceThreshold,
         decimal confidenceThreshold,
+        bool useSynapseUtilizationRateFilter,
+        string? utilizationReferenceSource,
+        decimal synapseUtilizationDelta,
         string? metricMode = null)
     {
         var performanceRows = LoadPerformanceRows();
         var resolvedMode = ResolveMetricMode(metricMode);
+        var resolvedUtilizationReferenceSource = UtilizationReferenceSources.Normalize(utilizationReferenceSource);
+        var resolvedSynapseUtilizationDelta = Math.Round(
+            ClampPercent(synapseUtilizationDelta, -100m, 100m),
+            0,
+            MidpointRounding.AwayFromZero);
         var groups = GetGuidelineFiles()
             .Select(file => BuildGuideline(file, performanceRows, resolvedMode))
-            .Select(detail => BuildPreviewGroup(detail, precisionThreshold, useConfidenceThreshold, confidenceThreshold))
+            .Select(detail => BuildPreviewGroup(
+                detail,
+                precisionThreshold,
+                useConfidenceThreshold,
+                confidenceThreshold,
+                useSynapseUtilizationRateFilter,
+                resolvedUtilizationReferenceSource,
+                resolvedSynapseUtilizationDelta))
             .Where(group => group.PathwayCount > 0)
             .OrderBy(group => group.Title)
             .ThenBy(group => group.Code)
@@ -65,11 +80,15 @@ public sealed class ObjectiveGuidelineService
             PrecisionThreshold: precisionThreshold,
             UseConfidenceThreshold: useConfidenceThreshold,
             ConfidenceThreshold: confidenceThreshold,
+            UseSynapseUtilizationRateFilter: useSynapseUtilizationRateFilter,
+            UtilizationReferenceSource: resolvedUtilizationReferenceSource,
+            SynapseUtilizationDelta: resolvedSynapseUtilizationDelta,
             MetricMode: MetricModeName(resolvedMode),
             GuidelineCount: groups.Count,
             PathwayCount: groups.Sum(group => group.PathwayCount),
             PrecisionQualifiedCount: groups.Sum(group => group.PrecisionQualifiedCount),
             ConfidenceQualifiedCount: groups.Sum(group => group.ConfidenceQualifiedCount),
+            UtilizationQualifiedCount: groups.Sum(group => group.UtilizationQualifiedCount),
             Guidelines: groups);
     }
 
@@ -396,10 +415,20 @@ public sealed class ObjectiveGuidelineService
         ObjectiveGuidelineDetail detail,
         decimal precisionThreshold,
         bool useConfidenceThreshold,
-        decimal confidenceThreshold)
+        decimal confidenceThreshold,
+        bool useSynapseUtilizationRateFilter,
+        string utilizationReferenceSource,
+        decimal synapseUtilizationDelta)
     {
         var evaluations = detail.Nodes
-            .Select(node => EvaluatePreviewNode(node, precisionThreshold, useConfidenceThreshold, confidenceThreshold))
+            .Select(node => EvaluatePreviewNode(
+                node,
+                precisionThreshold,
+                useConfidenceThreshold,
+                confidenceThreshold,
+                useSynapseUtilizationRateFilter,
+                utilizationReferenceSource,
+                synapseUtilizationDelta))
             .ToList();
         var nodes = evaluations
             .Select(evaluation => evaluation.Node)
@@ -414,6 +443,7 @@ public sealed class ObjectiveGuidelineService
             PathwayCount: evaluations.Sum(evaluation => evaluation.PathwayCount),
             PrecisionQualifiedCount: evaluations.Sum(evaluation => evaluation.PrecisionQualifiedCount),
             ConfidenceQualifiedCount: evaluations.Sum(evaluation => evaluation.ConfidenceQualifiedCount),
+            UtilizationQualifiedCount: evaluations.Sum(evaluation => evaluation.UtilizationQualifiedCount),
             Nodes: nodes);
     }
 
@@ -422,37 +452,69 @@ public sealed class ObjectiveGuidelineService
         decimal precisionThreshold,
         bool useConfidenceThreshold,
         decimal confidenceThreshold,
+        bool useSynapseUtilizationRateFilter,
+        string utilizationReferenceSource,
+        decimal synapseUtilizationDelta,
         bool forceInclude = false)
     {
         var precision = node.Metrics?.AgreementAgree;
         var confidence = node.Metrics?.Confidence;
         var precisionQualified = precision is not null && precision >= precisionThreshold;
         var confidenceQualified = !useConfidenceThreshold || (confidence is not null && confidence >= confidenceThreshold);
+        var utilizationComparison = EvaluateUtilizationComparison(
+            node.Metrics,
+            useSynapseUtilizationRateFilter,
+            utilizationReferenceSource,
+            synapseUtilizationDelta);
         var isExample = IsExampleLogic(node);
 
         if (node.Items.Count == 0)
         {
-            var triggerable = !isExample && precisionQualified && confidenceQualified;
+            var triggerable = !isExample && precisionQualified && confidenceQualified && utilizationComparison.IsQualified;
             var included = forceInclude || triggerable || precisionQualified;
             return new PreviewEvaluation(
                 Node: included
-                    ? ToPreviewNode(node, precisionQualified, confidenceQualified, isExample, triggerable, triggerable ? 1 : 0, [])
+                    ? ToPreviewNode(
+                        node,
+                        precisionQualified,
+                        confidenceQualified,
+                        utilizationComparison,
+                        isExample,
+                        triggerable,
+                        triggerable ? 1 : 0,
+                        [])
                     : null,
                 GatePassed: triggerable,
                 PathwayCount: triggerable ? 1 : 0,
                 PrecisionQualifiedCount: precisionQualified ? 1 : 0,
-                ConfidenceQualifiedCount: precisionQualified && confidenceQualified ? 1 : 0);
+                ConfidenceQualifiedCount: precisionQualified && confidenceQualified ? 1 : 0,
+                UtilizationQualifiedCount: precisionQualified && confidenceQualified && utilizationComparison.IsQualified ? 1 : 0);
         }
 
         var childEvaluations = node.Items
-            .Select(child => EvaluatePreviewNode(child, precisionThreshold, useConfidenceThreshold, confidenceThreshold))
+            .Select(child => EvaluatePreviewNode(
+                child,
+                precisionThreshold,
+                useConfidenceThreshold,
+                confidenceThreshold,
+                useSynapseUtilizationRateFilter,
+                utilizationReferenceSource,
+                synapseUtilizationDelta))
             .ToList();
         var anyChildRelevant = childEvaluations.Any(evaluation => evaluation.Node is not null || evaluation.GatePassed);
 
         if (IsAllLogic(node) && anyChildRelevant)
         {
             childEvaluations = node.Items
-                .Select(child => EvaluatePreviewNode(child, precisionThreshold, useConfidenceThreshold, confidenceThreshold, forceInclude: !IsExampleLogic(child)))
+                .Select(child => EvaluatePreviewNode(
+                    child,
+                    precisionThreshold,
+                    useConfidenceThreshold,
+                    confidenceThreshold,
+                    useSynapseUtilizationRateFilter,
+                    utilizationReferenceSource,
+                    synapseUtilizationDelta,
+                    forceInclude: !IsExampleLogic(child)))
                 .ToList();
         }
 
@@ -468,6 +530,10 @@ public sealed class ObjectiveGuidelineService
             .ToList();
         var nodePrecisionQualified = precisionQualified || childEvaluations.Any(evaluation => evaluation.PrecisionQualifiedCount > 0);
         var nodeConfidenceQualified = !useConfidenceThreshold || childEvaluations.Any(evaluation => evaluation.ConfidenceQualifiedCount > 0);
+        var nodeUtilizationQualified = !useSynapseUtilizationRateFilter
+            || (IsAllLogic(node)
+                ? requiredChildEvaluations.Count > 0 && requiredChildEvaluations.All(evaluation => evaluation.Node?.IsUtilizationQualified == true)
+                : childEvaluations.Any(evaluation => evaluation.Node?.IsUtilizationQualified == true));
         var gatePassed = false;
         var pathwayCount = 0;
 
@@ -490,18 +556,28 @@ public sealed class ObjectiveGuidelineService
         var includeNode = forceInclude || childNodes.Count > 0 || gatePassed || precisionQualified;
         return new PreviewEvaluation(
             Node: includeNode
-                ? ToPreviewNode(node, nodePrecisionQualified, nodeConfidenceQualified, isExample, gatePassed, pathwayCount, childNodes)
+                ? ToPreviewNode(
+                    node,
+                    nodePrecisionQualified,
+                    nodeConfidenceQualified,
+                    utilizationComparison with { IsQualified = nodeUtilizationQualified },
+                    isExample,
+                    gatePassed,
+                    pathwayCount,
+                    childNodes)
                 : null,
             GatePassed: gatePassed,
             PathwayCount: pathwayCount,
             PrecisionQualifiedCount: (precisionQualified ? 1 : 0) + childEvaluations.Sum(evaluation => evaluation.PrecisionQualifiedCount),
-            ConfidenceQualifiedCount: (precisionQualified && confidenceQualified ? 1 : 0) + childEvaluations.Sum(evaluation => evaluation.ConfidenceQualifiedCount));
+            ConfidenceQualifiedCount: (precisionQualified && confidenceQualified ? 1 : 0) + childEvaluations.Sum(evaluation => evaluation.ConfidenceQualifiedCount),
+            UtilizationQualifiedCount: (precisionQualified && confidenceQualified && utilizationComparison.IsQualified ? 1 : 0) + childEvaluations.Sum(evaluation => evaluation.UtilizationQualifiedCount));
     }
 
     private static ObjectiveGuidelinePreviewNode ToPreviewNode(
         ObjectiveGuidelineNode node,
         bool precisionQualified,
         bool confidenceQualified,
+        UtilizationComparison utilizationComparison,
         bool isExample,
         bool triggerable,
         int pathwayCount,
@@ -515,12 +591,38 @@ public sealed class ObjectiveGuidelineService
             LogicText: node.LogicText,
             Precision: node.Metrics?.AgreementAgree,
             Confidence: node.Metrics?.Confidence,
+            MetAi: utilizationComparison.MetAi,
+            UtilizationReferenceRate: utilizationComparison.ReferenceRate,
+            SynapseUtilizationDifference: utilizationComparison.Difference,
             IsExample: isExample,
             IsTriggerable: triggerable,
             IsPrecisionQualified: precisionQualified,
             IsConfidenceQualified: confidenceQualified,
+            IsUtilizationQualified: utilizationComparison.IsQualified,
             PathwayCount: pathwayCount,
             Items: items);
+    }
+
+    private static UtilizationComparison EvaluateUtilizationComparison(
+        ObjectiveGuidelineMetricSet? metrics,
+        bool useSynapseUtilizationRateFilter,
+        string utilizationReferenceSource,
+        decimal synapseUtilizationDelta)
+    {
+        var metAi = metrics?.MetAi;
+        var referenceRate = utilizationReferenceSource switch
+        {
+            UtilizationReferenceSources.Provider => metrics?.ProviderSelectionRate,
+            UtilizationReferenceSources.PayerProviderOverlap => metrics?.ProviderAndPayerSelectionRate,
+            _ => metrics?.PayerSelectionRate
+        };
+        var difference = metAi is not null && referenceRate is not null
+            ? (decimal?)Math.Round(metAi.Value - referenceRate.Value, 1)
+            : null;
+        var isQualified = !useSynapseUtilizationRateFilter
+            || (difference is not null && difference <= synapseUtilizationDelta);
+
+        return new UtilizationComparison(metAi, referenceRate, difference, isQualified);
     }
 
     private static ObjectiveGuidelineMetricSet? AggregatePerformanceMetrics(IEnumerable<PerformanceRow> rows)
@@ -1067,7 +1169,14 @@ public sealed class ObjectiveGuidelineService
         bool GatePassed,
         int PathwayCount,
         int PrecisionQualifiedCount,
-        int ConfidenceQualifiedCount);
+        int ConfidenceQualifiedCount,
+        int UtilizationQualifiedCount);
+
+    private sealed record UtilizationComparison(
+        decimal? MetAi,
+        decimal? ReferenceRate,
+        decimal? Difference,
+        bool IsQualified);
 
     private sealed record PerformanceRow(
         string Uid,
